@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search, Filter, SortDesc, Bell } from 'lucide-react';
+import { Search, Filter, SortDesc, Bell, Zap } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -12,6 +12,7 @@ interface LeadsPriorityListProps {
   onContact: (leadId: string, method: 'phone' | 'email' | 'text') => void;
   onViewDetails: (leadId: string) => void;
   onToggleNotifications: () => void;
+  onTriggerToast: () => void;
   hasNotifications?: boolean;
 }
 
@@ -23,6 +24,7 @@ export function LeadsPriorityList({
   onContact, 
   onViewDetails, 
   onToggleNotifications,
+  onTriggerToast,
   hasNotifications = false 
 }: LeadsPriorityListProps) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -101,6 +103,24 @@ export function LeadsPriorityList({
 
   return (
     <div className="space-y-6">
+      {/* Monthly Goals */}
+      <div className="bg-gradient-primary/10 border border-primary/20 rounded-lg p-4">
+        <div className="grid grid-cols-3 gap-4 text-center">
+          <div>
+            <p className="text-2xl font-bold text-primary">47</p>
+            <p className="text-xs text-primary/70">Leads This Month</p>
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-primary">60</p>
+            <p className="text-xs text-primary/70">Monthly Goal</p>
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-primary">78%</p>
+            <p className="text-xs text-primary/70">Goal Progress</p>
+          </div>
+        </div>
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -109,20 +129,30 @@ export function LeadsPriorityList({
             Prioritized by AI scoring algorithm • {filteredAndSortedLeads.length} of {leads.length} leads
           </p>
         </div>
-        <Button 
-          variant="outline" 
-          className={cn(
-            'relative gap-2',
-            hasNotifications && 'border-notification-bg text-notification-bg'
-          )}
-          onClick={onToggleNotifications}
-        >
-          <Bell className="h-4 w-4" />
-          Notifications
-          {hasNotifications && (
-            <div className="absolute -top-1 -right-1 h-3 w-3 bg-hot-lead rounded-full animate-pulse" />
-          )}
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            className="gap-2"
+            onClick={onTriggerToast}
+          >
+            <Zap className="h-4 w-4" />
+            Trigger Toast
+          </Button>
+          <Button 
+            variant="outline" 
+            className={cn(
+              'relative gap-2',
+              hasNotifications && 'border-notification-bg text-notification-bg'
+            )}
+            onClick={onToggleNotifications}
+          >
+            <Bell className="h-4 w-4" />
+            Notifications
+            {hasNotifications && (
+              <div className="absolute -top-1 -right-1 h-3 w-3 bg-hot-lead rounded-full animate-pulse" />
+            )}
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}

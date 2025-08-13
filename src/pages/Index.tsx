@@ -139,6 +139,19 @@ const Index = () => {
     setIsNotificationPanelOpen(!isNotificationPanelOpen);
   };
 
+  const handleTriggerToast = () => {
+    const hotLeads = leads.filter(lead => lead.priority === 'hot');
+    if (hotLeads.length > 0) {
+      const randomLead = hotLeads[Math.floor(Math.random() * hotLeads.length)];
+      setToastData({
+        leadName: randomLead.name,
+        message: 'Customer just viewed vehicle details online',
+        suggestedResponse: `Hi ${randomLead.name}, I noticed you were looking at the ${randomLead.vehicle}. I'm here to answer any questions and can schedule a test drive whenever convenient for you!`
+      });
+      setShowToast(true);
+    }
+  };
+
   const handleSendResponse = (message: string) => {
     toast({
       title: 'Message Sent',
@@ -168,6 +181,7 @@ const Index = () => {
           onContact={handleContact}
           onViewDetails={handleViewDetails}
           onToggleNotifications={handleToggleNotifications}
+          onTriggerToast={handleTriggerToast}
           hasNotifications={isNotificationPanelOpen || showToast}
         />
       </div>
