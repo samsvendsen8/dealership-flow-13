@@ -1,0 +1,250 @@
+import { useState, useMemo } from 'react';
+import { Search, Filter, SortDesc, Bell } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { LeadCard, type Lead } from './LeadCard';
+import { cn } from '@/lib/utils';
+
+interface LeadsPriorityListProps {
+  leads: Lead[];
+  onContact: (leadId: string, method: 'phone' | 'email' | 'text') => void;
+  onViewDetails: (leadId: string) => void;
+  onToggleNotifications: () => void;
+  hasNotifications?: boolean;
+}
+
+type SortOption = 'priority' | 'value' | 'activity' | 'status';
+type FilterOption = 'all' | 'hot' | 'warm' | 'cold' | 'new' | 'contacted';
+
+export function LeadsPriorityList({ 
+  leads, 
+  onContact, 
+  onViewDetails, 
+  onToggleNotifications,
+  hasNotifications = false 
+}: LeadsPriorityListProps) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState<SortOption>('priority');
+  const [filterBy, setFilterBy] = useState<FilterOption>('all');
+
+  // Priority scoring function
+  const getPriorityScore = (lead: Lead): number => {
+    let score = 0;
+    
+    // Priority base score
+    if (lead.priority === 'hot') score += 100;
+    else if (lead.priority === 'warm') score += 50;
+    else score += 10;
+    
+    // Value multiplier
+    score += (lead.value / 1000) * 2;
+    
+    // Time on lot bonus
+    if (lead.timeOnLot) score += 50;
+    
+    // Recent activity bonus
+    if (lead.lastActivity.includes('min')) score += 30;
+    else if (lead.lastActivity.includes('hour')) score += 20;
+    
+    // Status adjustment
+    if (lead.status === 'new') score += 25;
+    else if (lead.status === 'contacted') score += 15;
+    
+    return score;
+  };
+
+  const filteredAndSortedLeads = useMemo(() => {
+    let filtered = leads.filter(lead => {
+      const matchesSearch = lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           lead.vehicle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           lead.email.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      if (!matchesSearch) return false;
+      
+      if (filterBy === 'all') return true;
+      if (['hot', 'warm', 'cold'].includes(filterBy)) {
+        return lead.priority === filterBy;
+      }
+      return lead.status === filterBy;
+    });
+
+    // Sort leads
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'priority':
+          return getPriorityScore(b) - getPriorityScore(a);
+        case 'value':
+          return b.value - a.value;
+        case 'activity':
+          // Simple time-based sorting (this would be more sophisticated in a real app)
+          return a.lastActivity.localeCompare(b.lastActivity);
+        case 'status':
+          const statusOrder = { new: 0, contacted: 1, qualified: 2, closed: 3 };
+          return statusOrder[a.status] - statusOrder[b.status];
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [leads, searchTerm, sortBy, filterBy]);
+
+  const priorityStats = useMemo(() => {
+    const stats = { hot: 0, warm: 0, cold: 0, total: leads.length };
+    leads.forEach(lead => {
+      stats[lead.priority]++;
+    });
+    return stats;
+  }, [leads]);
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Lead Priority Dashboard</h1>
+          <p className="text-muted-foreground">
+            Prioritized by AI scoring algorithm • {filteredAndSortedLeads.length} of {leads.length} leads
+          </p>
+        </div>
+        <Button 
+          variant="outline" 
+          className={cn(
+            'relative gap-2',
+            hasNotifications && 'border-notification-bg text-notification-bg'
+          )}
+          onClick={onToggleNotifications}
+        >
+          <Bell className="h-4 w-4" />
+          Notifications
+          {hasNotifications && (
+            <div className="absolute -top-1 -right-1 h-3 w-3 bg-hot-lead rounded-full animate-pulse" />
+          )}
+        </Button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-4 gap-4">
+        <div className="bg-card border border-border rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-2xl font-bold text-foreground">{priorityStats.hot}</p>
+              <p className="text-sm text-muted-foreground">Hot Leads</p>
+            </div>
+            <div className="h-8 w-8 bg-hot-lead/10 rounded-full flex items-center justify-center">
+              🔥
+            </div>
+          </div>
+        </div>
+        <div className="bg-card border border-border rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-2xl font-bold text-foreground">{priorityStats.warm}</p>
+              <p className="text-sm text-muted-foreground">Warm Leads</p>
+            </div>
+            <div className="h-8 w-8 bg-warm-lead/10 rounded-full flex items-center justify-center">
+              ⚡
+            </div>
+          </div>
+        </div>
+        <div className="bg-card border border-border rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-2xl font-bold text-foreground">{priorityStats.cold}</p>
+              <p className="text-sm text-muted-foreground">Cold Leads</p>
+            </div>
+            <div className="h-8 w-8 bg-cold-lead/10 rounded-full flex items-center justify-center">
+              ❄️
+            </div>
+          </div>
+        </div>
+        <div className="bg-card border border-border rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-2xl font-bold text-foreground">{priorityStats.total}</p>
+              <p className="text-sm text-muted-foreground">Total Leads</p>
+            </div>
+            <div className="h-8 w-8 bg-primary/10 rounded-full flex items-center justify-center">
+              📋
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filters and Search */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search leads by name, vehicle, or email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
+          <SelectTrigger className="w-48">
+            <SortDesc className="h-4 w-4 mr-2" />
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="priority">Sort by Priority</SelectItem>
+            <SelectItem value="value">Sort by Value</SelectItem>
+            <SelectItem value="activity">Sort by Activity</SelectItem>
+            <SelectItem value="status">Sort by Status</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={filterBy} onValueChange={(value: FilterOption) => setFilterBy(value)}>
+          <SelectTrigger className="w-40">
+            <Filter className="h-4 w-4 mr-2" />
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Leads</SelectItem>
+            <SelectItem value="hot">Hot Priority</SelectItem>
+            <SelectItem value="warm">Warm Priority</SelectItem>
+            <SelectItem value="cold">Cold Priority</SelectItem>
+            <SelectItem value="new">New Status</SelectItem>
+            <SelectItem value="contacted">Contacted</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Priority Algorithm Info */}
+      <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+        <h3 className="font-semibold text-primary mb-2">🤖 AI Priority Scoring</h3>
+        <p className="text-sm text-primary/80">
+          Leads are automatically ranked using: Priority level (Hot/Warm/Cold) + Deal value + Time on lot + 
+          Recent activity + Lead status. Higher scores appear first for maximum efficiency.
+        </p>
+      </div>
+
+      {/* Leads List */}
+      <div className="grid gap-4">
+        {filteredAndSortedLeads.map((lead, index) => (
+          <div key={lead.id} className="relative">
+            {index === 0 && lead.priority === 'hot' && (
+              <Badge className="absolute -top-2 -left-2 z-10 bg-hot-lead text-white animate-pulse">
+                🚨 TOP PRIORITY
+              </Badge>
+            )}
+            <LeadCard
+              lead={lead}
+              onContact={onContact}
+              onViewDetails={onViewDetails}
+            />
+          </div>
+        ))}
+        
+        {filteredAndSortedLeads.length === 0 && (
+          <div className="text-center py-12 text-muted-foreground">
+            <p className="text-lg mb-2">No leads found</p>
+            <p className="text-sm">Try adjusting your search or filter criteria</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

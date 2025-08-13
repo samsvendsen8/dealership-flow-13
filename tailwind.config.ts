@@ -52,6 +52,22 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// CRM-specific colors
+				'hot-lead': 'hsl(var(--hot-lead))',
+				'warm-lead': 'hsl(var(--warm-lead))',
+				'cold-lead': 'hsl(var(--cold-lead))',
+				success: 'hsl(var(--success))',
+				warning: 'hsl(var(--warning))',
+				
+				// Status colors
+				'status-new': 'hsl(var(--status-new))',
+				'status-contacted': 'hsl(var(--status-contacted))',
+				'status-qualified': 'hsl(var(--status-qualified))',
+				'status-closed': 'hsl(var(--status-closed))',
+				
+				// Notification colors
+				'notification-bg': 'hsl(var(--notification-bg))',
+				'notification-fg': 'hsl(var(--notification-fg))',
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -84,11 +100,51 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				fadeIn: {
+					from: { opacity: '0' },
+					to: { opacity: '1' }
+				},
+				slideInRight: {
+					from: { 
+						transform: 'translateX(100%)',
+						opacity: '0'
+					},
+					to: { 
+						transform: 'translateX(0)',
+						opacity: '1'
+					}
+				},
+				pulseGlow: {
+					'0%, 100%': { 
+						opacity: '1',
+						transform: 'scale(1)'
+					},
+					'50%': { 
+						opacity: '0.8',
+						transform: 'scale(1.02)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fadeIn 0.3s ease-out',
+				'slide-in-right': 'slideInRight 0.3s ease-out',
+				'pulse-glow': 'pulseGlow 2s ease-in-out infinite'
+			},
+			backgroundImage: {
+				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-hot': 'var(--gradient-hot)',
+				'gradient-warm': 'var(--gradient-warm)'
+			},
+			boxShadow: {
+				'soft': 'var(--shadow-soft)',
+				'medium': 'var(--shadow-medium)',
+				'strong': 'var(--shadow-strong)'
+			},
+			transitionTimingFunction: {
+				'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)'
 			}
 		}
 	},
