@@ -235,33 +235,26 @@ const Index = () => {
     return () => clearInterval(interval);
   }, [leads]);
 
+  const [contactMethod, setContactMethod] = useState<'phone' | 'email' | 'text' | undefined>();
+  const [aiSuggestedResponse, setAiSuggestedResponse] = useState<string>('');
+
   const handleContact = (leadId: string, method: 'phone' | 'email' | 'text') => {
     const lead = leads.find(l => l.id === leadId);
     if (lead) {
-      // Update lead journey stage when contacting
-      setLeads(prevLeads => 
-        prevLeads.map(l => {
-          if (l.id === leadId) {
-            const stages: Lead['journeyStage'][] = ['inquiry', 'engaged', 'visit', 'test-drive', 'proposal', 'financing', 'sold', 'delivered'];
-            const currentIndex = stages.indexOf(l.journeyStage);
-            const nextStage = currentIndex < stages.length - 1 ? stages[currentIndex + 1] : l.journeyStage;
-            
-            return {
-              ...l,
-              journeyStage: nextStage,
-              stageProgress: Math.min(100, l.stageProgress + 15),
-              lastActivity: `${method} contact made`,
-              status: 'contacted' as const
-            };
-          }
-          return l;
-        })
-      );
-      
-      toast({
-        title: `Contacting ${lead.name}`,
-        description: `Initiating ${method} contact - Journey stage updated!`,
-      });
+      // Generate AI suggested response based on contact method and lead data
+      const generateAiResponse = (contactMethod: string, leadData: Lead) => {
+        const responses = {
+          phone: `Hi ${leadData.name}, this is [Your Name] from [Dealership]. I wanted to personally reach out about your interest in the ${leadData.vehicle}. I have some great financing options and would love to schedule a time for you to see the vehicle. When would be convenient for a quick call?`,
+          email: `Dear ${leadData.name},\n\nThank you for your interest in the ${leadData.vehicle}! I wanted to reach out personally to answer any questions you might have.\n\nBased on your inquiry, I believe this vehicle would be perfect for your needs. I'd be happy to:\n• Arrange a test drive at your convenience\n• Discuss financing options\n• Provide detailed specifications\n\nWhen would be a good time to connect?\n\nBest regards,\n[Your Name]`,
+          text: `Hi ${leadData.name}! Thanks for your interest in the ${leadData.vehicle}. I'm here to help with any questions and can arrange a test drive whenever works for you. What's the best time to call? - [Your Name] at [Dealership]`
+        };
+        return responses[contactMethod as keyof typeof responses];
+      };
+
+      setContactMethod(method);
+      setAiSuggestedResponse(generateAiResponse(method, lead));
+      setSelectedLead(lead);
+      setIsNotificationPanelOpen(true);
     }
   };
 
@@ -347,9 +340,44 @@ const Index = () => {
 
       <NotificationPanel
         isOpen={isNotificationPanelOpen}
-        onClose={() => setIsNotificationPanelOpen(false)}
+        onClose={() => {
+          setIsNotificationPanelOpen(false);
+          setContactMethod(undefined);
+          setAiSuggestedResponse('');
+        }}
         selectedLead={selectedLead}
-        onContact={handleContact}
+        onContact={(leadId, method) => {
+          // Update lead journey stage when actually sending the contact
+          setLeads(prevLeads => 
+            prevLeads.map(l => {
+              if (l.id === leadId) {
+                const stages: Lead['journeyStage'][] = ['inquiry', 'engaged', 'visit', 'test-drive', 'proposal', 'financing', 'sold', 'delivered'];
+                const currentIndex = stages.indexOf(l.journeyStage);
+                const nextStage = currentIndex < stages.length - 1 ? stages[currentIndex + 1] : l.journeyStage;
+                
+                return {
+                  ...l,
+                  journeyStage: nextStage,
+                  stageProgress: Math.min(100, l.stageProgress + 15),
+                  lastActivity: `${method} contact sent`,
+                  status: 'contacted' as const
+                };
+              }
+              return l;
+            })
+          );
+          
+          toast({
+            title: `Message Sent`,
+            description: `${method} sent to ${selectedLead?.name} - Journey stage updated!`,
+          });
+          
+          setIsNotificationPanelOpen(false);
+          setContactMethod(undefined);
+          setAiSuggestedResponse('');
+        }}
+        contactMethod={contactMethod}
+        aiSuggestedResponse={aiSuggestedResponse}
       />
 
       <ToastNotification

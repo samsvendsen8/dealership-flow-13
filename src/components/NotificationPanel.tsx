@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Phone, Mail, MessageCircle, User, Calendar, DollarSign, Car } from 'lucide-react';
+import { X, Phone, Mail, MessageCircle, User, Calendar, DollarSign, Car, Send, Edit3 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +13,8 @@ interface NotificationPanelProps {
   onClose: () => void;
   selectedLead?: Lead;
   onContact: (leadId: string, method: 'phone' | 'email' | 'text') => void;
+  contactMethod?: 'phone' | 'email' | 'text';
+  aiSuggestedResponse?: string;
 }
 
 const statusStyles = {
@@ -22,8 +24,14 @@ const statusStyles = {
   closed: 'bg-status-closed text-white'
 };
 
-export function NotificationPanel({ isOpen, onClose, selectedLead, onContact }: NotificationPanelProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'history' | 'notes'>('overview');
+export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, contactMethod, aiSuggestedResponse }: NotificationPanelProps) {
+  const [activeTab, setActiveTab] = useState<'overview' | 'history' | 'notes' | 'response'>('response');
+  const [responseText, setResponseText] = useState('');
+
+  // Update response text when AI suggestion changes
+  if (aiSuggestedResponse && responseText !== aiSuggestedResponse) {
+    setResponseText(aiSuggestedResponse);
+  }
 
   if (!isOpen) return null;
 
@@ -112,7 +120,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact }: 
 
             {/* Tabs */}
             <div className="flex space-x-1 bg-muted p-1 rounded-lg">
-              {['overview', 'history', 'notes'].map((tab) => (
+              {['response', 'overview', 'history', 'notes'].map((tab) => (
                 <button
                   key={tab}
                   className={cn(
@@ -131,6 +139,57 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact }: 
             {/* Tab Content */}
             <Card>
               <CardContent className="pt-6">
+                {activeTab === 'response' && contactMethod && (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 mb-4">
+                      {contactMethod === 'phone' && <Phone className="h-5 w-5 text-primary" />}
+                      {contactMethod === 'email' && <Mail className="h-5 w-5 text-primary" />}
+                      {contactMethod === 'text' && <MessageCircle className="h-5 w-5 text-primary" />}
+                      <h4 className="font-medium">
+                        {contactMethod === 'phone' && 'Phone Call Script'}
+                        {contactMethod === 'email' && 'Email Response'}
+                        {contactMethod === 'text' && 'Text Message'}
+                      </h4>
+                    </div>
+                    
+                    <div className="bg-primary/5 border border-primary/20 rounded-md p-3 mb-4">
+                      <p className="text-xs font-medium text-primary mb-2">
+                        🤖 AI Suggested Response:
+                      </p>
+                      <p className="text-sm text-foreground">{aiSuggestedResponse}</p>
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Your Response:</label>
+                      <textarea
+                        value={responseText}
+                        onChange={(e) => setResponseText(e.target.value)}
+                        className="w-full h-32 p-3 border border-input rounded-md text-sm resize-none"
+                        placeholder={`Type your ${contactMethod} message here...`}
+                      />
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button 
+                        className="flex-1 gap-2 bg-gradient-primary hover:opacity-90"
+                        onClick={() => {
+                          onContact(selectedLead.id, contactMethod);
+                          setResponseText('');
+                        }}
+                      >
+                        <Send className="h-4 w-4" />
+                        Send {contactMethod === 'phone' ? 'Call' : contactMethod === 'email' ? 'Email' : 'Text'}
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        onClick={() => setResponseText(aiSuggestedResponse || '')}
+                      >
+                        <Edit3 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+                
                 {activeTab === 'overview' && (
                   <div className="space-y-4">
                     <div>
