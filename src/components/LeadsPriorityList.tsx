@@ -47,13 +47,28 @@ export function LeadsPriorityList({
     // Time on lot bonus
     if (lead.timeOnLot) score += 50;
     
-    // Recent activity bonus
-    if (lead.lastActivity.includes('min')) score += 30;
-    else if (lead.lastActivity.includes('hour')) score += 20;
+    // Recent activity logic - MAJOR CHANGE HERE
+    if (lead.lastActivity.includes('Just replied') || lead.lastActivity.includes('contact sent') || lead.lastActivity.includes('contact made')) {
+      // Recently contacted leads get LOWER priority since we're waiting for their response
+      score -= 75; // Significant penalty for recently contacted leads
+    } else if (lead.lastActivity.includes('Just now')) {
+      // New activity from customer gets HIGH priority
+      score += 40;
+    } else if (lead.lastActivity.includes('min')) {
+      score += 30;
+    } else if (lead.lastActivity.includes('hour')) {
+      score += 20;
+    } else if (lead.lastActivity.includes('day')) {
+      // Leads not contacted for a day get higher priority
+      score += 25;
+    }
     
-    // Status adjustment
+    // Status adjustment - but reduce bonus for contacted leads
     if (lead.status === 'new') score += 25;
-    else if (lead.status === 'contacted') score += 15;
+    else if (lead.status === 'contacted') {
+      // Lower bonus for contacted leads since action has been taken
+      score += 5; // Reduced from 15
+    }
     
     return score;
   };
@@ -252,8 +267,9 @@ export function LeadsPriorityList({
       <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
         <h3 className="font-semibold text-primary mb-2">🤖 AI Priority Scoring</h3>
         <p className="text-sm text-primary/80">
-          Leads are automatically ranked using: Priority level (Hot/Warm/Cold) + Deal value + Time on lot + 
-          Recent activity + Lead status. Higher scores appear first for maximum efficiency.
+          Leads are automatically ranked using: Priority level + Deal value + Time on lot + Recent activity. 
+          <strong>Recently contacted leads move down</strong> since you're waiting for their response, 
+          while new customer activity gets top priority.
         </p>
       </div>
 
