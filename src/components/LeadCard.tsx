@@ -114,44 +114,54 @@ export function LeadCard({ lead, onContact, onViewDetails }: LeadCardProps) {
             <div className="p-1 rounded-full bg-gradient-primary text-white">
               <MessageCircle className="h-3 w-3" />
             </div>
-            <h4 className="font-medium text-primary text-sm">AI Analysis</h4>
+            <h4 className="font-medium text-primary text-sm">AI Journey Analysis</h4>
           </div>
           
           <div className="space-y-2 text-xs">
             <p className="text-foreground">
-              <strong>Status:</strong> {
-                lead.journeyStage === 'inquiry' ? 'Initial inquiry stage' :
-                lead.journeyStage === 'engaged' ? 'Active engagement' :
-                lead.journeyStage === 'visit' ? 'Showroom visit completed' :
-                lead.journeyStage === 'test-drive' ? 'Test drive completed' :
-                'Progressing through pipeline'
-              }
+              <strong>Overview:</strong> {lead.name} has progressed {
+                lead.journeyStage === 'inquiry' ? 'through initial inquiry stage' :
+                lead.journeyStage === 'engaged' ? 'to active engagement with positive responses' :
+                lead.journeyStage === 'visit' ? 'to showroom visit with strong buying signals' :
+                lead.journeyStage === 'test-drive' ? 'to test drive completion with purchase intent' :
+                'through the sales pipeline'
+              }.
             </p>
             
             {/* Notable Patterns */}
             {lead.journeyStage === 'engaged' && (
-              <div className="bg-success/10 border border-success/20 rounded-md p-1.5">
-                <p className="text-success text-xs font-medium">✓ High engagement</p>
+              <div className="bg-success/10 border border-success/20 rounded-md p-2">
+                <p className="text-success text-xs font-medium">✓ Notable: Quick response shows high engagement</p>
               </div>
             )}
             
             {lead.journeyStage === 'visit' && (
-              <div className="bg-hot-lead/10 border border-hot-lead/20 rounded-md p-1.5">
-                <p className="text-hot-lead text-xs font-medium">🔥 Hot signal</p>
+              <div className="bg-hot-lead/10 border border-hot-lead/20 rounded-md p-2">
+                <p className="text-hot-lead text-xs font-medium">🔥 Hot Signal: Extended visit with financing questions</p>
               </div>
             )}
             
             {lead.journeyStage === 'test-drive' && (
-              <div className="bg-success/10 border border-success/20 rounded-md p-1.5">
-                <p className="text-success text-xs font-medium">🎯 Purchase ready</p>
+              <div className="bg-success/10 border border-success/20 rounded-md p-2">
+                <p className="text-success text-xs font-medium">🎯 Purchase Ready: Asked about trade-in - strong buying intent</p>
               </div>
             )}
             
             {lead.priority === 'hot' && (
-              <div className="bg-warning/10 border border-warning/20 rounded-md p-1.5">
-                <p className="text-warning text-xs font-medium">⚠️ Priority follow-up</p>
+              <div className="bg-warning/10 border border-warning/20 rounded-md p-2">
+                <p className="text-warning text-xs font-medium">⚠️ Irregular: High-value lead with rapid progression - prioritize follow-up</p>
               </div>
             )}
+            
+            <p className="text-muted-foreground text-xs">
+              <strong>Next action:</strong> {
+                lead.journeyStage === 'inquiry' ? 'Follow up with alternative contact method' :
+                lead.journeyStage === 'engaged' ? 'Confirm weekend appointment details' :
+                lead.journeyStage === 'visit' ? 'Schedule test drive immediately' :
+                lead.journeyStage === 'test-drive' ? 'Present purchase proposal with trade-in evaluation' :
+                'Continue nurturing relationship'
+              }
+            </p>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4 text-sm">
