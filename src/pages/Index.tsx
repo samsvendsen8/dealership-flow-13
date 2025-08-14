@@ -113,60 +113,124 @@ const Index = () => {
   });
   const { toast } = useToast();
 
-  // Real-time lead simulation - moves leads through journey stages
+  // Real-time new lead generation - simulates incoming leads
   useEffect(() => {
+    const newLeadTemplates = [
+      {
+        name: 'Jennifer Martinez',
+        email: 'jennifer.martinez@email.com',
+        vehicle: '2024 Mazda CX-5',
+        source: 'Website',
+        value: 31000,
+        notes: 'Interested in safety features and warranty',
+        journeyStage: 'inquiry' as const,
+        stageProgress: 10
+      },
+      {
+        name: 'Robert Kim',
+        email: 'robert.kim@email.com',
+        vehicle: '2024 Chevrolet Silverado',
+        source: 'Facebook',
+        value: 52000,
+        notes: 'Looking for heavy-duty truck for business',
+        journeyStage: 'inquiry' as const,
+        stageProgress: 15
+      },
+      {
+        name: 'Amanda Foster',
+        email: 'amanda.foster@email.com',
+        vehicle: '2024 Audi Q5',
+        source: 'Google Ads',
+        value: 48000,
+        notes: 'Premium features important, wants luxury',
+        journeyStage: 'engaged' as const,
+        stageProgress: 25
+      },
+      {
+        name: 'Carlos Rivera',
+        email: 'carlos.rivera@email.com',
+        vehicle: '2024 Hyundai Tucson',
+        source: 'Referral',
+        value: 35000,
+        notes: 'First-time buyer, needs financing help',
+        journeyStage: 'inquiry' as const,
+        stageProgress: 8
+      },
+      {
+        name: 'Michelle Wong',
+        email: 'michelle.wong@email.com',
+        vehicle: '2024 Lexus RX',
+        source: 'Website',
+        value: 55000,
+        notes: 'Returning customer, ready to upgrade',
+        journeyStage: 'engaged' as const,
+        stageProgress: 35
+      }
+    ];
+
     const interval = setInterval(() => {
-      setLeads(prevLeads => {
-        return prevLeads.map(lead => {
-          // Random chance to progress a lead
-          if (Math.random() > 0.85) {
-            const stages: Lead['journeyStage'][] = ['inquiry', 'engaged', 'visit', 'test-drive', 'proposal', 'financing', 'sold', 'delivered'];
-            const currentIndex = stages.indexOf(lead.journeyStage);
-            
-            // Move to next stage if not at the end
-            if (currentIndex < stages.length - 1) {
-              const nextStage = stages[currentIndex + 1];
-              const newProgress = Math.min(100, lead.stageProgress + Math.floor(Math.random() * 20) + 10);
-              
-              return {
-                ...lead,
-                journeyStage: nextStage,
-                stageProgress: newProgress,
-                lastActivity: 'Just now',
-                priority: newProgress > 70 ? 'hot' : newProgress > 40 ? 'warm' : 'cold'
-              };
-            }
-          }
-          return lead;
-        });
-      });
-    }, 8000); // Update every 8 seconds for demo
+      // 40% chance of new lead every interval
+      if (Math.random() > 0.6) {
+        const template = newLeadTemplates[Math.floor(Math.random() * newLeadTemplates.length)];
+        const leadCount = leads.length;
+        
+        const newLead: Lead = {
+          id: `new-${Date.now()}`,
+          name: template.name,
+          email: template.email,
+          phone: `(555) ${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 9000) + 1000}`,
+          vehicle: template.vehicle,
+          status: 'new',
+          priority: Math.random() > 0.7 ? 'hot' : Math.random() > 0.4 ? 'warm' : 'cold',
+          lastActivity: 'Just now',
+          value: template.value + Math.floor(Math.random() * 5000) - 2500,
+          source: template.source,
+          notes: template.notes,
+          journeyStage: template.journeyStage,
+          stageProgress: template.stageProgress,
+          ...(Math.random() > 0.7 && { timeOnLot: `${Math.floor(Math.random() * 30) + 5} minutes` })
+        };
+
+        setLeads(prevLeads => [newLead, ...prevLeads]);
+        
+        // Show toast notification for new hot leads
+        if (newLead.priority === 'hot') {
+          setToastData({
+            leadName: newLead.name,
+            message: `New ${newLead.priority} lead just submitted inquiry!`,
+            suggestedResponse: `Hi ${newLead.name}, thank you for your interest in the ${newLead.vehicle}! I'd love to schedule a quick call to discuss your needs and answer any questions. When would be a good time to connect?`
+          });
+          setShowToast(true);
+        }
+      }
+    }, 12000); // New lead every 12 seconds on average
 
     return () => clearInterval(interval);
-  }, []);
+  }, [leads.length]);
 
-  // Simulate hot lead notifications
+  // Random activity updates for existing leads
   useEffect(() => {
     const interval = setInterval(() => {
-      const hotLeads = leads.filter(lead => lead.priority === 'hot');
-      if (hotLeads.length > 0 && Math.random() > 0.7) {
-        const randomLead = hotLeads[Math.floor(Math.random() * hotLeads.length)];
-        const messages = [
-          'Customer just viewed vehicle details online',
-          'Customer requested financing information',
-          'Customer scheduled a test drive',
-          'Customer is currently browsing inventory',
-          'Customer added vehicle to favorites'
-        ];
-        
-        setToastData({
-          leadName: randomLead.name,
-          message: messages[Math.floor(Math.random() * messages.length)],
-          suggestedResponse: `Hi ${randomLead.name}, I noticed you were looking at the ${randomLead.vehicle}. I'm here to answer any questions and can schedule a test drive whenever convenient for you!`
-        });
-        setShowToast(true);
+      if (Math.random() > 0.7) {
+        const randomLead = leads[Math.floor(Math.random() * leads.length)];
+        if (randomLead && randomLead.priority === 'hot') {
+          const activities = [
+            'viewed vehicle photos',
+            'requested pricing information',
+            'browsed financing options',
+            'checked availability',
+            'viewed similar models'
+          ];
+          
+          setToastData({
+            leadName: randomLead.name,
+            message: `Customer just ${activities[Math.floor(Math.random() * activities.length)]}`,
+            suggestedResponse: `Hi ${randomLead.name}, I saw you were interested in the ${randomLead.vehicle}. I'm here to help with any questions and can arrange a test drive at your convenience!`
+          });
+          setShowToast(true);
+        }
       }
-    }, 15000); // Show notification every 15 seconds for demo
+    }, 20000); // Activity notification every 20 seconds
 
     return () => clearInterval(interval);
   }, [leads]);
