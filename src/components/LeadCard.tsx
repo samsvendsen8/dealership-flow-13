@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Phone, Mail, MessageCircle, Clock, DollarSign, Car, ArrowRight } from 'lucide-react';
+import { Phone, Mail, MessageCircle, Clock, DollarSign, Car, ArrowRight, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 
 export interface Lead {
@@ -59,6 +60,8 @@ const journeyStages = {
 };
 
 export function LeadCard({ lead, onContact, onViewDetails }: LeadCardProps) {
+  const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
+  
   return (
     <Card 
       className={cn(
@@ -109,61 +112,69 @@ export function LeadCard({ lead, onContact, onViewDetails }: LeadCardProps) {
 
       <CardContent className="space-y-4">
         {/* AI Journey Analysis */}
-        <div className="bg-gradient-to-r from-primary/5 to-hot-lead/5 border border-primary/20 rounded-lg p-3 space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="p-1 rounded-full bg-gradient-primary text-white">
-              <MessageCircle className="h-3 w-3" />
-            </div>
-            <h4 className="font-medium text-primary text-sm">AI Journey Analysis</h4>
+        <Collapsible open={isAnalysisOpen} onOpenChange={setIsAnalysisOpen}>
+          <div className="bg-gradient-to-r from-primary/5 to-hot-lead/5 border border-primary/20 rounded-lg p-3 space-y-2">
+            <CollapsibleTrigger 
+              className="flex items-center justify-between w-full hover:opacity-80 transition-opacity"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-2">
+                <div className="p-1 rounded-full bg-gradient-primary text-white">
+                  <MessageCircle className="h-3 w-3" />
+                </div>
+                <h4 className="font-medium text-primary text-sm">AI Journey Analysis</h4>
+              </div>
+              <ChevronDown className={cn("h-4 w-4 text-primary transition-transform duration-200", isAnalysisOpen && "rotate-180")} />
+            </CollapsibleTrigger>
+            
+            <CollapsibleContent className="space-y-2 text-xs">
+              <p className="text-foreground">
+                <strong>Overview:</strong> {lead.name} has progressed {
+                  lead.journeyStage === 'inquiry' ? 'through initial inquiry stage' :
+                  lead.journeyStage === 'engaged' ? 'to active engagement with positive responses' :
+                  lead.journeyStage === 'visit' ? 'to showroom visit with strong buying signals' :
+                  lead.journeyStage === 'test-drive' ? 'to test drive completion with purchase intent' :
+                  'through the sales pipeline'
+                }.
+              </p>
+              
+              {/* Notable Patterns */}
+              {lead.journeyStage === 'engaged' && (
+                <div className="bg-success/10 border border-success/20 rounded-md p-2">
+                  <p className="text-success text-xs font-medium">✓ Notable: Quick response shows high engagement</p>
+                </div>
+              )}
+              
+              {lead.journeyStage === 'visit' && (
+                <div className="bg-hot-lead/10 border border-hot-lead/20 rounded-md p-2">
+                  <p className="text-hot-lead text-xs font-medium">🔥 Hot Signal: Extended visit with financing questions</p>
+                </div>
+              )}
+              
+              {lead.journeyStage === 'test-drive' && (
+                <div className="bg-success/10 border border-success/20 rounded-md p-2">
+                  <p className="text-success text-xs font-medium">🎯 Purchase Ready: Asked about trade-in - strong buying intent</p>
+                </div>
+              )}
+              
+              {lead.priority === 'hot' && (
+                <div className="bg-warning/10 border border-warning/20 rounded-md p-2">
+                  <p className="text-warning text-xs font-medium">⚠️ Irregular: High-value lead with rapid progression - prioritize follow-up</p>
+                </div>
+              )}
+              
+              <p className="text-muted-foreground text-xs">
+                <strong>Next action:</strong> {
+                  lead.journeyStage === 'inquiry' ? 'Follow up with alternative contact method' :
+                  lead.journeyStage === 'engaged' ? 'Confirm weekend appointment details' :
+                  lead.journeyStage === 'visit' ? 'Schedule test drive immediately' :
+                  lead.journeyStage === 'test-drive' ? 'Present purchase proposal with trade-in evaluation' :
+                  'Continue nurturing relationship'
+                }
+              </p>
+            </CollapsibleContent>
           </div>
-          
-          <div className="space-y-2 text-xs">
-            <p className="text-foreground">
-              <strong>Overview:</strong> {lead.name} has progressed {
-                lead.journeyStage === 'inquiry' ? 'through initial inquiry stage' :
-                lead.journeyStage === 'engaged' ? 'to active engagement with positive responses' :
-                lead.journeyStage === 'visit' ? 'to showroom visit with strong buying signals' :
-                lead.journeyStage === 'test-drive' ? 'to test drive completion with purchase intent' :
-                'through the sales pipeline'
-              }.
-            </p>
-            
-            {/* Notable Patterns */}
-            {lead.journeyStage === 'engaged' && (
-              <div className="bg-success/10 border border-success/20 rounded-md p-2">
-                <p className="text-success text-xs font-medium">✓ Notable: Quick response shows high engagement</p>
-              </div>
-            )}
-            
-            {lead.journeyStage === 'visit' && (
-              <div className="bg-hot-lead/10 border border-hot-lead/20 rounded-md p-2">
-                <p className="text-hot-lead text-xs font-medium">🔥 Hot Signal: Extended visit with financing questions</p>
-              </div>
-            )}
-            
-            {lead.journeyStage === 'test-drive' && (
-              <div className="bg-success/10 border border-success/20 rounded-md p-2">
-                <p className="text-success text-xs font-medium">🎯 Purchase Ready: Asked about trade-in - strong buying intent</p>
-              </div>
-            )}
-            
-            {lead.priority === 'hot' && (
-              <div className="bg-warning/10 border border-warning/20 rounded-md p-2">
-                <p className="text-warning text-xs font-medium">⚠️ Irregular: High-value lead with rapid progression - prioritize follow-up</p>
-              </div>
-            )}
-            
-            <p className="text-muted-foreground text-xs">
-              <strong>Next action:</strong> {
-                lead.journeyStage === 'inquiry' ? 'Follow up with alternative contact method' :
-                lead.journeyStage === 'engaged' ? 'Confirm weekend appointment details' :
-                lead.journeyStage === 'visit' ? 'Schedule test drive immediately' :
-                lead.journeyStage === 'test-drive' ? 'Present purchase proposal with trade-in evaluation' :
-                'Continue nurturing relationship'
-              }
-            </p>
-          </div>
-        </div>
+        </Collapsible>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div className="flex items-center gap-2">
             <Car className="h-4 w-4 text-muted-foreground" />
