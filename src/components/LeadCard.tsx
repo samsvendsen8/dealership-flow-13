@@ -108,6 +108,52 @@ export function LeadCard({ lead, onContact, onViewDetails }: LeadCardProps) {
       </CardHeader>
 
       <CardContent className="space-y-4">
+        {/* AI Journey Analysis */}
+        <div className="bg-gradient-to-r from-primary/5 to-hot-lead/5 border border-primary/20 rounded-lg p-3 space-y-2">
+          <div className="flex items-center gap-2">
+            <div className="p-1 rounded-full bg-gradient-primary text-white">
+              <MessageCircle className="h-3 w-3" />
+            </div>
+            <h4 className="font-medium text-primary text-sm">AI Analysis</h4>
+          </div>
+          
+          <div className="space-y-2 text-xs">
+            <p className="text-foreground">
+              <strong>Status:</strong> {
+                lead.journeyStage === 'inquiry' ? 'Initial inquiry stage' :
+                lead.journeyStage === 'engaged' ? 'Active engagement' :
+                lead.journeyStage === 'visit' ? 'Showroom visit completed' :
+                lead.journeyStage === 'test-drive' ? 'Test drive completed' :
+                'Progressing through pipeline'
+              }
+            </p>
+            
+            {/* Notable Patterns */}
+            {lead.journeyStage === 'engaged' && (
+              <div className="bg-success/10 border border-success/20 rounded-md p-1.5">
+                <p className="text-success text-xs font-medium">✓ High engagement</p>
+              </div>
+            )}
+            
+            {lead.journeyStage === 'visit' && (
+              <div className="bg-hot-lead/10 border border-hot-lead/20 rounded-md p-1.5">
+                <p className="text-hot-lead text-xs font-medium">🔥 Hot signal</p>
+              </div>
+            )}
+            
+            {lead.journeyStage === 'test-drive' && (
+              <div className="bg-success/10 border border-success/20 rounded-md p-1.5">
+                <p className="text-success text-xs font-medium">🎯 Purchase ready</p>
+              </div>
+            )}
+            
+            {lead.priority === 'hot' && (
+              <div className="bg-warning/10 border border-warning/20 rounded-md p-1.5">
+                <p className="text-warning text-xs font-medium">⚠️ Priority follow-up</p>
+              </div>
+            )}
+          </div>
+        </div>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div className="flex items-center gap-2">
             <Car className="h-4 w-4 text-muted-foreground" />
