@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { LeadCard, type Lead } from './LeadCard';
 import { cn } from '@/lib/utils';
 
@@ -104,19 +105,24 @@ export function LeadsPriorityList({
   return (
     <div className="space-y-6">
       {/* Monthly Goals */}
-      <div className="bg-gradient-primary/10 border border-primary/20 rounded-lg p-4">
-        <div className="grid grid-cols-3 gap-4 text-center">
-          <div>
-            <p className="text-2xl font-bold text-primary">47</p>
-            <p className="text-xs text-primary/70">Leads This Month</p>
+      <div className="bg-gradient-primary/10 border border-primary/20 rounded-lg p-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <div className="text-center">
+              <p className="text-lg font-bold text-primary">47</p>
+              <p className="text-xs text-primary/70">This Month</p>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold text-primary">60</p>
+              <p className="text-xs text-primary/70">Goal</p>
+            </div>
           </div>
-          <div>
-            <p className="text-2xl font-bold text-primary">60</p>
-            <p className="text-xs text-primary/70">Monthly Goal</p>
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-primary">78%</p>
-            <p className="text-xs text-primary/70">Goal Progress</p>
+          <div className="flex-1 max-w-xs ml-6">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-primary/70">Progress</span>
+              <span className="text-sm font-semibold text-primary">78%</span>
+            </div>
+            <Progress value={78} className="h-2" />
           </div>
         </div>
       </div>
