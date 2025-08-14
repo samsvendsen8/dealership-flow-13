@@ -193,16 +193,24 @@ const Index = () => {
         };
 
         setLeads(prevLeads => [newLead, ...prevLeads]);
+        console.log('Adding new lead to toast queue:', newLead.name);
         
         // Add toast notification for hot leads
         if (newLead.priority === 'hot') {
-          setToastQueue(prev => [...prev, {
+          const newToast = {
             id: `${newLead.id}-${Date.now()}`,
             leadId: newLead.id,
             leadName: newLead.name,
             message: `New ${newLead.priority} lead just came in!`,
             suggestedResponse: `Hi ${newLead.name}! Thanks for your interest in the ${newLead.vehicle}. I'd love to help you find the perfect vehicle. When would be a good time to discuss your needs?`
-          }]);
+          };
+          console.log('Adding toast:', newToast);
+          setToastQueue(prev => {
+            console.log('Previous toast queue:', prev);
+            const newQueue = [...prev, newToast];
+            console.log('New toast queue:', newQueue);
+            return newQueue;
+          });
         }
       }
     }, 12000); // New lead every 12 seconds on average
@@ -402,20 +410,26 @@ const Index = () => {
 
       {/* Stacked Toast Notifications */}
       <div className="fixed top-4 right-4 space-y-3 z-50">
-        {toastQueue.map((toast, index) => (
-          <ToastNotification
-            key={toast.id}
-            isVisible={true}
-            leadName={toast.leadName}
-            message={toast.message}
-            suggestedResponse={toast.suggestedResponse}
-            onSend={(message) => handleSendResponse(toast.id, message)}
-            onEdit={handleEditResponse}
-            onViewDetails={() => handleViewToastDetails(toast.id)}
-            onDismiss={() => handleDismissToast(toast.id)}
-            stackIndex={index}
-          />
-        ))}
+        {(() => {
+          console.log('Rendering toasts, queue length:', toastQueue.length);
+          return toastQueue.map((toast, index) => {
+            console.log('Rendering toast:', toast, 'at index:', index);
+            return (
+              <ToastNotification
+                key={toast.id}
+                isVisible={true}
+                leadName={toast.leadName}
+                message={toast.message}
+                suggestedResponse={toast.suggestedResponse}
+                onSend={(message) => handleSendResponse(toast.id, message)}
+                onEdit={handleEditResponse}
+                onViewDetails={() => handleViewToastDetails(toast.id)}
+                onDismiss={() => handleDismissToast(toast.id)}
+                stackIndex={index}
+              />
+            );
+          });
+        })()}
       </div>
     </div>
   );
