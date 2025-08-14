@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Phone, Mail, MessageCircle, User, Calendar, DollarSign, Car, Send, Edit3 } from 'lucide-react';
+import { X, Phone, Mail, MessageCircle, User, Calendar, DollarSign, Car, Send, Edit3, ChevronDown, ChevronRight, PlayCircle, Clock, Check, MessageSquare } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,11 +27,172 @@ const statusStyles = {
 export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, contactMethod, aiSuggestedResponse }: NotificationPanelProps) {
   const [activeTab, setActiveTab] = useState<'overview' | 'history' | 'notes' | 'response'>('response');
   const [responseText, setResponseText] = useState('');
+  const [expandedHistoryItems, setExpandedHistoryItems] = useState<Set<string>>(new Set());
+
+  type HistoryContent = 
+    | { type: 'form'; data: Record<string, string> }
+    | { type: 'voicemail'; duration: string; transcript: string }
+    | { type: 'text'; messages: Array<{ sender: string; text: string; time: string }> }
+    | { type: 'email'; subject: string; body: string }
+    | { type: 'meeting'; duration: string; notes: string; actions: string[] };
+
+  type HistoryItem = {
+    id: string;
+    type: string;
+    title: string;
+    timestamp: string;
+    icon: any;
+    color: string;
+    description: string;
+    expandable: boolean;
+    content: HistoryContent;
+  };
 
   // Update response text when AI suggestion changes
   if (aiSuggestedResponse && responseText !== aiSuggestedResponse) {
     setResponseText(aiSuggestedResponse);
   }
+
+  
+  const toggleHistoryItem = (itemId: string) => {
+    const newExpanded = new Set(expandedHistoryItems);
+    if (newExpanded.has(itemId)) {
+      newExpanded.delete(itemId);
+    } else {
+      newExpanded.add(itemId);
+    }
+    setExpandedHistoryItems(newExpanded);
+  };
+
+  const generateFakeHistory = (): HistoryItem[] => {
+    if (!selectedLead) return [];
+
+    const baseHistory: HistoryItem[] = [
+      {
+        id: 'created',
+        type: 'system',
+        title: 'Lead Created',
+        timestamp: '3 days ago',
+        icon: Clock,
+        color: 'border-status-new',
+        description: `${selectedLead.name} submitted inquiry through ${selectedLead.source}`,
+        expandable: true,
+        content: {
+          type: 'form',
+          data: {
+            'Vehicle Interest': selectedLead.vehicle,
+            'Preferred Contact': 'Phone',
+            'Budget Range': `$${(selectedLead.value * 0.8).toLocaleString()} - $${selectedLead.value.toLocaleString()}`,
+            'Additional Notes': selectedLead.notes || 'Interested in test driving soon'
+          }
+        }
+      }
+    ];
+
+    // Add journey-specific history based on current stage
+    const stageHistory: Record<string, HistoryItem[]> = {
+      'inquiry': [
+        {
+          id: 'first-contact',
+          type: 'outbound',
+          title: 'Initial Phone Call',
+          timestamp: '2 days ago',
+          icon: Phone,
+          color: 'border-status-contacted',
+          description: 'Left voicemail - no answer',
+          expandable: true,
+          content: {
+            type: 'voicemail',
+            duration: '45 seconds',
+            transcript: `Hi ${selectedLead.name}, this is Alex from Premier Auto. Thanks for your interest in the ${selectedLead.vehicle}. I'd love to discuss your needs and schedule a test drive. Please call me back at (555) 123-4567. Looking forward to hearing from you!`
+          }
+        }
+      ],
+      'engaged': [
+        {
+          id: 'text-response',
+          type: 'inbound',
+          title: 'Customer Text Reply',
+          timestamp: '1 day ago',
+          icon: MessageSquare,
+          color: 'border-success',
+          description: 'Customer responded via text',
+          expandable: true,
+          content: {
+            type: 'text',
+            messages: [
+              { sender: 'customer', text: 'Hi Alex, got your voicemail. Still interested in the car. When can I see it?', time: '1 day ago' },
+              { sender: 'me', text: `Great to hear from you! The ${selectedLead.vehicle} is available for viewing. Are you free this weekend?`, time: '1 day ago' },
+              { sender: 'customer', text: 'Saturday afternoon works for me', time: '1 day ago' }
+            ]
+          }
+        },
+        {
+          id: 'email-sent',
+          type: 'outbound', 
+          title: 'Vehicle Details Email',
+          timestamp: '1 day ago',
+          icon: Mail,
+          color: 'border-primary',
+          description: 'Sent detailed vehicle information',
+          expandable: true,
+          content: {
+            type: 'email',
+            subject: `${selectedLead.vehicle} - Complete Details & Pricing`,
+            body: `Hi ${selectedLead.name},\n\nAs promised, here are the complete details for the ${selectedLead.vehicle}:\n\n• Price: $${selectedLead.value.toLocaleString()}\n• Mileage: 12,450 miles\n• Features: Premium package, leather seats, navigation\n• Warranty: 3 years/36,000 miles remaining\n\nI've attached the vehicle history report and additional photos. Looking forward to our meeting this Saturday!\n\nBest regards,\nAlex`
+          }
+        }
+      ],
+      'visit': [
+        {
+          id: 'showroom-visit',
+          type: 'meeting',
+          title: 'Showroom Visit',
+          timestamp: '5 hours ago',
+          icon: Check,
+          color: 'border-hot-lead',
+          description: 'Customer visited showroom',
+          expandable: true,
+          content: {
+            type: 'meeting',
+            duration: '45 minutes',
+            notes: `${selectedLead.name} arrived on time and was very impressed with the ${selectedLead.vehicle}. Spent significant time examining the interior and asking detailed questions about financing options. Showed strong buying signals.`,
+            actions: ['Vehicle inspection completed', 'Financing discussion initiated', 'Test drive scheduled']
+          }
+        }
+      ],
+      'test-drive': [
+        {
+          id: 'test-drive',
+          type: 'meeting',
+          title: 'Test Drive Completed',
+          timestamp: '2 hours ago',
+          icon: Check,
+          color: 'border-success',
+          description: 'Successful test drive - customer very positive',
+          expandable: true,
+          content: {
+            type: 'meeting',
+            duration: '30 minutes',
+            notes: `Excellent test drive! ${selectedLead.name} loved the handling and comfort. Asked about trade-in value for current vehicle. Ready to move forward with purchase.`,
+            actions: ['Trade-in evaluation completed', 'Financing pre-approval started', 'Purchase proposal prepared']
+          }
+        }
+      ]
+    };
+
+    // Add history based on current journey stage
+    const currentStageIndex = ['inquiry', 'engaged', 'visit', 'test-drive', 'proposal', 'financing', 'sold', 'delivered'].indexOf(selectedLead.journeyStage);
+    
+    let allHistory: HistoryItem[] = [...baseHistory];
+    
+    if (currentStageIndex >= 0) allHistory.push(...(stageHistory.inquiry || []));
+    if (currentStageIndex >= 1) allHistory.push(...(stageHistory.engaged || []));
+    if (currentStageIndex >= 2) allHistory.push(...(stageHistory.visit || []));
+    if (currentStageIndex >= 3) allHistory.push(...(stageHistory['test-drive'] || []));
+
+    return allHistory.reverse(); // Most recent first
+  };
 
   if (!isOpen) return null;
 
@@ -228,19 +389,135 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                 )}
 
                 {activeTab === 'history' && (
-                  <div className="space-y-3">
-                    <div className="border-l-2 border-status-new pl-3">
-                      <p className="text-sm font-medium">Lead Created</p>
-                      <p className="text-xs text-muted-foreground">2 hours ago</p>
-                    </div>
-                    <div className="border-l-2 border-status-contacted pl-3">
-                      <p className="text-sm font-medium">First Contact Attempted</p>
-                      <p className="text-xs text-muted-foreground">1 hour ago</p>
-                    </div>
-                    <div className="border-l-2 border-warning pl-3">
-                      <p className="text-sm font-medium">Customer Visited Website</p>
-                      <p className="text-xs text-muted-foreground">30 minutes ago</p>
-                    </div>
+                  <div className="space-y-4">
+                    {generateFakeHistory().map((item) => {
+                      const IconComponent = item.icon;
+                      const isExpanded = expandedHistoryItems.has(item.id);
+                      
+                      return (
+                        <div key={item.id} className={`border-l-3 ${item.color} pl-4 pb-4`}>
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-start space-x-3 flex-1">
+                              <div className={`p-2 rounded-full ${
+                                item.type === 'inbound' ? 'bg-success/10 text-success' :
+                                item.type === 'outbound' ? 'bg-primary/10 text-primary' :
+                                item.type === 'meeting' ? 'bg-hot-lead/10 text-hot-lead' :
+                                'bg-muted text-muted-foreground'
+                              }`}>
+                                <IconComponent className="h-4 w-4" />
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between">
+                                  <h4 className="font-medium text-sm">{item.title}</h4>
+                                  <span className="text-xs text-muted-foreground">{item.timestamp}</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-1">{item.description}</p>
+                                
+                                {item.expandable && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="mt-2 h-auto p-1 text-xs"
+                                    onClick={() => toggleHistoryItem(item.id)}
+                                  >
+                                    {isExpanded ? <ChevronDown className="h-3 w-3 mr-1" /> : <ChevronRight className="h-3 w-3 mr-1" />}
+                                    {isExpanded ? 'Hide Details' : 'View Details'}
+                                  </Button>
+                                )}
+                                
+                                {isExpanded && item.content && (
+                                  <div className="mt-3 p-3 bg-muted/50 rounded-md border">
+                                     {item.content.type === 'voicemail' && 'duration' in item.content && (
+                                       <div className="space-y-2">
+                                         <div className="flex items-center space-x-2">
+                                           <PlayCircle className="h-4 w-4 text-primary" />
+                                           <span className="text-sm font-medium">Voicemail Recording</span>
+                                           <span className="text-xs text-muted-foreground">({item.content.duration})</span>
+                                         </div>
+                                         <div className="bg-background p-2 rounded text-xs">
+                                           <strong>Transcript:</strong><br />
+                                           {'transcript' in item.content && item.content.transcript}
+                                         </div>
+                                       </div>
+                                     )}
+                                     
+                                     {item.content.type === 'text' && 'messages' in item.content && (
+                                      <div className="space-y-2">
+                                        <h5 className="text-sm font-medium">Text Conversation</h5>
+                                        <div className="space-y-1">
+                                          {item.content.messages.map((msg, idx) => (
+                                            <div key={idx} className={`p-2 rounded text-xs ${
+                                              msg.sender === 'customer' 
+                                                ? 'bg-primary/10 text-primary ml-4' 
+                                                : 'bg-muted text-foreground mr-4'
+                                            }`}>
+                                              <div className="font-medium">{msg.sender === 'customer' ? selectedLead.name : 'Me'}</div>
+                                              <div>{msg.text}</div>
+                                              <div className="text-xs opacity-70 mt-1">{msg.time}</div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                     
+                                     {item.content.type === 'email' && 'subject' in item.content && 'body' in item.content && (
+                                       <div className="space-y-2">
+                                         <div className="flex items-center space-x-2">
+                                           <Mail className="h-4 w-4 text-primary" />
+                                           <span className="text-sm font-medium">Email Content</span>
+                                         </div>
+                                         <div className="bg-background p-2 rounded text-xs space-y-2">
+                                           <div><strong>Subject:</strong> {item.content.subject}</div>
+                                           <div><strong>Body:</strong></div>
+                                           <div className="whitespace-pre-line">{item.content.body}</div>
+                                         </div>
+                                       </div>
+                                     )}
+                                     
+                                     {item.content.type === 'meeting' && 'duration' in item.content && 'notes' in item.content && (
+                                      <div className="space-y-2">
+                                        <div className="flex items-center space-x-2">
+                                          <Clock className="h-4 w-4 text-hot-lead" />
+                                          <span className="text-sm font-medium">Meeting Summary</span>
+                                          <span className="text-xs text-muted-foreground">({item.content.duration})</span>
+                                        </div>
+                                         <div className="bg-background p-2 rounded text-xs space-y-2">
+                                           <div><strong>Notes:</strong></div>
+                                           <div>{item.content.notes}</div>
+                                           {'actions' in item.content && item.content.actions && (
+                                             <>
+                                               <div><strong>Actions Completed:</strong></div>
+                                               <ul className="list-disc list-inside">
+                                                 {item.content.actions.map((action, idx) => (
+                                                   <li key={idx}>{action}</li>
+                                                 ))}
+                                               </ul>
+                                             </>
+                                           )}
+                                         </div>
+                                       </div>
+                                     )}
+                                     
+                                     {item.content.type === 'form' && 'data' in item.content && (
+                                      <div className="space-y-2">
+                                        <h5 className="text-sm font-medium">Initial Inquiry Details</h5>
+                                        <div className="bg-background p-2 rounded text-xs space-y-1">
+                                          {Object.entries(item.content.data).map(([key, value]) => (
+                                            <div key={key}>
+                                              <strong>{key}:</strong> {value}
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
 
