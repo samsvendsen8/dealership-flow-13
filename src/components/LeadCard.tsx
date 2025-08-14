@@ -59,17 +59,12 @@ const journeyStages = {
 };
 
 export function LeadCard({ lead, onContact, onViewDetails }: LeadCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
     <Card 
       className={cn(
         'relative border-l-4 transition-all duration-300 cursor-pointer shadow-soft hover:shadow-medium',
-        priorityStyles[lead.priority],
-        isHovered && lead.priority === 'hot' && 'animate-pulse-glow'
+        priorityStyles[lead.priority]
       )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       onClick={() => onViewDetails(lead.id)}
     >
       <CardHeader className="pb-3">
