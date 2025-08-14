@@ -29,6 +29,11 @@ export function ToastNotification({
   const [isEditing, setIsEditing] = useState(false);
   const [editedResponse, setEditedResponse] = useState(suggestedResponse);
 
+  // Update editedResponse when suggestedResponse changes
+  if (editedResponse !== suggestedResponse && !isEditing) {
+    setEditedResponse(suggestedResponse);
+  }
+
   if (!isVisible) return null;
 
   const handleSend = () => {
