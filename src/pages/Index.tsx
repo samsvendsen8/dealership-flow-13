@@ -105,12 +105,13 @@ const Index = () => {
   const [leads, setLeads] = useState<Lead[]>(mockLeads);
   const [isNotificationPanelOpen, setIsNotificationPanelOpen] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | undefined>();
-  const [showToast, setShowToast] = useState(false);
-  const [toastData, setToastData] = useState({
-    leadName: '',
-    message: '',
-    suggestedResponse: ''
-  });
+  const [toastQueue, setToastQueue] = useState<Array<{
+    id: string;
+    leadId: string;
+    leadName: string;
+    message: string;
+    suggestedResponse: string;
+  }>>([]);
   const { toast } = useToast();
 
   // Real-time new lead generation - simulates incoming leads
@@ -193,14 +194,15 @@ const Index = () => {
 
         setLeads(prevLeads => [newLead, ...prevLeads]);
         
-        // Show toast notification for new hot leads
+        // Add toast notification for hot leads
         if (newLead.priority === 'hot') {
-          setToastData({
+          setToastQueue(prev => [...prev, {
+            id: `${newLead.id}-${Date.now()}`,
+            leadId: newLead.id,
             leadName: newLead.name,
-            message: `New ${newLead.priority} lead just submitted inquiry!`,
-            suggestedResponse: `Hi ${newLead.name}, thank you for your interest in the ${newLead.vehicle}! I'd love to schedule a quick call to discuss your needs and answer any questions. When would be a good time to connect?`
-          });
-          setShowToast(true);
+            message: `New ${newLead.priority} lead just came in!`,
+            suggestedResponse: `Hi ${newLead.name}! Thanks for your interest in the ${newLead.vehicle}. I'd love to help you find the perfect vehicle. When would be a good time to discuss your needs?`
+          }]);
         }
       }
     }, 12000); // New lead every 12 seconds on average
@@ -222,12 +224,14 @@ const Index = () => {
             'viewed similar models'
           ];
           
-          setToastData({
+          const activity = activities[Math.floor(Math.random() * activities.length)];
+          setToastQueue(prev => [...prev, {
+            id: `${randomLead.id}-${Date.now()}`,
+            leadId: randomLead.id,
             leadName: randomLead.name,
-            message: `Customer just ${activities[Math.floor(Math.random() * activities.length)]}`,
+            message: `${randomLead.name} just ${activity}`,
             suggestedResponse: `Hi ${randomLead.name}, I saw you were interested in the ${randomLead.vehicle}. I'm here to help with any questions and can arrange a test drive at your convenience!`
-          });
-          setShowToast(true);
+          }]);
         }
       }
     }, 20000); // Activity notification every 20 seconds
@@ -272,22 +276,28 @@ const Index = () => {
     const hotLeads = leads.filter(lead => lead.priority === 'hot');
     if (hotLeads.length > 0) {
       const randomLead = hotLeads[Math.floor(Math.random() * hotLeads.length)];
-      setToastData({
+      setToastQueue(prev => [...prev, {
+        id: `${randomLead.id}-${Date.now()}`,
+        leadId: randomLead.id,
         leadName: randomLead.name,
         message: 'Customer just viewed vehicle details online',
         suggestedResponse: `Hi ${randomLead.name}, I noticed you were looking at the ${randomLead.vehicle}. I'm here to answer any questions and can schedule a test drive whenever convenient for you!`
-      });
-      setShowToast(true);
+      }]);
     }
   };
 
-  const handleSendResponse = (message: string) => {
-    // Find and update the lead that was responded to
-    const leadName = toastData.leadName;
+  const handleSendResponse = (toastId: string, message: string) => {
+    // Find the toast and its associated lead
+    const toastItem = toastQueue.find(t => t.id === toastId);
+    if (!toastItem) return;
+    
+    // In a real app, this would send the message via the selected method
+    console.log('Sending response:', message);
+    
+    // Update the lead status
     setLeads(prevLeads => 
       prevLeads.map(lead => {
-        if (lead.name === leadName) {
-          // Progress the journey stage when responding
+        if (lead.id === toastItem.leadId) {
           const stages: Lead['journeyStage'][] = ['inquiry', 'engaged', 'visit', 'test-drive', 'proposal', 'financing', 'sold', 'delivered'];
           const currentIndex = stages.indexOf(lead.journeyStage);
           const nextStage = currentIndex < stages.length - 1 ? stages[currentIndex + 1] : lead.journeyStage;
@@ -295,21 +305,22 @@ const Index = () => {
           return {
             ...lead,
             journeyStage: nextStage,
-            stageProgress: Math.min(100, lead.stageProgress + 20),
+            stageProgress: Math.min(100, lead.stageProgress + 15),
             lastActivity: 'Just replied',
-            status: 'contacted' as const,
-            priority: lead.stageProgress > 60 ? 'hot' as const : 'warm' as const
+            status: 'contacted' as const
           };
         }
         return lead;
       })
     );
     
+    // Remove the toast from queue
+    setToastQueue(prev => prev.filter(t => t.id !== toastId));
+    
     toast({
-      title: 'Message Sent',
-      description: `Response sent to ${toastData.leadName} - Journey stage updated!`,
+      title: "Response Sent!",
+      description: `Your message was sent to ${toastItem.leadName}`,
     });
-    setShowToast(false);
   };
 
   const handleEditResponse = () => {
@@ -317,12 +328,21 @@ const Index = () => {
     console.log('Edit response');
   };
 
-  const handleViewToastDetails = () => {
-    const lead = leads.find(l => l.name === toastData.leadName);
+  const handleViewToastDetails = (toastId: string) => {
+    const toastItem = toastQueue.find(t => t.id === toastId);
+    if (!toastItem) return;
+    
+    const lead = leads.find(l => l.id === toastItem.leadId);
     if (lead) {
-      handleViewDetails(lead.id);
+      setSelectedLead(lead);
+      setIsNotificationPanelOpen(true);
+      // Remove the toast from queue
+      setToastQueue(prev => prev.filter(t => t.id !== toastId));
     }
-    setShowToast(false);
+  };
+
+  const handleDismissToast = (toastId: string) => {
+    setToastQueue(prev => prev.filter(t => t.id !== toastId));
   };
 
   return (
@@ -334,7 +354,7 @@ const Index = () => {
           onViewDetails={handleViewDetails}
           onToggleNotifications={handleToggleNotifications}
           onTriggerToast={handleTriggerToast}
-          hasNotifications={isNotificationPanelOpen || showToast}
+          hasNotifications={isNotificationPanelOpen || toastQueue.length > 0}
         />
       </div>
 
@@ -380,16 +400,23 @@ const Index = () => {
         aiSuggestedResponse={aiSuggestedResponse}
       />
 
-      <ToastNotification
-        isVisible={showToast}
-        leadName={toastData.leadName}
-        message={toastData.message}
-        suggestedResponse={toastData.suggestedResponse}
-        onSend={handleSendResponse}
-        onEdit={handleEditResponse}
-        onViewDetails={handleViewToastDetails}
-        onDismiss={() => setShowToast(false)}
-      />
+      {/* Stacked Toast Notifications */}
+      <div className="fixed top-4 right-4 space-y-3 z-50">
+        {toastQueue.map((toast, index) => (
+          <ToastNotification
+            key={toast.id}
+            isVisible={true}
+            leadName={toast.leadName}
+            message={toast.message}
+            suggestedResponse={toast.suggestedResponse}
+            onSend={(message) => handleSendResponse(toast.id, message)}
+            onEdit={handleEditResponse}
+            onViewDetails={() => handleViewToastDetails(toast.id)}
+            onDismiss={() => handleDismissToast(toast.id)}
+            stackIndex={index}
+          />
+        ))}
+      </div>
     </div>
   );
 };

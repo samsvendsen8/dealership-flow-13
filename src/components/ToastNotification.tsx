@@ -14,6 +14,7 @@ interface ToastNotificationProps {
   onEdit: () => void;
   onViewDetails: () => void;
   onDismiss: () => void;
+  stackIndex?: number;
 }
 
 export function ToastNotification({
@@ -24,7 +25,8 @@ export function ToastNotification({
   onSend,
   onEdit,
   onViewDetails,
-  onDismiss
+  onDismiss,
+  stackIndex = 0
 }: ToastNotificationProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedResponse, setEditedResponse] = useState(suggestedResponse);
@@ -47,8 +49,8 @@ export function ToastNotification({
 
   return (
     <div className={cn(
-      'fixed top-4 right-4 w-96 z-50 animate-slide-in-right',
-      'transition-all duration-300'
+      'w-96 animate-slide-in-right transition-all duration-300',
+      stackIndex > 0 && 'opacity-90 scale-95'
     )}>
       <Card className="border-l-4 border-l-hot-lead shadow-strong bg-card">
         <CardContent className="p-4">
