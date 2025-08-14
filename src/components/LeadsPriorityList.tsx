@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { LeadCard, type Lead } from './LeadCard';
+import { LeadsQuickList } from './LeadsQuickList';
 import { cn } from '@/lib/utils';
 
 interface LeadsPriorityListProps {
@@ -32,6 +33,7 @@ export function LeadsPriorityList({
   const [sortBy, setSortBy] = useState<SortOption>('priority');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
   const [isCondensed, setIsCondensed] = useState(false);
+  const [selectedLeadId, setSelectedLeadId] = useState<string | undefined>();
 
   // Priority scoring function
   const getPriorityScore = (lead: Lead): number => {
@@ -285,30 +287,62 @@ export function LeadsPriorityList({
         </div>
       </div>
 
-      {/* Leads List */}
-      <div className="grid gap-4">
-        {filteredAndSortedLeads.map((lead, index) => (
-          <div key={lead.id} className="relative">
-            {index === 0 && lead.priority === 'hot' && (
-              <Badge className="absolute -top-2 -left-2 z-10 bg-hot-lead text-white animate-pulse">
-                🚨 TOP PRIORITY
-              </Badge>
-            )}
-            <LeadCard
-              lead={lead}
-              onContact={onContact}
-              onViewDetails={onViewDetails}
-              isCondensed={isCondensed}
+      {/* Two Column Layout */}
+      <div className="grid grid-cols-12 gap-6">
+        {/* Main Cards Section - 9 columns */}
+        <div className="col-span-9 space-y-4">
+          {filteredAndSortedLeads.map((lead, index) => (
+            <div 
+              key={lead.id} 
+              className="relative"
+              id={`lead-card-${lead.id}`}
+            >
+              {index === 0 && lead.priority === 'hot' && (
+                <Badge className="absolute -top-2 -left-2 z-10 bg-hot-lead text-white animate-pulse">
+                  🚨 TOP PRIORITY
+                </Badge>
+              )}
+              <LeadCard
+                lead={lead}
+                onContact={onContact}
+                onViewDetails={onViewDetails}
+                isCondensed={isCondensed}
+              />
+            </div>
+          ))}
+          
+          {filteredAndSortedLeads.length === 0 && (
+            <div className="text-center py-12 text-muted-foreground">
+              <p className="text-lg mb-2">No leads found</p>
+              <p className="text-sm">Try adjusting your search or filter criteria</p>
+            </div>
+          )}
+        </div>
+
+        {/* Quick List Sidebar - 3 columns */}
+        <div className="col-span-3">
+          <div className="sticky top-24">
+            <LeadsQuickList
+              leads={filteredAndSortedLeads}
+              onLeadClick={(leadId) => {
+                setSelectedLeadId(leadId);
+                const element = document.getElementById(`lead-card-${leadId}`);
+                if (element) {
+                  element.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                  });
+                  // Highlight briefly
+                  element.classList.add('ring-2', 'ring-primary/50');
+                  setTimeout(() => {
+                    element.classList.remove('ring-2', 'ring-primary/50');
+                  }, 2000);
+                }
+              }}
+              selectedLeadId={selectedLeadId}
             />
           </div>
-        ))}
-        
-        {filteredAndSortedLeads.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
-            <p className="text-lg mb-2">No leads found</p>
-            <p className="text-sm">Try adjusting your search or filter criteria</p>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
