@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Search, Filter, SortDesc, Bell, Zap, LayoutGrid, List } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -38,7 +38,7 @@ export function LeadsPriorityList({
   const [activeTab, setActiveTab] = useState('action-required');
 
   // Priority scoring function
-  const getPriorityScore = (lead: Lead): number => {
+  const getPriorityScore = useCallback((lead: Lead): number => {
     let score = 0;
     
     // Priority base score
@@ -76,7 +76,7 @@ export function LeadsPriorityList({
     }
     
     return score;
-  };
+  }, []);
 
   // Function to determine lead category for tabs
   const getLeadCategory = (lead: Lead) => {
@@ -113,40 +113,42 @@ export function LeadsPriorityList({
     return categories;
   }, [leads]);
 
-  const getFilteredAndSortedLeads = (categoryLeads: Lead[]) => {
-    let filtered = categoryLeads.filter(lead => {
-      const matchesSearch = lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           lead.vehicle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           lead.email.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      if (!matchesSearch) return false;
-      
-      if (filterBy === 'all') return true;
-      if (['hot', 'warm', 'cold'].includes(filterBy)) {
-        return lead.priority === filterBy;
-      }
-      return lead.status === filterBy;
-    });
+  const getFilteredAndSortedLeads = useMemo(() => {
+    return (categoryLeads: Lead[]) => {
+      let filtered = categoryLeads.filter(lead => {
+        const matchesSearch = lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             lead.vehicle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             lead.email.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        if (!matchesSearch) return false;
+        
+        if (filterBy === 'all') return true;
+        if (['hot', 'warm', 'cold'].includes(filterBy)) {
+          return lead.priority === filterBy;
+        }
+        return lead.status === filterBy;
+      });
 
-    // Sort leads
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'priority':
-          return getPriorityScore(b) - getPriorityScore(a);
-        case 'value':
-          return b.value - a.value;
-        case 'activity':
-          return a.lastActivity.localeCompare(b.lastActivity);
-        case 'status':
-          const statusOrder = { new: 0, contacted: 1, qualified: 2, closed: 3 };
-          return statusOrder[a.status] - statusOrder[b.status];
-        default:
-          return 0;
-      }
-    });
+      // Sort leads
+      filtered.sort((a, b) => {
+        switch (sortBy) {
+          case 'priority':
+            return getPriorityScore(b) - getPriorityScore(a);
+          case 'value':
+            return b.value - a.value;
+          case 'activity':
+            return a.lastActivity.localeCompare(b.lastActivity);
+          case 'status':
+            const statusOrder = { new: 0, contacted: 1, qualified: 2, closed: 3 };
+            return statusOrder[a.status] - statusOrder[b.status];
+          default:
+            return 0;
+        }
+      });
 
-    return filtered;
-  };
+      return filtered;
+    };
+  }, [searchTerm, sortBy, filterBy, getPriorityScore]);
 
   const priorityStats = useMemo(() => {
     const stats = { hot: 0, warm: 0, cold: 0, total: leads.length };
