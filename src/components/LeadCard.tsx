@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Phone, Mail, MessageCircle, Clock, DollarSign, Car } from 'lucide-react';
+import { Phone, Mail, MessageCircle, Clock, DollarSign, Car, ArrowRight } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,8 @@ export interface Lead {
   source: string;
   timeOnLot?: string;
   notes?: string;
+  journeyStage: 'inquiry' | 'engaged' | 'visit' | 'test-drive' | 'proposal' | 'financing' | 'sold' | 'delivered';
+  stageProgress: number; // 0-100 percentage
 }
 
 interface LeadCardProps {
@@ -43,6 +45,17 @@ const priorityLabels = {
   hot: '🔥 Hot Lead',
   warm: '⚡ Warm Lead',
   cold: '❄️ Cold Lead'
+};
+
+const journeyStages = {
+  inquiry: { label: 'Inquiry', icon: '💬', color: 'bg-blue-500' },
+  engaged: { label: 'Engaged', icon: '🎯', color: 'bg-teal-500' },
+  visit: { label: 'Visit', icon: '🏢', color: 'bg-purple-500' },
+  'test-drive': { label: 'Test Drive', icon: '🚗', color: 'bg-orange-500' },
+  proposal: { label: 'Proposal', icon: '📄', color: 'bg-yellow-500' },
+  financing: { label: 'Financing', icon: '🏦', color: 'bg-indigo-500' },
+  sold: { label: 'Sold', icon: '✅', color: 'bg-green-500' },
+  delivered: { label: 'Delivered', icon: '🎉', color: 'bg-emerald-500' }
 };
 
 export function LeadCard({ lead, onContact, onViewDetails }: LeadCardProps) {
@@ -72,6 +85,29 @@ export function LeadCard({ lead, onContact, onViewDetails }: LeadCardProps) {
             <span className="text-xs text-muted-foreground font-medium">
               {priorityLabels[lead.priority]}
             </span>
+          </div>
+        </div>
+        
+        {/* Journey Stage Progress */}
+        <div className="mt-3 p-2 bg-muted/30 rounded-md">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-medium text-muted-foreground">Journey Stage</span>
+            <span className="text-xs text-muted-foreground">{lead.stageProgress}%</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-xs text-white", journeyStages[lead.journeyStage].color)}>
+              {journeyStages[lead.journeyStage].icon}
+            </div>
+            <span className="text-sm font-medium">{journeyStages[lead.journeyStage].label}</span>
+            <div className="flex-1 mx-2">
+              <div className="w-full bg-muted rounded-full h-1.5">
+                <div 
+                  className={cn("h-1.5 rounded-full transition-all duration-500", journeyStages[lead.journeyStage].color)}
+                  style={{ width: `${lead.stageProgress}%` }}
+                />
+              </div>
+            </div>
+            <ArrowRight className="h-3 w-3 text-muted-foreground" />
           </div>
         </div>
       </CardHeader>
