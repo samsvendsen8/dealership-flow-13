@@ -87,7 +87,14 @@ export function LeadsPriorityList({
     const hasRecentCustomerActivity = lead.lastActivity.includes('Just now') && 
                                      !hasRecentContact;
     
-    if (hasRecentCustomerActivity) {
+    // Check if lead has gone cold (no activity for extended period)
+    const isOldActivity = lead.lastActivity.includes('week ago') || 
+                         lead.lastActivity.includes('month ago') ||
+                         lead.priority === 'cold';
+    
+    if (isOldActivity && !hasRecentCustomerActivity) {
+      return 'cold';
+    } else if (hasRecentCustomerActivity) {
       return 're-engaged';
     } else if (hasRecentContact || lead.status === 'contacted') {
       return 'awaiting-response';
@@ -102,6 +109,7 @@ export function LeadsPriorityList({
       'action-required': [] as Lead[],
       'awaiting-response': [] as Lead[],
       're-engaged': [] as Lead[],
+      'cold': [] as Lead[],
       'all': leads
     };
 
@@ -338,7 +346,7 @@ export function LeadsPriorityList({
 
       {/* Tabs Section */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5 sticky top-20 z-30 bg-background">
           <TabsTrigger value="action-required" className="gap-2">
             🎯 Action Required
             <Badge variant="secondary" className="ml-1">
@@ -357,6 +365,12 @@ export function LeadsPriorityList({
               {leadsByCategory['re-engaged'].length}
             </Badge>
           </TabsTrigger>
+          <TabsTrigger value="cold" className="gap-2">
+            ❄️ Cold Leads
+            <Badge variant="secondary" className="ml-1">
+              {leadsByCategory['cold'].length}
+            </Badge>
+          </TabsTrigger>
           <TabsTrigger value="all" className="gap-2">
             📋 All Leads
             <Badge variant="secondary" className="ml-1">
@@ -366,7 +380,7 @@ export function LeadsPriorityList({
         </TabsList>
 
         {/* Tab Content for each category */}
-        {(['action-required', 'awaiting-response', 're-engaged', 'all'] as const).map((category) => {
+        {(['action-required', 'awaiting-response', 're-engaged', 'cold', 'all'] as const).map((category) => {
           const currentLeads = getFilteredAndSortedLeads(leadsByCategory[category]);
           
           return (
@@ -420,6 +434,7 @@ export function LeadsPriorityList({
                         {category === 'action-required' && 'No leads requiring immediate action.'}
                         {category === 'awaiting-response' && 'No leads awaiting your response.'}
                         {category === 're-engaged' && 'No recently re-engaged leads.'}
+                        {category === 'cold' && 'No cold leads to re-engage with.'}
                         {category === 'all' && 'Try adjusting your search or filter criteria.'}
                       </p>
                     </div>
