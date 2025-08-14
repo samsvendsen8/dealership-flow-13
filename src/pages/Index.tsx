@@ -238,9 +238,29 @@ const Index = () => {
   const handleContact = (leadId: string, method: 'phone' | 'email' | 'text') => {
     const lead = leads.find(l => l.id === leadId);
     if (lead) {
+      // Update lead journey stage when contacting
+      setLeads(prevLeads => 
+        prevLeads.map(l => {
+          if (l.id === leadId) {
+            const stages: Lead['journeyStage'][] = ['inquiry', 'engaged', 'visit', 'test-drive', 'proposal', 'financing', 'sold', 'delivered'];
+            const currentIndex = stages.indexOf(l.journeyStage);
+            const nextStage = currentIndex < stages.length - 1 ? stages[currentIndex + 1] : l.journeyStage;
+            
+            return {
+              ...l,
+              journeyStage: nextStage,
+              stageProgress: Math.min(100, l.stageProgress + 15),
+              lastActivity: `${method} contact made`,
+              status: 'contacted' as const
+            };
+          }
+          return l;
+        })
+      );
+      
       toast({
         title: `Contacting ${lead.name}`,
-        description: `Initiating ${method} contact...`,
+        description: `Initiating ${method} contact - Journey stage updated!`,
       });
     }
   };
@@ -269,9 +289,32 @@ const Index = () => {
   };
 
   const handleSendResponse = (message: string) => {
+    // Find and update the lead that was responded to
+    const leadName = toastData.leadName;
+    setLeads(prevLeads => 
+      prevLeads.map(lead => {
+        if (lead.name === leadName) {
+          // Progress the journey stage when responding
+          const stages: Lead['journeyStage'][] = ['inquiry', 'engaged', 'visit', 'test-drive', 'proposal', 'financing', 'sold', 'delivered'];
+          const currentIndex = stages.indexOf(lead.journeyStage);
+          const nextStage = currentIndex < stages.length - 1 ? stages[currentIndex + 1] : lead.journeyStage;
+          
+          return {
+            ...lead,
+            journeyStage: nextStage,
+            stageProgress: Math.min(100, lead.stageProgress + 20),
+            lastActivity: 'Just replied',
+            status: 'contacted' as const,
+            priority: lead.stageProgress > 60 ? 'hot' as const : 'warm' as const
+          };
+        }
+        return lead;
+      })
+    );
+    
     toast({
       title: 'Message Sent',
-      description: `Response sent to ${toastData.leadName}`,
+      description: `Response sent to ${toastData.leadName} - Journey stage updated!`,
     });
     setShowToast(false);
   };
