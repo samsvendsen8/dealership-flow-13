@@ -390,6 +390,63 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
 
                 {activeTab === 'history' && (
                   <div className="space-y-4">
+                    {/* AI Journey Summary */}
+                    <div className="bg-gradient-to-r from-primary/5 to-hot-lead/5 border border-primary/20 rounded-lg p-4 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="p-1.5 rounded-full bg-gradient-primary text-white">
+                          <MessageCircle className="h-3 w-3" />
+                        </div>
+                        <h4 className="font-medium text-primary">AI Journey Analysis</h4>
+                      </div>
+                      
+                      <div className="space-y-2 text-sm">
+                        <p className="text-foreground">
+                          <strong>Journey Overview:</strong> {selectedLead.name} has progressed {
+                            selectedLead.journeyStage === 'inquiry' ? 'through initial inquiry stage' :
+                            selectedLead.journeyStage === 'engaged' ? 'to active engagement with positive text responses' :
+                            selectedLead.journeyStage === 'visit' ? 'to showroom visit with strong buying signals' :
+                            selectedLead.journeyStage === 'test-drive' ? 'to test drive completion with purchase intent' :
+                            'through the sales pipeline'
+                          }.
+                        </p>
+                        
+                        {/* Notable Patterns */}
+                        {selectedLead.journeyStage === 'engaged' && (
+                          <div className="bg-success/10 border border-success/20 rounded-md p-2">
+                            <p className="text-success text-xs font-medium">✓ Notable: Quick text response shows high engagement</p>
+                          </div>
+                        )}
+                        
+                        {selectedLead.journeyStage === 'visit' && (
+                          <div className="bg-hot-lead/10 border border-hot-lead/20 rounded-md p-2">
+                            <p className="text-hot-lead text-xs font-medium">🔥 Hot Signal: Extended showroom visit with financing questions</p>
+                          </div>
+                        )}
+                        
+                        {selectedLead.journeyStage === 'test-drive' && (
+                          <div className="bg-success/10 border border-success/20 rounded-md p-2">
+                            <p className="text-success text-xs font-medium">🎯 Purchase Ready: Asked about trade-in value - strong buying intent</p>
+                          </div>
+                        )}
+                        
+                        {selectedLead.priority === 'hot' && (
+                          <div className="bg-warning/10 border border-warning/20 rounded-md p-2">
+                            <p className="text-warning text-xs font-medium">⚠️ Irregular: High-value lead with rapid progression - prioritize immediate follow-up</p>
+                          </div>
+                        )}
+                        
+                        <p className="text-muted-foreground text-xs">
+                          Next recommended action: {
+                            selectedLead.journeyStage === 'inquiry' ? 'Follow up with alternative contact method' :
+                            selectedLead.journeyStage === 'engaged' ? 'Confirm weekend appointment details' :
+                            selectedLead.journeyStage === 'visit' ? 'Schedule test drive immediately' :
+                            selectedLead.journeyStage === 'test-drive' ? 'Present purchase proposal with trade-in evaluation' :
+                            'Continue nurturing relationship'
+                          }
+                        </p>
+                      </div>
+                    </div>
+
                     {generateFakeHistory().map((item) => {
                       const IconComponent = item.icon;
                       const isExpanded = expandedHistoryItems.has(item.id);
