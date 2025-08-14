@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Phone, Mail, MessageCircle, Clock, DollarSign, Car, ArrowRight, ChevronDown } from 'lucide-react';
+import { Phone, Mail, MessageCircle, Clock, DollarSign, Car, ArrowRight, ChevronDown, Calendar, MapPin, FileText } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -27,6 +27,7 @@ interface LeadCardProps {
   lead: Lead;
   onContact: (leadId: string, method: 'phone' | 'email' | 'text') => void;
   onViewDetails: (leadId: string) => void;
+  isCondensed?: boolean;
 }
 
 const priorityStyles = {
@@ -59,8 +60,111 @@ const journeyStages = {
   delivered: { label: 'Delivered', icon: '🎉', color: 'bg-emerald-500' }
 };
 
-export function LeadCard({ lead, onContact, onViewDetails }: LeadCardProps) {
+export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false }: LeadCardProps) {
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
+  
+  // Get recommended quick actions based on journey stage
+  const getQuickActions = () => {
+    switch (lead.journeyStage) {
+      case 'inquiry':
+        return [
+          { label: 'Follow up', icon: Phone, action: () => onContact(lead.id, 'phone') },
+          { label: 'Send info', icon: Mail, action: () => onContact(lead.id, 'email') }
+        ];
+      case 'engaged':
+        return [
+          { label: 'Schedule visit', icon: Calendar, action: () => onViewDetails(lead.id) },
+          { label: 'Send location', icon: MapPin, action: () => onContact(lead.id, 'text') }
+        ];
+      case 'visit':
+        return [
+          { label: 'Schedule test drive', icon: Car, action: () => onViewDetails(lead.id) },
+          { label: 'Quick call', icon: Phone, action: () => onContact(lead.id, 'phone') }
+        ];
+      case 'test-drive':
+        return [
+          { label: 'Send proposal', icon: FileText, action: () => onContact(lead.id, 'email') },
+          { label: 'Discuss trade-in', icon: Phone, action: () => onContact(lead.id, 'phone') }
+        ];
+      default:
+        return [
+          { label: 'Call', icon: Phone, action: () => onContact(lead.id, 'phone') },
+          { label: 'Email', icon: Mail, action: () => onContact(lead.id, 'email') }
+        ];
+    }
+  };
+
+  const quickActions = getQuickActions();
+  
+  if (isCondensed) {
+    return (
+      <Card 
+        className={cn(
+          'relative border-l-4 transition-all duration-300 cursor-pointer shadow-soft hover:shadow-medium',
+          priorityStyles[lead.priority]
+        )}
+        onClick={() => onViewDetails(lead.id)}
+      >
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3">
+                <div>
+                  <h3 className="font-semibold text-foreground truncate">{lead.name}</h3>
+                  <p className="text-xs text-muted-foreground truncate">{lead.email}</p>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <div className={cn("w-4 h-4 rounded-full flex items-center justify-center text-xs text-white", journeyStages[lead.journeyStage].color)}>
+                    {journeyStages[lead.journeyStage].icon}
+                  </div>
+                  <span className="font-medium">{journeyStages[lead.journeyStage].label}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <Car className="h-3 w-3" />
+                  {lead.vehicle}
+                </span>
+                <span className="flex items-center gap-1">
+                  <DollarSign className="h-3 w-3 text-success" />
+                  ${lead.value.toLocaleString()}
+                </span>
+                <span>{lead.lastActivity}</span>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Badge className={cn(statusStyles[lead.status], "text-xs")} variant="secondary">
+                {lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}
+              </Badge>
+              
+              {/* Quick Actions */}
+              <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+                {quickActions.slice(0, 2).map((action, idx) => (
+                  <Button
+                    key={idx}
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 w-7 p-0"
+                    onClick={action.action}
+                    title={action.label}
+                  >
+                    <action.icon className="h-3 w-3" />
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          {lead.timeOnLot && (
+            <div className="mt-2 text-xs text-warning font-medium">
+              🚗 On lot: {lead.timeOnLot}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
   
   return (
     <Card 
@@ -111,6 +215,25 @@ export function LeadCard({ lead, onContact, onViewDetails }: LeadCardProps) {
       </CardHeader>
 
       <CardContent className="space-y-4">
+        {/* Quick Actions Bar */}
+        <div className="flex items-center justify-between bg-muted/20 rounded-lg p-2">
+          <div className="text-xs font-medium text-muted-foreground">Recommended:</div>
+          <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+            {quickActions.map((action, idx) => (
+              <Button
+                key={idx}
+                size="sm"
+                variant="outline"
+                className="h-7 px-2 text-xs gap-1"
+                onClick={action.action}
+              >
+                <action.icon className="h-3 w-3" />
+                {action.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+
         {/* AI Journey Analysis */}
         <Collapsible open={isAnalysisOpen} onOpenChange={setIsAnalysisOpen}>
           <div className="bg-gradient-to-r from-primary/5 to-hot-lead/5 border border-primary/20 rounded-lg p-3 space-y-2">
@@ -175,6 +298,7 @@ export function LeadCard({ lead, onContact, onViewDetails }: LeadCardProps) {
             </CollapsibleContent>
           </div>
         </Collapsible>
+        
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div className="flex items-center gap-2">
             <Car className="h-4 w-4 text-muted-foreground" />

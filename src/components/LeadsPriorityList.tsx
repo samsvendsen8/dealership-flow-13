@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search, Filter, SortDesc, Bell, Zap } from 'lucide-react';
+import { Search, Filter, SortDesc, Bell, Zap, LayoutGrid, List } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -31,6 +31,7 @@ export function LeadsPriorityList({
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('priority');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
+  const [isCondensed, setIsCondensed] = useState(false);
 
   // Priority scoring function
   const getPriorityScore = (lead: Lead): number => {
@@ -261,6 +262,15 @@ export function LeadsPriorityList({
             <SelectItem value="contacted">Contacted</SelectItem>
           </SelectContent>
         </Select>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsCondensed(!isCondensed)}
+          className="gap-2"
+        >
+          {isCondensed ? <LayoutGrid className="h-4 w-4" /> : <List className="h-4 w-4" />}
+          {isCondensed ? 'Expanded' : 'Condensed'}
+        </Button>
       </div>
 
       {/* Priority Algorithm Info */}
@@ -286,6 +296,7 @@ export function LeadsPriorityList({
               lead={lead}
               onContact={onContact}
               onViewDetails={onViewDetails}
+              isCondensed={isCondensed}
             />
           </div>
         ))}
