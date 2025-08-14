@@ -225,62 +225,64 @@ export function LeadsPriorityList({
         </div>
       </div>
 
-      {/* Filters and Search */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search leads by name, vehicle, or email..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
+      {/* Filters and Search - Sticky */}
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border pb-4 space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search leads by name, vehicle, or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
+            <SelectTrigger className="w-48">
+              <SortDesc className="h-4 w-4 mr-2" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="priority">Sort by Priority</SelectItem>
+              <SelectItem value="value">Sort by Value</SelectItem>
+              <SelectItem value="activity">Sort by Activity</SelectItem>
+              <SelectItem value="status">Sort by Status</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={filterBy} onValueChange={(value: FilterOption) => setFilterBy(value)}>
+            <SelectTrigger className="w-40">
+              <Filter className="h-4 w-4 mr-2" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Leads</SelectItem>
+              <SelectItem value="hot">Hot Priority</SelectItem>
+              <SelectItem value="warm">Warm Priority</SelectItem>
+              <SelectItem value="cold">Cold Priority</SelectItem>
+              <SelectItem value="new">New Status</SelectItem>
+              <SelectItem value="contacted">Contacted</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsCondensed(!isCondensed)}
+            className="gap-2"
+          >
+            {isCondensed ? <LayoutGrid className="h-4 w-4" /> : <List className="h-4 w-4" />}
+            {isCondensed ? 'Expanded' : 'Condensed'}
+          </Button>
         </div>
-        <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
-          <SelectTrigger className="w-48">
-            <SortDesc className="h-4 w-4 mr-2" />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="priority">Sort by Priority</SelectItem>
-            <SelectItem value="value">Sort by Value</SelectItem>
-            <SelectItem value="activity">Sort by Activity</SelectItem>
-            <SelectItem value="status">Sort by Status</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={filterBy} onValueChange={(value: FilterOption) => setFilterBy(value)}>
-          <SelectTrigger className="w-40">
-            <Filter className="h-4 w-4 mr-2" />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Leads</SelectItem>
-            <SelectItem value="hot">Hot Priority</SelectItem>
-            <SelectItem value="warm">Warm Priority</SelectItem>
-            <SelectItem value="cold">Cold Priority</SelectItem>
-            <SelectItem value="new">New Status</SelectItem>
-            <SelectItem value="contacted">Contacted</SelectItem>
-          </SelectContent>
-        </Select>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setIsCondensed(!isCondensed)}
-          className="gap-2"
-        >
-          {isCondensed ? <LayoutGrid className="h-4 w-4" /> : <List className="h-4 w-4" />}
-          {isCondensed ? 'Expanded' : 'Condensed'}
-        </Button>
-      </div>
 
-      {/* Priority Algorithm Info */}
-      <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-        <h3 className="font-semibold text-primary mb-2">🤖 AI Priority Scoring</h3>
-        <p className="text-sm text-primary/80">
-          Leads are automatically ranked using: Priority level + Deal value + Time on lot + Recent activity. 
-          <strong>Recently contacted leads move down</strong> since you're waiting for their response, 
-          while new customer activity gets top priority.
-        </p>
+        {/* Priority Algorithm Info */}
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+          <h3 className="font-semibold text-primary mb-2">🤖 AI Priority Scoring</h3>
+          <p className="text-sm text-primary/80">
+            Leads are automatically ranked using: Priority level + Deal value + Time on lot + Recent activity. 
+            <strong>Recently contacted leads move down</strong> since you're waiting for their response, 
+            while new customer activity gets top priority.
+          </p>
+        </div>
       </div>
 
       {/* Leads List */}

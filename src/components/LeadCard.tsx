@@ -63,33 +63,61 @@ const journeyStages = {
 export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false }: LeadCardProps) {
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
   
-  // Get recommended quick actions based on journey stage
+  // Get recommended quick actions based on journey stage and contact history
   const getQuickActions = () => {
+    const isRecentlyContacted = lead.lastActivity.includes('contact sent') || 
+                               lead.lastActivity.includes('contact made') || 
+                               lead.lastActivity.includes('Just replied');
+    const hasNewActivity = lead.lastActivity.includes('Just now') || 
+                          lead.lastActivity.includes('min ago');
+
     switch (lead.journeyStage) {
       case 'inquiry':
+        if (isRecentlyContacted) {
+          return [
+            { label: 'Try different method', icon: MessageCircle, action: () => onContact(lead.id, 'text'), context: 'No response to last contact' },
+            { label: 'Check voicemail', icon: Phone, action: () => onContact(lead.id, 'phone'), context: 'Follow up on initial inquiry' }
+          ];
+        }
         return [
-          { label: 'Follow up', icon: Phone, action: () => onContact(lead.id, 'phone') },
-          { label: 'Send info', icon: Mail, action: () => onContact(lead.id, 'email') }
+          { label: 'Initial contact', icon: Phone, action: () => onContact(lead.id, 'phone'), context: 'First outreach - establish connection' },
+          { label: 'Send brochure', icon: Mail, action: () => onContact(lead.id, 'email'), context: 'Share vehicle information' }
         ];
+      
       case 'engaged':
+        if (hasNewActivity) {
+          return [
+            { label: 'Schedule visit now', icon: Calendar, action: () => onViewDetails(lead.id), context: 'Customer is active - strike while hot' },
+            { label: 'Answer questions', icon: MessageCircle, action: () => onContact(lead.id, 'text'), context: 'Respond to recent engagement' }
+          ];
+        }
         return [
-          { label: 'Schedule visit', icon: Calendar, action: () => onViewDetails(lead.id) },
-          { label: 'Send location', icon: MapPin, action: () => onContact(lead.id, 'text') }
+          { label: 'Confirm appointment', icon: Calendar, action: () => onViewDetails(lead.id), context: 'Previous positive responses' },
+          { label: 'Send directions', icon: MapPin, action: () => onContact(lead.id, 'text'), context: 'Help them find showroom' }
         ];
+      
       case 'visit':
+        if (lead.timeOnLot) {
+          return [
+            { label: 'Immediate assistance', icon: Phone, action: () => onContact(lead.id, 'phone'), context: 'Customer currently on lot!' },
+            { label: 'Test drive ready', icon: Car, action: () => onViewDetails(lead.id), context: 'Convert visit to test drive' }
+          ];
+        }
         return [
-          { label: 'Schedule test drive', icon: Car, action: () => onViewDetails(lead.id) },
-          { label: 'Quick call', icon: Phone, action: () => onContact(lead.id, 'phone') }
+          { label: 'Schedule test drive', icon: Car, action: () => onViewDetails(lead.id), context: 'Post-visit follow up with strong buying signals' },
+          { label: 'Address concerns', icon: Phone, action: () => onContact(lead.id, 'phone'), context: 'Extended visit shows serious interest' }
         ];
+      
       case 'test-drive':
         return [
-          { label: 'Send proposal', icon: FileText, action: () => onContact(lead.id, 'email') },
-          { label: 'Discuss trade-in', icon: Phone, action: () => onContact(lead.id, 'phone') }
+          { label: 'Present offer', icon: FileText, action: () => onContact(lead.id, 'email'), context: 'High purchase intent after test drive' },
+          { label: 'Trade-in discussion', icon: Phone, action: () => onContact(lead.id, 'phone'), context: 'Customer asked about trade-in value' }
         ];
+      
       default:
         return [
-          { label: 'Call', icon: Phone, action: () => onContact(lead.id, 'phone') },
-          { label: 'Email', icon: Mail, action: () => onContact(lead.id, 'email') }
+          { label: 'Status check', icon: Phone, action: () => onContact(lead.id, 'phone'), context: 'Regular follow-up' },
+          { label: 'Send update', icon: Mail, action: () => onContact(lead.id, 'email'), context: 'Keep relationship warm' }
         ];
     }
   };
@@ -216,21 +244,26 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false }
 
       <CardContent className="space-y-4">
         {/* Quick Actions Bar */}
-        <div className="flex items-center justify-between bg-muted/20 rounded-lg p-2">
-          <div className="text-xs font-medium text-muted-foreground">Recommended:</div>
-          <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-            {quickActions.map((action, idx) => (
-              <Button
-                key={idx}
-                size="sm"
-                variant="outline"
-                className="h-7 px-2 text-xs gap-1"
-                onClick={action.action}
-              >
-                <action.icon className="h-3 w-3" />
-                {action.label}
-              </Button>
-            ))}
+        <div className="bg-muted/20 rounded-lg p-3 space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="text-xs font-medium text-muted-foreground">Recommended Actions</div>
+            <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+              {quickActions.map((action, idx) => (
+                <Button
+                  key={idx}
+                  size="sm"
+                  variant="outline"
+                  className="h-7 px-2 text-xs gap-1"
+                  onClick={action.action}
+                >
+                  <action.icon className="h-3 w-3" />
+                  {action.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+          <div className="text-xs text-muted-foreground">
+            <strong>Context:</strong> {quickActions[0]?.context}
           </div>
         </div>
 
