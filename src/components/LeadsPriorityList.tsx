@@ -122,25 +122,36 @@ export function LeadsPriorityList({
 
   return (
     <div className="space-y-6 padding-top-20">
-      {/* Monthly Goals */}
-      <div className="bg-gradient-primary/10 border border-primary/20 rounded-lg p-3">
+      {/* Monthly Goals - Gamified */}
+      <div className="bg-gradient-primary/10 border border-primary/20 rounded-lg p-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-8">
             <div className="text-center">
-              <p className="text-lg font-bold text-primary">47</p>
+              <div className="relative">
+                <p className="text-2xl font-bold text-primary">47</p>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-success rounded-full"></div>
+              </div>
               <p className="text-xs text-primary/70">This Month</p>
             </div>
             <div className="text-center">
-              <p className="text-lg font-bold text-primary">60</p>
+              <p className="text-2xl font-bold text-primary/60">60</p>
               <p className="text-xs text-primary/70">Goal</p>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold text-success">🏆</p>
+              <p className="text-xs text-success">On Track</p>
             </div>
           </div>
           <div className="flex-1 max-w-xs ml-6">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-primary/70">Progress</span>
+              <span className="text-xs text-primary/70">Progress to Goal</span>
               <span className="text-sm font-semibold text-primary">78%</span>
             </div>
-            <Progress value={78} className="h-2" />
+            <Progress value={78} className="h-3" />
+            <div className="flex justify-between mt-1 text-xs text-primary/60">
+              <span>13 to go</span>
+              <span>🎯 Next: 50</span>
+            </div>
           </div>
         </div>
       </div>
@@ -228,7 +239,7 @@ export function LeadsPriorityList({
       </div>
 
       {/* Filters and Search - Sticky */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border pb-4 space-y-4">
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border py-6 space-y-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -295,29 +306,29 @@ export function LeadsPriorityList({
             <div 
               key={lead.id} 
               className={cn(
-                "relative transition-all duration-500",
-                selectedLeadId === lead.id && "animate-pulse"
+                "relative transition-all duration-300",
+                selectedLeadId === lead.id && "transform translate-x-2"
               )}
               id={`lead-card-${lead.id}`}
             >
-              {/* Connection indicator */}
+              {/* Static connection indicator */}
               {selectedLeadId === lead.id && (
-                <div className="absolute -left-6 top-1/2 transform -translate-y-1/2 z-20">
-                  <div className="flex items-center">
-                    <div className="w-4 h-0.5 bg-primary animate-scale-in"></div>
-                    <div className="w-2 h-2 bg-primary rounded-full animate-ping"></div>
+                <div className="absolute -left-8 top-1/2 transform -translate-y-1/2 z-20">
+                  <div className="flex items-center text-primary">
+                    <div className="w-6 h-0.5 bg-primary"></div>
+                    <div className="w-3 h-3 bg-primary rounded-full border-2 border-background"></div>
                   </div>
                 </div>
               )}
               
               {index === 0 && lead.priority === 'hot' && (
-                <Badge className="absolute -top-2 -left-2 z-10 bg-hot-lead text-white animate-pulse">
+                <Badge className="absolute -top-2 -left-2 z-10 bg-hot-lead text-white">
                   🚨 TOP PRIORITY
                 </Badge>
               )}
               <div className={cn(
                 "transition-all duration-300",
-                selectedLeadId === lead.id && "ring-2 ring-primary/60 shadow-lg shadow-primary/20 bg-primary/5 rounded-lg"
+                selectedLeadId === lead.id && "ring-2 ring-primary shadow-lg shadow-primary/10 bg-primary/5 rounded-lg"
               )}>
                 <LeadCard
                   lead={lead}

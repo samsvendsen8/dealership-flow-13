@@ -47,16 +47,15 @@ export function LeadsQuickList({ leads, onLeadClick, selectedLeadId }: LeadsQuic
                   'relative border-l-2 bg-card border border-border rounded-lg p-3 cursor-pointer transition-all duration-300 hover:shadow-sm group',
                   priorityStyles[lead.priority],
                   selectedLeadId === lead.id ? 
-                    'ring-2 ring-primary bg-primary/10 shadow-md scale-[1.02] border-primary/50' : 
+                    'ring-2 ring-primary bg-primary/10 shadow-md border-primary/50 transform translate-x-1' : 
                     'hover:scale-[1.01]'
                 )}
                 onClick={() => onLeadClick(lead.id)}
               >
-                {/* Selection indicator */}
+                {/* Static selection indicator */}
                 {selectedLeadId === lead.id && (
-                  <div className="absolute -right-1 top-1/2 transform -translate-y-1/2">
-                    <div className="w-3 h-3 bg-primary rounded-full animate-ping"></div>
-                    <div className="absolute top-0 w-3 h-3 bg-primary rounded-full"></div>
+                  <div className="absolute -right-2 top-1/2 transform -translate-y-1/2">
+                    <div className="w-4 h-4 bg-primary rounded-full border-2 border-background shadow-sm"></div>
                   </div>
                 )}
                 
