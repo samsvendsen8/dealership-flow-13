@@ -294,20 +294,38 @@ export function LeadsPriorityList({
           {filteredAndSortedLeads.map((lead, index) => (
             <div 
               key={lead.id} 
-              className="relative"
+              className={cn(
+                "relative transition-all duration-500",
+                selectedLeadId === lead.id && "animate-pulse"
+              )}
               id={`lead-card-${lead.id}`}
             >
+              {/* Connection indicator */}
+              {selectedLeadId === lead.id && (
+                <div className="absolute -left-6 top-1/2 transform -translate-y-1/2 z-20">
+                  <div className="flex items-center">
+                    <div className="w-4 h-0.5 bg-primary animate-scale-in"></div>
+                    <div className="w-2 h-2 bg-primary rounded-full animate-ping"></div>
+                  </div>
+                </div>
+              )}
+              
               {index === 0 && lead.priority === 'hot' && (
                 <Badge className="absolute -top-2 -left-2 z-10 bg-hot-lead text-white animate-pulse">
                   🚨 TOP PRIORITY
                 </Badge>
               )}
-              <LeadCard
-                lead={lead}
-                onContact={onContact}
-                onViewDetails={onViewDetails}
-                isCondensed={isCondensed}
-              />
+              <div className={cn(
+                "transition-all duration-300",
+                selectedLeadId === lead.id && "ring-2 ring-primary/60 shadow-lg shadow-primary/20 bg-primary/5 rounded-lg"
+              )}>
+                <LeadCard
+                  lead={lead}
+                  onContact={onContact}
+                  onViewDetails={onViewDetails}
+                  isCondensed={isCondensed}
+                />
+              </div>
             </div>
           ))}
           
@@ -328,15 +346,18 @@ export function LeadsPriorityList({
                 setSelectedLeadId(leadId);
                 const element = document.getElementById(`lead-card-${leadId}`);
                 if (element) {
-                  element.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'center' 
-                  });
-                  // Highlight briefly
-                  element.classList.add('ring-2', 'ring-primary/50');
+                  // Clear previous selection first
                   setTimeout(() => {
-                    element.classList.remove('ring-2', 'ring-primary/50');
-                  }, 2000);
+                    element.scrollIntoView({ 
+                      behavior: 'smooth', 
+                      block: 'center' 
+                    });
+                  }, 100);
+                  
+                  // Auto-clear selection after 4 seconds
+                  setTimeout(() => {
+                    setSelectedLeadId(undefined);
+                  }, 4000);
                 }
               }}
               selectedLeadId={selectedLeadId}

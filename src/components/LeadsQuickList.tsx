@@ -44,12 +44,22 @@ export function LeadsQuickList({ leads, onLeadClick, selectedLeadId }: LeadsQuic
               <div
                 key={lead.id}
                 className={cn(
-                  'relative border-l-2 bg-card border border-border rounded-lg p-3 cursor-pointer transition-all duration-200 hover:shadow-sm',
+                  'relative border-l-2 bg-card border border-border rounded-lg p-3 cursor-pointer transition-all duration-300 hover:shadow-sm group',
                   priorityStyles[lead.priority],
-                  selectedLeadId === lead.id && 'ring-2 ring-primary/50 bg-primary/5'
+                  selectedLeadId === lead.id ? 
+                    'ring-2 ring-primary bg-primary/10 shadow-md scale-[1.02] border-primary/50' : 
+                    'hover:scale-[1.01]'
                 )}
                 onClick={() => onLeadClick(lead.id)}
               >
+                {/* Selection indicator */}
+                {selectedLeadId === lead.id && (
+                  <div className="absolute -right-1 top-1/2 transform -translate-y-1/2">
+                    <div className="w-3 h-3 bg-primary rounded-full animate-ping"></div>
+                    <div className="absolute top-0 w-3 h-3 bg-primary rounded-full"></div>
+                  </div>
+                )}
+                
                 <div className="space-y-2">
                   {/* Header */}
                   <div className="flex items-start justify-between">
