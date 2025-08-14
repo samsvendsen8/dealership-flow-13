@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Phone, Mail, MessageCircle, User, Calendar, DollarSign, Car, Send, Edit3, ChevronDown, ChevronRight, PlayCircle, Clock, Check, MessageSquare } from 'lucide-react';
+import { X, Phone, Mail, MessageCircle, User, Calendar, DollarSign, Car, Send, Edit3, ChevronDown, ChevronRight, PlayCircle, Timer, Check, MessageSquare } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -73,7 +73,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
         type: 'system',
         title: 'Lead Created',
         timestamp: '3 days ago',
-        icon: Clock,
+        icon: Timer,
         color: 'border-status-new',
         description: `${selectedLead.name} submitted inquiry through ${selectedLead.source}`,
         expandable: true,
@@ -476,8 +476,8 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                                      
                                      {item.content.type === 'meeting' && 'duration' in item.content && 'notes' in item.content && (
                                       <div className="space-y-2">
-                                        <div className="flex items-center space-x-2">
-                                          <Clock className="h-4 w-4 text-hot-lead" />
+                                         <div className="flex items-center space-x-2">
+                                           <Timer className="h-4 w-4 text-hot-lead" />
                                           <span className="text-sm font-medium">Meeting Summary</span>
                                           <span className="text-xs text-muted-foreground">({item.content.duration})</span>
                                         </div>
