@@ -119,7 +119,7 @@ export function LeadsPriorityList({
   }, [leads]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 padding-top-20">
       {/* Monthly Goals */}
       <div className="bg-gradient-primary/10 border border-primary/20 rounded-lg p-3">
         <div className="flex items-center justify-between">
