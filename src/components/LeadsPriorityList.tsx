@@ -285,7 +285,7 @@ export function LeadsPriorityList({
       </div>
 
       {/* Filters and Search - Sticky */}
-      <div className="sticky top-0 z-10 bg-card/95 backdrop-blur-sm border border-border rounded-lg shadow-sm py-6 px-4 mx-1 space-y-4">
+      <div className="sticky top-0 z-20 bg-card backdrop-blur-sm border border-border rounded-lg shadow-sm py-4 px-4 mb-4 space-y-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -346,7 +346,7 @@ export function LeadsPriorityList({
 
       {/* Tabs Section */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5 sticky top-32 z-30 bg-card/95 backdrop-blur-sm border border-border shadow-sm mx-1 rounded-lg p-1">
+        <TabsList className="grid w-full grid-cols-5 sticky top-44 z-30 bg-card backdrop-blur-sm border border-border shadow-sm mb-6 p-1.5">
           <TabsTrigger value="action-required" className="gap-2">
             🎯 Action Required
             <Badge variant="secondary" className="ml-1">
