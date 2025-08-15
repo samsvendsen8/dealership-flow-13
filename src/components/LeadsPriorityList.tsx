@@ -346,7 +346,7 @@ export function LeadsPriorityList({
 
       {/* Tabs Section */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5 sticky top-44 z-30 bg-card backdrop-blur-sm border border-border shadow-sm mb-6 p-3">
+        <TabsList className="grid w-full grid-cols-5 sticky top-44 z-30 bg-card backdrop-blur-sm border border-border shadow-sm mb-6 p-3 h-auto">
           <TabsTrigger value="action-required" className="gap-2">
             🎯 Action Required
             <Badge variant="secondary" className="ml-1">
