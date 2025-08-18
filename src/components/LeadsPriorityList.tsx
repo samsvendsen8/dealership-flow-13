@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { Search, Filter, SortDesc, Bell, Zap, LayoutGrid, List, Info } from 'lucide-react';
+import { Search, Filter, SortDesc, Bell, Zap, Info } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -34,7 +34,7 @@ export function LeadsPriorityList({
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('priority');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
-  const [isCondensed, setIsCondensed] = useState(false);
+  
   const [selectedLeadId, setSelectedLeadId] = useState<string | undefined>();
   const [activeTab, setActiveTab] = useState('action-required');
 
@@ -286,7 +286,7 @@ export function LeadsPriorityList({
       </div>
 
       {/* Filters and Search - Sticky */}
-      <div className="sticky top-0 z-20 bg-card backdrop-blur-sm border border-border rounded-lg shadow-sm py-4 px-4 mb-4 space-y-4">
+      <div className="sticky top-0 z-30 bg-card backdrop-blur-sm border border-border rounded-lg shadow-sm py-4 px-4 mb-4 space-y-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -323,15 +323,6 @@ export function LeadsPriorityList({
               <SelectItem value="contacted">Contacted</SelectItem>
             </SelectContent>
           </Select>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsCondensed(!isCondensed)}
-            className="gap-2"
-          >
-            {isCondensed ? <LayoutGrid className="h-4 w-4" /> : <List className="h-4 w-4" />}
-            {isCondensed ? 'Expanded' : 'Condensed'}
-          </Button>
         </div>
 
         {/* Priority Algorithm Info - Tooltip Icon */}
@@ -358,7 +349,7 @@ export function LeadsPriorityList({
 
       {/* Tabs Section */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5 sticky top-44 z-30 bg-card backdrop-blur-sm border border-border shadow-sm mb-6 p-3 h-auto">
+        <TabsList className="grid w-full grid-cols-5 sticky top-28 z-20 bg-card backdrop-blur-sm border border-border shadow-sm mb-6 p-3 h-auto">
           <TabsTrigger value="action-required" className="gap-2">
             🎯 Action Required
             <Badge variant="secondary" className="ml-1">
@@ -401,7 +392,7 @@ export function LeadsPriorityList({
               <div className="grid grid-cols-12 gap-6">
                 {/* Sticky Quick List Sidebar - 4 columns */}
                 <div className="col-span-4">
-                  <div className="sticky top-44 z-10 h-[calc(100vh-12rem)] overflow-auto">
+                  <div className="sticky top-44 z-10 h-[calc(100vh-14rem)] overflow-auto">
                     <LeadsQuickList 
                       leads={currentLeads}
                       onLeadClick={(leadId) => {
@@ -415,7 +406,7 @@ export function LeadsPriorityList({
                 {/* Single Card Focus Area - 8 columns */}
                 <div className="col-span-8">
                   {currentLeads.length > 0 ? (
-                    <div className="sticky top-44 z-10">
+                    <div className="sticky top-44 z-5">
                       {(() => {
                         const displayLead = selectedLeadId ? 
                           currentLeads.find(lead => lead.id === selectedLeadId) : 
