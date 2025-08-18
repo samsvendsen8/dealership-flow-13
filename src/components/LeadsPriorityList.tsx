@@ -1,11 +1,12 @@
 import { useState, useMemo, useCallback } from 'react';
-import { Search, Filter, SortDesc, Bell, Zap, LayoutGrid, List } from 'lucide-react';
+import { Search, Filter, SortDesc, Bell, Zap, LayoutGrid, List, Info } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { LeadCard, type Lead } from './LeadCard';
 import { LeadsQuickList } from './LeadsQuickList';
 import { cn } from '@/lib/utils';
@@ -333,14 +334,25 @@ export function LeadsPriorityList({
           </Button>
         </div>
 
-        {/* Priority Algorithm Info */}
-        <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-          <h3 className="font-semibold text-primary mb-2">🤖 AI Priority Scoring</h3>
-          <p className="text-sm text-primary/80">
-            Leads are automatically ranked using: Priority level + Deal value + Time on lot + Recent activity. 
-            <strong>Recently contacted leads move down</strong> since you're waiting for their response, 
-            while new customer activity gets top priority.
-          </p>
+        {/* Priority Algorithm Info - Tooltip Icon */}
+        <div className="flex items-center gap-2">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Info className="h-4 w-4 text-primary" />
+                  <span>AI Priority Scoring</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-sm">
+                <p className="text-sm">
+                  🤖 Leads are automatically ranked using: Priority level + Deal value + Time on lot + Recent activity. 
+                  <strong>Recently contacted leads move down</strong> since you're waiting for their response, 
+                  while new customer activity gets top priority.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
 
@@ -385,52 +397,62 @@ export function LeadsPriorityList({
           
           return (
             <TabsContent key={category} value={category} className="mt-6">
-              {/* Two Column Layout */}
+              {/* Two Column Layout - Sticky Quick List + Single Card */}
               <div className="grid grid-cols-12 gap-6">
-                {/* Main Cards Section - 9 columns */}
-                <div className="col-span-9 space-y-4">
-                  {currentLeads.map((lead, index) => (
-                    <div 
-                      key={lead.id} 
-                      className={cn(
-                        "relative transition-all duration-300",
-                        selectedLeadId === lead.id && "transform translate-x-2"
-                      )}
-                      id={`lead-card-${lead.id}`}
-                    >
-                      {/* Static connection indicator */}
-                      {selectedLeadId === lead.id && (
-                        <div className="absolute -left-8 top-1/2 transform -translate-y-1/2 z-20">
-                          <div className="flex items-center text-primary">
-                            <div className="w-6 h-0.5 bg-primary"></div>
-                            <div className="w-3 h-3 bg-primary rounded-full border-2 border-background"></div>
+                {/* Sticky Quick List Sidebar - 4 columns */}
+                <div className="col-span-4">
+                  <div className="sticky top-44 z-10 h-[calc(100vh-12rem)] overflow-auto">
+                    <LeadsQuickList 
+                      leads={currentLeads}
+                      onLeadClick={(leadId) => {
+                        setSelectedLeadId(leadId);
+                      }}
+                      selectedLeadId={selectedLeadId || (currentLeads.length > 0 ? currentLeads[0].id : undefined)}
+                    />
+                  </div>
+                </div>
+
+                {/* Single Card Focus Area - 8 columns */}
+                <div className="col-span-8">
+                  {currentLeads.length > 0 ? (
+                    <div className="sticky top-44 z-10">
+                      {(() => {
+                        const displayLead = selectedLeadId ? 
+                          currentLeads.find(lead => lead.id === selectedLeadId) : 
+                          currentLeads[0];
+                        
+                        if (!displayLead) return null;
+                        
+                        const leadIndex = currentLeads.findIndex(lead => lead.id === displayLead.id);
+                        
+                        return (
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between bg-card/80 backdrop-blur-sm border rounded-lg p-3">
+                              <div className="text-sm text-muted-foreground">
+                                Lead {leadIndex + 1} of {currentLeads.length} • {displayLead.name}
+                              </div>
+                              {leadIndex === 0 && displayLead.priority === 'hot' && category === 'action-required' && (
+                                <Badge className="bg-hot-lead text-white">
+                                  🚨 TOP PRIORITY
+                                </Badge>
+                              )}
+                            </div>
+                            
+                            <LeadCard
+                              lead={displayLead}
+                              onContact={onContact}
+                              onViewDetails={onViewDetails}
+                              isCondensed={false}
+                              isFocused={true}
+                            />
                           </div>
-                        </div>
-                      )}
-                      
-                      {index === 0 && lead.priority === 'hot' && category === 'action-required' && (
-                        <Badge className="absolute -top-2 -left-2 z-10 bg-hot-lead text-white">
-                          🚨 TOP PRIORITY
-                        </Badge>
-                      )}
-                      <div className={cn(
-                        "transition-all duration-300",
-                        selectedLeadId === lead.id && "ring-2 ring-primary shadow-lg shadow-primary/10 bg-primary/5 rounded-lg"
-                      )}>
-                        <LeadCard
-                          lead={lead}
-                          onContact={onContact}
-                          onViewDetails={onViewDetails}
-                          isCondensed={isCondensed}
-                        />
-                      </div>
+                        );
+                      })()}
                     </div>
-                  ))}
-                  
-                  {currentLeads.length === 0 && (
-                    <div className="text-center py-12 text-muted-foreground">
-                      <p className="text-lg mb-2">No leads found</p>
-                      <p className="text-sm">
+                  ) : (
+                    <div className="text-center p-12 text-muted-foreground">
+                      <h3 className="text-lg font-semibold mb-2">No leads in this category</h3>
+                      <p>
                         {category === 'action-required' && 'No leads requiring immediate action.'}
                         {category === 'awaiting-response' && 'No leads awaiting your response.'}
                         {category === 're-engaged' && 'No recently re-engaged leads.'}
@@ -439,32 +461,6 @@ export function LeadsPriorityList({
                       </p>
                     </div>
                   )}
-                </div>
-
-                {/* Quick List Sidebar - 3 columns */}
-                <div className="col-span-3">
-                  <div className="sticky top-24">
-                    <LeadsQuickList
-                      leads={currentLeads}
-                      onLeadClick={(leadId) => {
-                        setSelectedLeadId(leadId);
-                        const element = document.getElementById(`lead-card-${leadId}`);
-                        if (element) {
-                          setTimeout(() => {
-                            element.scrollIntoView({ 
-                              behavior: 'smooth', 
-                              block: 'center' 
-                            });
-                          }, 100);
-                          
-                          setTimeout(() => {
-                            setSelectedLeadId(undefined);
-                          }, 4000);
-                        }
-                      }}
-                      selectedLeadId={selectedLeadId}
-                    />
-                  </div>
                 </div>
               </div>
             </TabsContent>
