@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { LeadsPriorityList } from '@/components/LeadsPriorityList';
+import { LeadFocusView } from '@/components/LeadFocusView';
 import { NotificationPanel } from '@/components/NotificationPanel';
 import { ToastNotification } from '@/components/ToastNotification';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Eye, List } from 'lucide-react';
 import type { Lead } from '@/components/LeadCard';
 
 // Mock data - in a real app this would come from your CRM API
@@ -21,7 +24,17 @@ const mockLeads: Lead[] = [
     timeOnLot: '15 minutes',
     notes: 'Customer expressed urgent interest in financing options',
     journeyStage: 'visit',
-    stageProgress: 65
+    stageProgress: 65,
+    contactAttempts: 2,
+    responseRate: 100,
+    daysSinceLastContact: 0,
+    nextFollowUp: 'Today 3pm',
+    dealProbability: 90,
+    sentiment: 'positive',
+    lastAppointment: 'Today',
+    keyInsight: 'Currently on lot - ready to make decision today with right financing',
+    preferredContact: 'phone',
+    budget: { min: 26000, max: 30000 }
   },
   {
     id: '2',
@@ -36,7 +49,18 @@ const mockLeads: Lead[] = [
     source: 'Referral',
     notes: 'Ready to purchase, waiting for trade-in appraisal',
     journeyStage: 'proposal',
-    stageProgress: 85
+    stageProgress: 85,
+    contactAttempts: 3,
+    responseRate: 67,
+    daysSinceLastContact: 0,
+    nextFollowUp: 'Tomorrow 2pm',
+    dealProbability: 85,
+    sentiment: 'positive',
+    lastAppointment: 'Yesterday',
+    keyInsight: 'Mentioned budget increase after seeing vehicle in person - ready to move forward',
+    preferredContact: 'phone',
+    budget: { min: 45000, max: 55000 },
+    tradeInVehicle: '2018 Honda Accord'
   },
   {
     id: '3',
@@ -51,7 +75,17 @@ const mockLeads: Lead[] = [
     source: 'Google Ads',
     notes: 'Interested in lease options, needs to discuss with spouse',
     journeyStage: 'financing',
-    stageProgress: 90
+    stageProgress: 90,
+    contactAttempts: 4,
+    responseRate: 75,
+    daysSinceLastContact: 1,
+    nextFollowUp: 'Friday 10am',
+    dealProbability: 70,
+    sentiment: 'neutral',
+    lastAppointment: '3 days ago',
+    keyInsight: 'Spouse approval needed - scheduled joint call Friday morning',
+    preferredContact: 'email',
+    budget: { min: 40000, max: 48000 }
   },
   {
     id: '4',
@@ -67,7 +101,16 @@ const mockLeads: Lead[] = [
     timeOnLot: '5 minutes',
     notes: 'Looking for work truck, budget conscious',
     journeyStage: 'test-drive',
-    stageProgress: 45
+    stageProgress: 45,
+    contactAttempts: 1,
+    responseRate: 100,
+    daysSinceLastContact: 0,
+    nextFollowUp: 'Monday 9am',
+    dealProbability: 60,
+    sentiment: 'neutral',
+    keyInsight: 'Price sensitive - mentioned competitor pricing, needs value proposition',
+    preferredContact: 'text',
+    budget: { min: 35000, max: 40000 }
   },
   {
     id: '5',
@@ -82,7 +125,16 @@ const mockLeads: Lead[] = [
     source: 'Email Campaign',
     notes: 'Initial inquiry, needs more information',
     journeyStage: 'engaged',
-    stageProgress: 30
+    stageProgress: 30,
+    contactAttempts: 2,
+    responseRate: 50,
+    daysSinceLastContact: 1,
+    dealProbability: 30,
+    sentiment: 'neutral',
+    lastAppointment: 'Never',
+    keyInsight: 'Early stage - needs education about vehicle benefits and financing options',
+    preferredContact: 'email',
+    budget: { min: 25000, max: 32000 }
   },
   {
     id: '6',
@@ -97,7 +149,16 @@ const mockLeads: Lead[] = [
     source: 'Website',
     notes: 'Cash buyer, ready to purchase today',
     journeyStage: 'inquiry',
-    stageProgress: 15
+    stageProgress: 15,
+    contactAttempts: 0,
+    responseRate: 0,
+    daysSinceLastContact: 0,
+    nextFollowUp: 'Today 4pm',
+    dealProbability: 95,
+    sentiment: 'positive',
+    keyInsight: 'Cash buyer with urgent timeline - immediate follow-up critical',
+    preferredContact: 'phone',
+    budget: { min: 40000, max: 50000 }
   }
 ];
 
@@ -105,6 +166,8 @@ const Index = () => {
   const [leads, setLeads] = useState<Lead[]>(mockLeads);
   const [isNotificationPanelOpen, setIsNotificationPanelOpen] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | undefined>();
+  const [viewMode, setViewMode] = useState<'list' | 'focus'>('list');
+  const [focusedLeadId, setFocusedLeadId] = useState<string | null>(null);
   const [toastQueue, setToastQueue] = useState<Array<{
     id: string;
     leadId: string;
@@ -272,8 +335,21 @@ const Index = () => {
 
   const handleViewDetails = (leadId: string) => {
     const lead = leads.find(l => l.id === leadId);
-    setSelectedLead(lead);
-    setIsNotificationPanelOpen(true);
+    if (viewMode === 'focus') {
+      setFocusedLeadId(leadId);
+    } else {
+      setSelectedLead(lead);
+      setIsNotificationPanelOpen(true);
+    }
+  };
+
+  const handleSelectFocusLead = (leadId: string) => {
+    setFocusedLeadId(leadId);
+  };
+
+  const handleBackToList = () => {
+    setViewMode('list');
+    setFocusedLeadId(null);
   };
 
   const handleToggleNotifications = () => {
@@ -355,81 +431,105 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-6 py-8">
-        <LeadsPriorityList
+      {viewMode === 'focus' ? (
+        <LeadFocusView 
           leads={leads}
+          selectedLeadId={focusedLeadId}
+          onSelectLead={handleSelectFocusLead}
           onContact={handleContact}
           onViewDetails={handleViewDetails}
-          onToggleNotifications={handleToggleNotifications}
-          onTriggerToast={handleTriggerToast}
-          hasNotifications={isNotificationPanelOpen || toastQueue.length > 0}
+          onBack={handleBackToList}
         />
-      </div>
+      ) : (
+        <div className="container mx-auto px-6 py-8">
+          {/* View Toggle Button */}
+          <div className="fixed top-4 left-4 z-40">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setViewMode('focus');
+                if (leads.length > 0) {
+                  setFocusedLeadId(leads[0].id);
+                }
+              }}
+              className="gap-2 bg-background/95 backdrop-blur-sm border shadow-lg"
+            >
+              <Eye className="h-4 w-4" />
+              Focus View
+            </Button>
+          </div>
 
-      <NotificationPanel
-        isOpen={isNotificationPanelOpen}
-        onClose={() => {
-          setIsNotificationPanelOpen(false);
-          setContactMethod(undefined);
-          setAiSuggestedResponse('');
-        }}
-        selectedLead={selectedLead}
-        onContact={(leadId, method) => {
-          // Update lead journey stage when actually sending the contact
-          setLeads(prevLeads => 
-            prevLeads.map(l => {
-              if (l.id === leadId) {
-                const stages: Lead['journeyStage'][] = ['inquiry', 'engaged', 'visit', 'test-drive', 'proposal', 'financing', 'sold', 'delivered'];
-                const currentIndex = stages.indexOf(l.journeyStage);
-                const nextStage = currentIndex < stages.length - 1 ? stages[currentIndex + 1] : l.journeyStage;
-                
-                return {
-                  ...l,
-                  journeyStage: nextStage,
-                  stageProgress: Math.min(100, l.stageProgress + 15),
-                  lastActivity: `${method} contact sent`,
-                  status: 'contacted' as const
-                };
-              }
-              return l;
-            })
-          );
-          
-          toast({
-            title: `Message Sent`,
-            description: `${method} sent to ${selectedLead?.name} - Journey stage updated!`,
-          });
-          
-          setIsNotificationPanelOpen(false);
-          setContactMethod(undefined);
-          setAiSuggestedResponse('');
-        }}
-        contactMethod={contactMethod}
-        aiSuggestedResponse={aiSuggestedResponse}
-      />
+          <LeadsPriorityList
+            leads={leads}
+            onContact={handleContact}
+            onViewDetails={handleViewDetails}
+            onToggleNotifications={handleToggleNotifications}
+            onTriggerToast={handleTriggerToast}
+            hasNotifications={isNotificationPanelOpen || toastQueue.length > 0}
+          />
+        </div>
+      )}
+
+      {viewMode === 'list' && (
+        <NotificationPanel
+          isOpen={isNotificationPanelOpen}
+          onClose={() => {
+            setIsNotificationPanelOpen(false);
+            setContactMethod(undefined);
+            setAiSuggestedResponse('');
+          }}
+          selectedLead={selectedLead}
+          onContact={(leadId, method) => {
+            setLeads(prevLeads => 
+              prevLeads.map(l => {
+                if (l.id === leadId) {
+                  const stages: Lead['journeyStage'][] = ['inquiry', 'engaged', 'visit', 'test-drive', 'proposal', 'financing', 'sold', 'delivered'];
+                  const currentIndex = stages.indexOf(l.journeyStage);
+                  const nextStage = currentIndex < stages.length - 1 ? stages[currentIndex + 1] : l.journeyStage;
+                  
+                  return {
+                    ...l,
+                    journeyStage: nextStage,
+                    stageProgress: Math.min(100, l.stageProgress + 15),
+                    lastActivity: `${method} contact sent`,
+                    status: 'contacted' as const
+                  };
+                }
+                return l;
+              })
+            );
+            
+            toast({
+              title: `Message Sent`,
+              description: `${method} sent to ${selectedLead?.name} - Journey stage updated!`,
+            });
+            
+            setIsNotificationPanelOpen(false);
+            setContactMethod(undefined);
+            setAiSuggestedResponse('');
+          }}
+          contactMethod={contactMethod}
+          aiSuggestedResponse={aiSuggestedResponse}
+        />
+      )}
 
       {/* Stacked Toast Notifications */}
       <div className="fixed top-4 right-4 space-y-3 z-50">
-        {(() => {
-          console.log('Rendering toasts, queue length:', toastQueue.length);
-          return toastQueue.map((toast, index) => {
-            console.log('Rendering toast:', toast, 'at index:', index);
-            return (
-              <ToastNotification
-                key={toast.id}
-                isVisible={true}
-                leadName={toast.leadName}
-                message={toast.message}
-                suggestedResponse={toast.suggestedResponse}
-                onSend={(message) => handleSendResponse(toast.id, message)}
-                onEdit={handleEditResponse}
-                onViewDetails={() => handleViewToastDetails(toast.id)}
-                onDismiss={() => handleDismissToast(toast.id)}
-                stackIndex={index}
-              />
-            );
-          });
-        })()}
+        {toastQueue.map((toast, index) => (
+          <ToastNotification
+            key={toast.id}
+            isVisible={true}
+            leadName={toast.leadName}
+            message={toast.message}
+            suggestedResponse={toast.suggestedResponse}
+            onSend={(message) => handleSendResponse(toast.id, message)}
+            onEdit={handleEditResponse}
+            onViewDetails={() => handleViewToastDetails(toast.id)}
+            onDismiss={() => handleDismissToast(toast.id)}
+            stackIndex={index}
+          />
+        ))}
       </div>
     </div>
   );

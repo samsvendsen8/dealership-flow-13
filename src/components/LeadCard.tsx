@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Phone, Mail, MessageCircle, Clock, DollarSign, Car, ArrowRight, ChevronDown, Calendar, MapPin, FileText } from 'lucide-react';
+import { Phone, Mail, MessageCircle, Clock, DollarSign, Car, ArrowRight, ChevronDown, Calendar, MapPin, FileText, TrendingUp, Heart, Target, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,18 @@ export interface Lead {
   notes?: string;
   journeyStage: 'inquiry' | 'engaged' | 'visit' | 'test-drive' | 'proposal' | 'financing' | 'sold' | 'delivered';
   stageProgress: number; // 0-100 percentage
+  // Enhanced data fields
+  contactAttempts?: number;
+  responseRate?: number;
+  daysSinceLastContact?: number;
+  nextFollowUp?: string;
+  dealProbability?: number;
+  sentiment?: 'positive' | 'neutral' | 'negative';
+  lastAppointment?: string;
+  keyInsight?: string;
+  preferredContact?: 'phone' | 'email' | 'text';
+  budget?: { min: number; max: number };
+  tradeInVehicle?: string;
 }
 
 interface LeadCardProps {
@@ -28,6 +40,7 @@ interface LeadCardProps {
   onContact: (leadId: string, method: 'phone' | 'email' | 'text') => void;
   onViewDetails: (leadId: string) => void;
   isCondensed?: boolean;
+  isFocused?: boolean;
 }
 
 const priorityStyles = {
@@ -60,7 +73,7 @@ const journeyStages = {
   delivered: { label: 'Delivered', icon: '🎉', color: 'bg-emerald-500' }
 };
 
-export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false }: LeadCardProps) {
+export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, isFocused = false }: LeadCardProps) {
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
   
   // Get recommended quick actions based on journey stage and contact history
@@ -124,6 +137,13 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false }
 
   const quickActions = getQuickActions();
   
+  // Sentiment colors and icons
+  const sentimentConfig = {
+    positive: { color: 'text-success', icon: '😊', bg: 'bg-success/10' },
+    neutral: { color: 'text-muted-foreground', icon: '😐', bg: 'bg-muted/10' },
+    negative: { color: 'text-destructive', icon: '😟', bg: 'bg-destructive/10' }
+  };
+
   if (isCondensed) {
     return (
       <Card 
@@ -138,7 +158,14 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false }
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3">
                 <div>
-                  <h3 className="font-semibold text-foreground truncate">{lead.name}</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-foreground truncate">{lead.name}</h3>
+                    {lead.sentiment && (
+                      <span className={cn("text-xs", sentimentConfig[lead.sentiment].color)}>
+                        {sentimentConfig[lead.sentiment].icon}
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs text-muted-foreground truncate">{lead.email}</p>
                 </div>
                 <div className="flex items-center gap-2 text-xs">
@@ -157,7 +184,25 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false }
                   <DollarSign className="h-3 w-3 text-success" />
                   ${lead.value.toLocaleString()}
                 </span>
+                {lead.dealProbability && (
+                  <span className="flex items-center gap-1">
+                    <Target className="h-3 w-3 text-primary" />
+                    {lead.dealProbability}%
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-3 mt-1 text-xs">
                 <span>{lead.lastActivity}</span>
+                {lead.contactAttempts && (
+                  <span className="text-muted-foreground">
+                    📞 {lead.contactAttempts} attempts
+                  </span>
+                )}
+                {lead.nextFollowUp && (
+                  <span className="text-primary">
+                    📅 Next: {lead.nextFollowUp}
+                  </span>
+                )}
               </div>
             </div>
             
@@ -198,15 +243,26 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false }
     <Card 
       className={cn(
         'relative border-l-4 transition-all duration-300 cursor-pointer shadow-soft hover:shadow-medium',
-        priorityStyles[lead.priority]
+        priorityStyles[lead.priority],
+        isFocused && 'ring-2 ring-primary shadow-lg scale-[1.02]'
       )}
       onClick={() => onViewDetails(lead.id)}
     >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-semibold text-lg text-foreground">{lead.name}</h3>
-            <p className="text-sm text-muted-foreground">{lead.email}</p>
+          <div className="flex items-center gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className={cn("font-semibold text-foreground", isFocused ? "text-xl" : "text-lg")}>{lead.name}</h3>
+                {lead.sentiment && (
+                  <span className={cn("px-2 py-1 rounded-full text-xs font-medium", sentimentConfig[lead.sentiment].bg, sentimentConfig[lead.sentiment].color)}>
+                    {sentimentConfig[lead.sentiment].icon} {lead.sentiment}
+                  </span>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground">{lead.email}</p>
+              <p className="text-sm text-muted-foreground">{lead.phone}</p>
+            </div>
           </div>
           <div className="flex flex-col items-end gap-2">
             <Badge className={statusStyles[lead.status]} variant="secondary">
@@ -215,11 +271,49 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false }
             <span className="text-xs text-muted-foreground font-medium">
               {priorityLabels[lead.priority]}
             </span>
+            {lead.dealProbability && (
+              <div className="flex items-center gap-1 text-xs">
+                <Target className="h-3 w-3 text-primary" />
+                <span className="font-medium text-primary">{lead.dealProbability}% likely</span>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Enhanced Metrics Row */}
+        <div className="grid grid-cols-3 gap-4 mt-4 p-3 bg-muted/20 rounded-lg">
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-1 text-lg font-bold text-success">
+              <DollarSign className="h-4 w-4" />
+              ${lead.value.toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground">Deal Value</p>
+            {lead.budget && (
+              <p className="text-xs text-muted-foreground">Budget: ${lead.budget.min.toLocaleString()}-${lead.budget.max.toLocaleString()}</p>
+            )}
+          </div>
+          <div className="text-center border-x border-border px-2">
+            <div className="flex items-center justify-center gap-1 text-lg font-bold text-primary">
+              {lead.contactAttempts || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">Contact Attempts</p>
+            {lead.responseRate && (
+              <p className="text-xs text-success">{lead.responseRate}% response rate</p>
+            )}
+          </div>
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-1 text-lg font-bold text-foreground">
+              {lead.daysSinceLastContact || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">Days Since Contact</p>
+            {lead.nextFollowUp && (
+              <p className="text-xs text-primary">Next: {lead.nextFollowUp}</p>
+            )}
           </div>
         </div>
         
         {/* Journey Stage Progress */}
-        <div className="mt-3 p-2 bg-muted/30 rounded-md">
+        <div className="mt-3 p-3 bg-muted/30 rounded-md">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-medium text-muted-foreground">Journey Stage</span>
             <span className="text-xs text-muted-foreground">{lead.stageProgress}%</span>
@@ -230,9 +324,9 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false }
             </div>
             <span className="text-sm font-medium">{journeyStages[lead.journeyStage].label}</span>
             <div className="flex-1 mx-2">
-              <div className="w-full bg-muted rounded-full h-1.5">
+              <div className="w-full bg-muted rounded-full h-2">
                 <div 
-                  className={cn("h-1.5 rounded-full transition-all duration-500", journeyStages[lead.journeyStage].color)}
+                  className={cn("h-2 rounded-full transition-all duration-500", journeyStages[lead.journeyStage].color)}
                   style={{ width: `${lead.stageProgress}%` }}
                 />
               </div>
@@ -243,6 +337,65 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false }
       </CardHeader>
 
       <CardContent className="space-y-4">
+        {/* Key Insight Section */}
+        {lead.keyInsight && (
+          <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp className="h-4 w-4 text-primary" />
+              <h4 className="font-medium text-primary text-sm">Key Insight</h4>
+            </div>
+            <p className="text-sm text-foreground">{lead.keyInsight}</p>
+          </div>
+        )}
+
+        {/* Vehicle & Trade-in Info */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-muted/20 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-1">
+              <Car className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium">Interested Vehicle</span>
+            </div>
+            <p className="text-sm font-semibold text-foreground">{lead.vehicle}</p>
+          </div>
+          {lead.tradeInVehicle && (
+            <div className="bg-muted/20 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <RefreshCw className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium">Trade-in Vehicle</span>
+              </div>
+              <p className="text-sm font-semibold text-foreground">{lead.tradeInVehicle}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Contact Preferences & History */}
+        <div className="bg-muted/10 rounded-lg p-3">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="font-medium text-sm">Contact Information</h4>
+            {lead.preferredContact && (
+              <Badge variant="outline" className="text-xs">
+                Prefers {lead.preferredContact}
+              </Badge>
+            )}
+          </div>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <span>{lead.lastActivity}</span>
+            </div>
+            {lead.lastAppointment && (
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span>Last: {lead.lastAppointment}</span>
+              </div>
+            )}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Source:</span>
+              <span className="text-xs font-medium">{lead.source}</span>
+            </div>
+          </div>
+        </div>
+
         {/* Quick Actions Bar */}
         <div className="bg-muted/20 rounded-lg p-3 space-y-2">
           <div className="flex items-center justify-between">
@@ -331,30 +484,12 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false }
             </CollapsibleContent>
           </div>
         </Collapsible>
-        
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <Car className="h-4 w-4 text-muted-foreground" />
-            <span className="font-medium">{lead.vehicle}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <DollarSign className="h-4 w-4 text-success" />
-            <span className="font-medium">${lead.value.toLocaleString()}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-muted-foreground" />
-            <span>{lead.lastActivity}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Source:</span>
-            <span className="text-xs font-medium">{lead.source}</span>
-          </div>
-        </div>
 
         {lead.timeOnLot && (
-          <div className="bg-warning/10 border border-warning/20 rounded-md p-2">
-            <p className="text-xs font-medium text-warning">
-              🚗 Customer on lot: {lead.timeOnLot}
+          <div className="bg-warning/10 border border-warning/20 rounded-md p-3">
+            <p className="text-sm font-medium text-warning flex items-center gap-2">
+              <AlertCircle className="h-4 w-4" />
+              Customer on lot: {lead.timeOnLot}
             </p>
           </div>
         )}
