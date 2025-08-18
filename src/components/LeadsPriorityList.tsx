@@ -38,6 +38,15 @@ export function LeadsPriorityList({
   const [selectedLeadId, setSelectedLeadId] = useState<string | undefined>();
   const [activeTab, setActiveTab] = useState('action-required');
 
+  // Handle tab change and reset to first lead
+  const handleTabChange = (newTab: string) => {
+    setActiveTab(newTab);
+    const newLeads = getFilteredAndSortedLeads(leadsByCategory[newTab as keyof typeof leadsByCategory]);
+    if (newLeads.length > 0) {
+      setSelectedLeadId(newLeads[0].id);
+    }
+  };
+
   // Priority scoring function
   const getPriorityScore = useCallback((lead: Lead): number => {
     let score = 0;
@@ -301,7 +310,7 @@ export function LeadsPriorityList({
       </div>
 
       {/* Tabs Section */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid w-full grid-cols-5 sticky top-28 z-20 bg-card backdrop-blur-sm border border-border shadow-sm mb-6 p-3 h-auto">
           <TabsTrigger value="action-required" className="gap-2">
             🎯 Action Required
@@ -387,7 +396,7 @@ export function LeadsPriorityList({
                               onContact={onContact}
                               onViewDetails={onViewDetails}
                               isCondensed={false}
-                              isFocused={true}
+                              isFocused={false}
                             />
                           </div>
                         );
