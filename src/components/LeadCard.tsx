@@ -4,7 +4,29 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Timeline } from '@/components/ui/timeline';
+import { WorkPlanProgress } from '@/components/WorkPlanProgress';
 import { cn } from '@/lib/utils';
+
+export interface WorkPlanStep {
+  id: string;
+  label: string;
+  type: 'call' | 'email' | 'text' | 'appointment' | 'follow-up';
+  dueDate?: string;
+  completedDate?: string;
+  status: 'pending' | 'completed' | 'overdue' | 'skipped';
+  attempts?: number;
+  maxAttempts: number;
+  notes?: string;
+}
+
+export interface JourneyStageData {
+  stage: string;
+  startDate: string;
+  completedDate?: string;
+  workPlan: WorkPlanStep[];
+  currentStep: number; // Index of current step
+}
 
 export interface Lead {
   id: string;
@@ -33,12 +55,17 @@ export interface Lead {
   preferredContact?: 'phone' | 'email' | 'text';
   budget?: { min: number; max: number };
   tradeInVehicle?: string;
+  // Work plan and timeline data
+  journeyTimeline?: JourneyStageData[];
+  currentWorkPlan?: WorkPlanStep[];
+  currentStepIndex?: number;
 }
 
 interface LeadCardProps {
   lead: Lead;
   onContact: (leadId: string, method: 'phone' | 'email' | 'text') => void;
   onViewDetails: (leadId: string) => void;
+  onExecuteStep?: (leadId: string, stepId: string, type: WorkPlanStep['type']) => void;
   isCondensed?: boolean;
   isFocused?: boolean;
 }
@@ -73,7 +100,7 @@ const journeyStages = {
   delivered: { label: 'Delivered', icon: '🎉', color: 'bg-emerald-500' }
 };
 
-export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, isFocused = false }: LeadCardProps) {
+export function LeadCard({ lead, onContact, onViewDetails, onExecuteStep, isCondensed = false, isFocused = false }: LeadCardProps) {
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
   
   // Get recommended quick actions based on journey stage and contact history
@@ -172,7 +199,14 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
                   <div className={cn("w-4 h-4 rounded-full flex items-center justify-center text-xs text-white", journeyStages[lead.journeyStage].color)}>
                     {journeyStages[lead.journeyStage].icon}
                   </div>
-                  <span className="font-medium">{journeyStages[lead.journeyStage].label}</span>
+                  <div className="flex flex-col">
+                    <span className="font-medium">{journeyStages[lead.journeyStage].label}</span>
+                    {lead.currentWorkPlan && lead.currentStepIndex !== undefined && (
+                      <span className="text-muted-foreground truncate">
+                        Step {lead.currentStepIndex + 1}: {lead.currentWorkPlan[lead.currentStepIndex]?.label}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
@@ -312,26 +346,50 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
           </div>
         </div>
         
-        {/* Journey Stage Progress */}
-        <div className="mt-3 p-3 bg-muted/30 rounded-md">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-medium text-muted-foreground">Journey Stage</span>
-            <span className="text-xs text-muted-foreground">{lead.stageProgress}%</span>
+        {/* Journey Stage Progress with Timeline */}
+        <div className="mt-3 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-muted-foreground">Journey Progress</span>
+            {lead.currentWorkPlan && lead.currentStepIndex !== undefined && (
+              <Badge variant="outline" className="text-xs">
+                Step {lead.currentStepIndex + 1}/{lead.currentWorkPlan.length}
+              </Badge>
+            )}
           </div>
-          <div className="flex items-center gap-2">
+          
+          {/* Timeline Dots */}
+          {lead.journeyTimeline && (
+            <Timeline 
+              journeyData={lead.journeyTimeline.map(stage => ({
+                stage: stage.stage,
+                date: stage.startDate,
+                isCompleted: !!stage.completedDate,
+                isCurrent: stage.stage === journeyStages[lead.journeyStage].label,
+                isOverdue: stage.workPlan.some(step => step.status === 'overdue'),
+                workPlanProgress: {
+                  completed: stage.workPlan.filter(step => step.status === 'completed').length,
+                  total: stage.workPlan.length,
+                  overdue: stage.workPlan.filter(step => step.status === 'overdue').length
+                }
+              }))}
+              className="px-2"
+            />
+          )}
+          
+          {/* Current Stage Info */}
+          <div className="flex items-center gap-2 p-2 bg-muted/20 rounded-md">
             <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-xs text-white", journeyStages[lead.journeyStage].color)}>
               {journeyStages[lead.journeyStage].icon}
             </div>
-            <span className="text-sm font-medium">{journeyStages[lead.journeyStage].label}</span>
-            <div className="flex-1 mx-2">
-              <div className="w-full bg-muted rounded-full h-2">
-                <div 
-                  className={cn("h-2 rounded-full transition-all duration-500", journeyStages[lead.journeyStage].color)}
-                  style={{ width: `${lead.stageProgress}%` }}
-                />
-              </div>
+            <div className="flex-1">
+              <span className="text-sm font-medium">{journeyStages[lead.journeyStage].label}</span>
+              {lead.currentWorkPlan && lead.currentStepIndex !== undefined && (
+                <p className="text-xs text-muted-foreground">
+                  Current: {lead.currentWorkPlan[lead.currentStepIndex]?.label}
+                </p>
+              )}
             </div>
-            <ArrowRight className="h-3 w-3 text-muted-foreground" />
+            <div className="text-xs text-muted-foreground">{lead.stageProgress}%</div>
           </div>
         </div>
       </CardHeader>

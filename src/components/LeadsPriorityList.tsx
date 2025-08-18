@@ -15,6 +15,7 @@ interface LeadsPriorityListProps {
   leads: Lead[];
   onContact: (leadId: string, method: 'phone' | 'email' | 'text') => void;
   onViewDetails: (leadId: string) => void;
+  onExecuteStep?: (leadId: string, stepId: string, type: 'call' | 'email' | 'text' | 'appointment' | 'follow-up') => void;
   onToggleNotifications: () => void;
   onTriggerToast: () => void;
   hasNotifications?: boolean;
@@ -27,6 +28,7 @@ export function LeadsPriorityList({
   leads, 
   onContact, 
   onViewDetails, 
+  onExecuteStep,
   onToggleNotifications,
   onTriggerToast,
   hasNotifications = false 
@@ -395,6 +397,7 @@ export function LeadsPriorityList({
                               lead={displayLead}
                               onContact={onContact}
                               onViewDetails={onViewDetails}
+                              onExecuteStep={onExecuteStep}
                               isCondensed={false}
                               isFocused={false}
                             />
