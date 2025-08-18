@@ -34,33 +34,7 @@ const mockLeads: Lead[] = [
     lastAppointment: 'Today',
     keyInsight: 'Currently on lot - ready to make decision today with right financing',
     preferredContact: 'phone',
-    budget: { min: 26000, max: 30000 },
-    journeyTimeline: [
-      {
-        stage: 'Inquiry',
-        startDate: '2024-01-15',
-        completedDate: '2024-01-15',
-        workPlan: [
-          { id: 'in1', label: 'Initial response call', type: 'call', status: 'completed', attempts: 1, maxAttempts: 3, completedDate: '2024-01-15' },
-          { id: 'in2', label: 'Send vehicle information', type: 'email', status: 'completed', attempts: 1, maxAttempts: 2, completedDate: '2024-01-15' }
-        ],
-        currentStep: 2
-      },
-      {
-        stage: 'Visit',
-        startDate: '2024-01-16',
-        workPlan: [
-          { id: 'v1', label: 'Welcome & tour', type: 'appointment', status: 'completed', attempts: 1, maxAttempts: 1, completedDate: '2024-01-16' },
-          { id: 'v2', label: 'Discuss financing options', type: 'appointment', status: 'pending', attempts: 0, maxAttempts: 1, dueDate: 'Today 3pm' }
-        ],
-        currentStep: 1
-      }
-    ],
-    currentWorkPlan: [
-      { id: 'v1', label: 'Welcome & tour', type: 'appointment', status: 'completed', attempts: 1, maxAttempts: 1, completedDate: '2024-01-16' },
-      { id: 'v2', label: 'Discuss financing options', type: 'appointment', status: 'pending', attempts: 0, maxAttempts: 1, dueDate: 'Today 3pm' }
-    ],
-    currentStepIndex: 1
+    budget: { min: 26000, max: 30000 }
   },
   {
     id: '2',
@@ -359,31 +333,6 @@ const Index = () => {
     }
   };
 
-  const handleExecuteStep = (leadId: string, stepId: string, type: 'call' | 'email' | 'text' | 'appointment' | 'follow-up') => {
-    const lead = leads.find(l => l.id === leadId);
-    if (lead) {
-      // In a real app, this would execute the work plan step
-      console.log(`Executing step ${stepId} of type ${type} for lead ${leadId}`);
-      
-      // Show appropriate contact method or action
-      switch (type) {
-        case 'call':
-          handleContact(leadId, 'phone');
-          break;
-        case 'email':
-          handleContact(leadId, 'email');
-          break;
-        case 'text':
-          handleContact(leadId, 'text');
-          break;
-        default:
-          // For appointments and other actions, show details
-          handleViewDetails(leadId);
-          break;
-      }
-    }
-  };
-
   const handleViewDetails = (leadId: string) => {
     const lead = leads.find(l => l.id === leadId);
     if (viewMode === 'focus') {
@@ -515,7 +464,6 @@ const Index = () => {
             leads={leads}
             onContact={handleContact}
             onViewDetails={handleViewDetails}
-            onExecuteStep={handleExecuteStep}
             onToggleNotifications={handleToggleNotifications}
             onTriggerToast={handleTriggerToast}
             hasNotifications={isNotificationPanelOpen || toastQueue.length > 0}
