@@ -90,12 +90,19 @@ export function LeadsQuickList({ leads, onLeadClick, selectedLeadId }: LeadsQuic
                     <span className="truncate">{lead.lastActivity}</span>
                   </div>
 
-                  {/* Time on Lot Badge */}
-                  {lead.timeOnLot && (
-                    <Badge variant="secondary" className="text-xs bg-warning/20 text-warning border-warning/30">
-                      On Lot: {lead.timeOnLot}
-                    </Badge>
-                  )}
+                   {/* Journey Stage & Time on Lot */}
+                   <div className="flex items-center justify-between gap-2">
+                     {lead.journeyStage && (
+                       <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">
+                         {lead.journeyStage}
+                       </Badge>
+                     )}
+                     {lead.timeOnLot && (
+                       <Badge variant="secondary" className="text-xs bg-warning/20 text-warning border-warning/30">
+                         On Lot: {lead.timeOnLot}
+                       </Badge>
+                     )}
+                   </div>
                 </div>
               </div>
             ))}

@@ -237,53 +237,6 @@ export function LeadsPriorityList({
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
-        <div className="bg-card border border-border rounded-lg p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-2xl font-bold text-foreground">{priorityStats.hot}</p>
-              <p className="text-sm text-muted-foreground">Hot Leads</p>
-            </div>
-            <div className="h-8 w-8 bg-hot-lead/10 rounded-full flex items-center justify-center">
-              🔥
-            </div>
-          </div>
-        </div>
-        <div className="bg-card border border-border rounded-lg p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-2xl font-bold text-foreground">{priorityStats.warm}</p>
-              <p className="text-sm text-muted-foreground">Warm Leads</p>
-            </div>
-            <div className="h-8 w-8 bg-warm-lead/10 rounded-full flex items-center justify-center">
-              ⚡
-            </div>
-          </div>
-        </div>
-        <div className="bg-card border border-border rounded-lg p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-2xl font-bold text-foreground">{priorityStats.cold}</p>
-              <p className="text-sm text-muted-foreground">Cold Leads</p>
-            </div>
-            <div className="h-8 w-8 bg-cold-lead/10 rounded-full flex items-center justify-center">
-              ❄️
-            </div>
-          </div>
-        </div>
-        <div className="bg-card border border-border rounded-lg p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-2xl font-bold text-foreground">{priorityStats.total}</p>
-              <p className="text-sm text-muted-foreground">Total Leads</p>
-            </div>
-            <div className="h-8 w-8 bg-primary/10 rounded-full flex items-center justify-center">
-              📋
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Filters and Search - Sticky */}
       <div className="sticky top-0 z-30 bg-card backdrop-blur-sm border border-border rounded-lg shadow-sm py-4 px-4 mb-4 space-y-4">
