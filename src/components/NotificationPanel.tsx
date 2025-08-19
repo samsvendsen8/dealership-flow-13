@@ -796,7 +796,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                             </div>
 
                             {selectedJourneyStage === stageKey && workPlan.length > 0 && (
-                              <div className="ml-9 space-y-2 border-l-2 border-muted pl-3">
+                              <div className="ml-9 space-y-2 border-l-2 border-muted pl-3 max-w-xs">
                                 <h5 className="text-xs font-medium text-muted-foreground">Work Plan Tasks</h5>
                                 {workPlan.map((task) => {
                                   const statusIcons = {
@@ -830,21 +830,21 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                                         statusColors[task.status]
                                       )}
                                     >
-                                      <div className="flex items-center gap-1 mt-0.5">
+                                      <div className="flex items-center gap-1 mt-0.5 flex-shrink-0">
                                         <StatusIcon className="h-3 w-3" />
                                         <ContactIcon className="h-2.5 w-2.5" />
                                       </div>
                                       
                                       <div className="flex-1 min-w-0">
-                                        <div className="flex items-center justify-between gap-2">
-                                          <span className="font-medium truncate">
+                                        <div className="flex items-start justify-between gap-2">
+                                          <span className="font-medium text-xs break-words">
                                             Attempt #{task.attemptNumber}: {task.title}
                                           </span>
-                                          <span className="text-muted-foreground whitespace-nowrap">
+                                          <span className="text-muted-foreground whitespace-nowrap text-xs flex-shrink-0">
                                             {task.dueDate}
                                           </span>
                                         </div>
-                                        <p className="text-muted-foreground mt-0.5 text-xs">
+                                        <p className="text-muted-foreground mt-0.5 text-xs break-words">
                                           {task.description}
                                         </p>
                                       </div>

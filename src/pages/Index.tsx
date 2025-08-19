@@ -515,22 +515,32 @@ const Index = () => {
               variant="outline"
               size="sm"
               onClick={() => {
-                // Scroll to top and focus the main container to fit everything in view
+                // Scroll to top of page
                 window.scrollTo({ 
                   top: 0, 
                   behavior: 'smooth' 
                 });
                 
-                // Optional: zoom out slightly to fit more content if supported
-                setTimeout(() => {
-                  const container = document.querySelector('.container');
-                  if (container) {
-                    container.scrollIntoView({ 
-                      behavior: 'smooth', 
-                      block: 'start' 
-                    });
+                // Try to zoom out the viewport if possible
+                if (document.body.style.zoom !== undefined) {
+                  document.body.style.zoom = '0.85';
+                  
+                  // Reset zoom after a delay
+                  setTimeout(() => {
+                    document.body.style.zoom = '1';
+                  }, 300);
+                } else {
+                  // Fallback: try to adjust viewport scale
+                  const viewport = document.querySelector('meta[name=viewport]');
+                  if (viewport) {
+                    const originalContent = viewport.getAttribute('content') || '';
+                    viewport.setAttribute('content', 'width=device-width, initial-scale=0.85');
+                    
+                    setTimeout(() => {
+                      viewport.setAttribute('content', originalContent);
+                    }, 300);
                   }
-                }, 300);
+                }
               }}
               className="gap-2 bg-background/95 backdrop-blur-sm border shadow-lg"
             >
