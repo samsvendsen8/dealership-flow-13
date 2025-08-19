@@ -184,6 +184,7 @@ export type Database = {
           customer_id: string
           financing_needed: boolean | null
           id: string
+          journey_stage: string | null
           last_contact: string | null
           lead_source_id: string | null
           next_follow_up: string | null
@@ -204,6 +205,7 @@ export type Database = {
           customer_id: string
           financing_needed?: boolean | null
           id?: string
+          journey_stage?: string | null
           last_contact?: string | null
           lead_source_id?: string | null
           next_follow_up?: string | null
@@ -224,6 +226,7 @@ export type Database = {
           customer_id?: string
           financing_needed?: boolean | null
           id?: string
+          journey_stage?: string | null
           last_contact?: string | null
           lead_source_id?: string | null
           next_follow_up?: string | null
@@ -259,6 +262,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          direction: string
+          id: string
+          lead_id: string
+          message_type: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          direction: string
+          id?: string
+          lead_id: string
+          message_type: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          direction?: string
+          id?: string
+          lead_id?: string
+          message_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       notifications: {
         Row: {

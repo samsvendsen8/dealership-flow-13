@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { LeadsPriorityList } from '@/components/LeadsPriorityList';
 import { LeadFocusView } from '@/components/LeadFocusView';
 import { NotificationPanel } from '@/components/NotificationPanel';
@@ -372,6 +373,42 @@ const Index = () => {
 
     return () => clearInterval(interval);
   }, [leads, toastsPaused]);
+
+  // Real-time updates for lead journey stage changes
+  useEffect(() => {
+    const channel = supabase
+      .channel('lead_updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'leads'
+        },
+        (payload) => {
+          // Update leads when journey stage changes
+          setLeads(prevLeads => 
+            prevLeads.map(lead => 
+              lead.id === (payload.new as any).id 
+                ? { ...lead, journeyStage: (payload.new as any).journey_stage }
+                : lead
+            )
+          );
+          
+          // Show toast notification for journey stage updates
+          toast({
+            title: "Journey Stage Updated",
+            description: "Lead moved to next stage after customer response",
+            duration: 3000,
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [toast]);
 
   const [contactMethod, setContactMethod] = useState<'phone' | 'email' | 'text' | undefined>();
   const [aiSuggestedResponse, setAiSuggestedResponse] = useState<string>('');

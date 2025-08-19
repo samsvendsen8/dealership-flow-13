@@ -8,6 +8,9 @@ import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import type { Lead } from './LeadCard';
+import MessageHistory from './MessageHistory';
+import { useMessaging } from '@/hooks/useMessaging';
+import { useToast } from '@/components/ui/use-toast';
 
 interface NotificationPanelProps {
   isOpen: boolean;
@@ -31,6 +34,8 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
   const [responseText, setResponseText] = useState('');
   const [expandedHistoryItems, setExpandedHistoryItems] = useState<Set<string>>(new Set());
   const [selectedJourneyStage, setSelectedJourneyStage] = useState<string | null>(null);
+  const { sendMessage, isLoading } = useMessaging();
+  const { toast } = useToast();
 
   type HistoryContent = 
     | { type: 'form'; data: Record<string, string> }
@@ -324,24 +329,47 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                       />
                     </div>
 
-                    <div className="flex gap-2">
-                      <Button 
-                        className="flex-1 gap-2 bg-gradient-primary hover:opacity-90"
-                        onClick={() => {
-                          onContact(selectedLead.id, contactMethod);
-                          setResponseText('');
-                        }}
-                      >
-                        <Send className="h-4 w-4" />
-                        Send {contactMethod === 'phone' ? 'Call' : contactMethod === 'email' ? 'Email' : 'Text'}
-                      </Button>
-                      <Button 
-                        variant="outline"
-                        onClick={() => setResponseText(aiSuggestedResponse || '')}
-                      >
-                        <Edit3 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                     <div className="flex gap-2">
+                       <Button 
+                         className="flex-1 gap-2 bg-gradient-primary hover:opacity-90"
+                         onClick={async () => {
+                           if (responseText.trim()) {
+                             try {
+                               await sendMessage(
+                                 selectedLead.id,
+                                 responseText,
+                                 contactMethod === 'phone' ? 'call' : contactMethod === 'email' ? 'email' : 'text',
+                                 selectedLead.journeyStage
+                               );
+                               
+                               toast({
+                                 title: "Message Sent",
+                                 description: `Your ${contactMethod} has been sent and customer will auto-respond in 15 seconds.`,
+                               });
+                               
+                               setResponseText('');
+                               onContact(selectedLead.id, contactMethod);
+                             } catch (error) {
+                               toast({
+                                 title: "Error",
+                                 description: "Failed to send message. Please try again.",
+                                 variant: "destructive"
+                               });
+                             }
+                           }
+                         }}
+                         disabled={!responseText.trim() || isLoading}
+                       >
+                         <Send className="h-4 w-4" />
+                         {isLoading ? "Sending..." : `Send ${contactMethod === 'phone' ? 'Call' : contactMethod === 'email' ? 'Email' : 'Text'}`}
+                       </Button>
+                       <Button 
+                         variant="outline"
+                         onClick={() => setResponseText(aiSuggestedResponse || '')}
+                       >
+                         <Edit3 className="h-4 w-4" />
+                       </Button>
+                     </div>
                   </div>
                 )}
                 
@@ -382,197 +410,9 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                   </div>
                 )}
 
-                {activeMainTab === 'customer-info' && activeSubTab === 'history' && (
-                  <div className="space-y-4">
-                    {/* AI Journey Summary */}
-                    <div className="bg-gradient-to-r from-primary/5 to-hot-lead/5 border border-primary/20 rounded-lg p-4 space-y-3">
-                      <div className="flex items-center gap-2">
-                        <div className="p-1.5 rounded-full bg-gradient-primary text-white">
-                          <MessageCircle className="h-3 w-3" />
-                        </div>
-                        <h4 className="font-medium text-primary">AI Journey Analysis</h4>
-                      </div>
-                      
-                      <div className="space-y-2 text-sm">
-                        <p className="text-foreground">
-                          <strong>Journey Overview:</strong> {selectedLead.name} has progressed {
-                            selectedLead.journeyStage === 'engaged' ? 'to active engagement with positive text responses' :
-                            selectedLead.journeyStage === 'visit' ? 'to showroom visit with strong buying signals' :
-                            selectedLead.journeyStage === 'proposal' ? 'to proposal stage with purchase intent' :
-                            selectedLead.journeyStage === 'sold' ? 'to deal completion' :
-                            selectedLead.journeyStage === 'delivered' ? 'to final delivery stage' :
-                            'through the sales pipeline'
-                          }.
-                        </p>
-                        
-                        {/* Notable Patterns */}
-                        {selectedLead.journeyStage === 'engaged' && (
-                          <div className="bg-success/10 border border-success/20 rounded-md p-2">
-                            <p className="text-success text-xs font-medium">✓ Notable: Quick text response shows high engagement</p>
-                          </div>
-                        )}
-                        
-                        {selectedLead.journeyStage === 'visit' && (
-                          <div className="bg-hot-lead/10 border border-hot-lead/20 rounded-md p-2">
-                            <p className="text-hot-lead text-xs font-medium">🔥 Hot Signal: Extended showroom visit with financing questions</p>
-                          </div>
-                        )}
-                        
-                        {selectedLead.journeyStage === 'proposal' && (
-                          <div className="bg-success/10 border border-success/20 rounded-md p-2">
-                            <p className="text-success text-xs font-medium">🎯 Purchase Ready: Proposal presented - strong buying intent</p>
-                          </div>
-                        )}
-                        
-                        {selectedLead.priority === 'hot' && (
-                          <div className="bg-warning/10 border border-warning/20 rounded-md p-2">
-                            <p className="text-warning text-xs font-medium">⚠️ Priority: High-value lead with rapid progression - prioritize immediate follow-up</p>
-                          </div>
-                        )}
-                        
-                        <p className="text-muted-foreground text-xs">
-                          Next recommended action: {
-                            selectedLead.journeyStage === 'engaged' ? 'Confirm weekend appointment details' :
-                            selectedLead.journeyStage === 'visit' ? 'Schedule test drive immediately' :
-                            selectedLead.journeyStage === 'proposal' ? 'Follow up on proposal with trade-in evaluation' :
-                            selectedLead.journeyStage === 'sold' ? 'Prepare for vehicle delivery' :
-                            selectedLead.journeyStage === 'delivered' ? 'Follow up for customer satisfaction' :
-                            'Continue nurturing relationship'
-                          }
-                        </p>
-                      </div>
-                    </div>
-
-                    {generateFakeHistory().map((item) => {
-                      const IconComponent = item.icon;
-                      const isExpanded = expandedHistoryItems.has(item.id);
-                      
-                      return (
-                        <div key={item.id} className={`border-l-3 ${item.color} pl-4 pb-4`}>
-                          <div className="flex items-start justify-between">
-                            <div className="flex items-start space-x-3 flex-1">
-                              <div className={`p-2 rounded-full ${
-                                item.type === 'inbound' ? 'bg-success/10 text-success' :
-                                item.type === 'outbound' ? 'bg-primary/10 text-primary' :
-                                item.type === 'meeting' ? 'bg-hot-lead/10 text-hot-lead' :
-                                'bg-muted text-muted-foreground'
-                              }`}>
-                                <IconComponent className="h-4 w-4" />
-                              </div>
-                              <div className="flex-1">
-                                <div className="flex items-center justify-between">
-                                  <h4 className="font-medium text-sm">{item.title}</h4>
-                                  <span className="text-xs text-muted-foreground">{item.timestamp}</span>
-                                </div>
-                                <p className="text-xs text-muted-foreground mt-1">{item.description}</p>
-                                
-                                {item.expandable && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="mt-2 h-auto p-1 text-xs"
-                                    onClick={() => toggleHistoryItem(item.id)}
-                                  >
-                                    {isExpanded ? <ChevronDown className="h-3 w-3 mr-1" /> : <ChevronRight className="h-3 w-3 mr-1" />}
-                                    {isExpanded ? 'Hide Details' : 'View Details'}
-                                  </Button>
-                                )}
-                                
-                                {isExpanded && item.content && (
-                                  <div className="mt-3 p-3 bg-muted/50 rounded-md border">
-                                     {item.content.type === 'voicemail' && 'duration' in item.content && (
-                                       <div className="space-y-2">
-                                         <div className="flex items-center space-x-2">
-                                           <PlayCircle className="h-4 w-4 text-primary" />
-                                           <span className="text-sm font-medium">Voicemail Recording</span>
-                                           <span className="text-xs text-muted-foreground">({item.content.duration})</span>
-                                         </div>
-                                         <div className="bg-background p-2 rounded text-xs">
-                                           <strong>Transcript:</strong><br />
-                                           {'transcript' in item.content && item.content.transcript}
-                                         </div>
-                                       </div>
-                                     )}
-                                     
-                                     {item.content.type === 'text' && 'messages' in item.content && (
-                                      <div className="space-y-2">
-                                        <h5 className="text-sm font-medium">Text Conversation</h5>
-                                        <div className="space-y-1">
-                                          {item.content.messages.map((msg, idx) => (
-                                            <div key={idx} className={`p-2 rounded text-xs ${
-                                              msg.sender === 'customer' 
-                                                ? 'bg-primary/10 text-primary ml-4' 
-                                                : 'bg-muted text-foreground mr-4'
-                                            }`}>
-                                              <div className="font-medium">{msg.sender === 'customer' ? selectedLead.name : 'Me'}</div>
-                                              <div>{msg.text}</div>
-                                              <div className="text-xs opacity-70 mt-1">{msg.time}</div>
-                                            </div>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    )}
-                                     
-                                     {item.content.type === 'email' && 'subject' in item.content && 'body' in item.content && (
-                                       <div className="space-y-2">
-                                         <div className="flex items-center space-x-2">
-                                           <Mail className="h-4 w-4 text-primary" />
-                                           <span className="text-sm font-medium">Email Content</span>
-                                         </div>
-                                         <div className="bg-background p-2 rounded text-xs space-y-2">
-                                           <div><strong>Subject:</strong> {item.content.subject}</div>
-                                           <div><strong>Body:</strong></div>
-                                           <div className="whitespace-pre-line">{item.content.body}</div>
-                                         </div>
-                                       </div>
-                                     )}
-                                     
-                                     {item.content.type === 'meeting' && 'duration' in item.content && 'notes' in item.content && (
-                                      <div className="space-y-2">
-                                         <div className="flex items-center space-x-2">
-                                           <Timer className="h-4 w-4 text-hot-lead" />
-                                          <span className="text-sm font-medium">Meeting Summary</span>
-                                          <span className="text-xs text-muted-foreground">({item.content.duration})</span>
-                                        </div>
-                                         <div className="bg-background p-2 rounded text-xs space-y-2">
-                                           <div><strong>Notes:</strong></div>
-                                           <div>{item.content.notes}</div>
-                                           {'actions' in item.content && item.content.actions && (
-                                             <>
-                                               <div><strong>Actions Completed:</strong></div>
-                                               <ul className="list-disc list-inside">
-                                                 {item.content.actions.map((action, idx) => (
-                                                   <li key={idx}>{action}</li>
-                                                 ))}
-                                               </ul>
-                                             </>
-                                           )}
-                                         </div>
-                                       </div>
-                                     )}
-                                     
-                                     {item.content.type === 'form' && 'data' in item.content && (
-                                      <div className="space-y-2">
-                                        <h5 className="text-sm font-medium">Initial Inquiry Details</h5>
-                                        <div className="bg-background p-2 rounded text-xs space-y-1">
-                                          {Object.entries(item.content.data).map(([key, value]) => (
-                                            <div key={key}>
-                                              <strong>{key}:</strong> {value}
-                                            </div>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                 {activeMainTab === 'customer-info' && activeSubTab === 'history' && (
+                   <MessageHistory leadId={selectedLead.id} />
+                 )}
 
                 {activeMainTab === 'customer-info' && activeSubTab === 'notes' && (
                   <div className="space-y-3">
