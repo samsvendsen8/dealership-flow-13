@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { X, Send, Edit3, Eye } from 'lucide-react';
+import { X, Send, Edit3, Eye, ChevronDown, Sparkles } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 
 interface ToastNotificationProps {
@@ -30,6 +31,47 @@ export function ToastNotification({
 }: ToastNotificationProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedResponse, setEditedResponse] = useState(suggestedResponse);
+  
+  // AI modification functions
+  const modifyResponse = (type: string) => {
+    let modified = suggestedResponse;
+    
+    switch (type) {
+      case 'shorter':
+        // Make the response shorter
+        const sentences = suggestedResponse.split('.').filter(s => s.trim());
+        modified = sentences.slice(0, Math.max(1, Math.floor(sentences.length / 2))).join('.') + '.';
+        break;
+      case 'casual':
+        // Make the response more casual
+        modified = suggestedResponse
+          .replace(/Dear /g, 'Hi ')
+          .replace(/I would like to/g, "I'd love to")
+          .replace(/Thank you for your interest/g, 'Thanks for checking out')
+          .replace(/Best regards,/g, 'Talk soon!')
+          .replace(/I am/g, "I'm")
+          .replace(/We would be/g, "We'd be")
+          .replace(/\[Your Name\]/g, 'me');
+        break;
+      case 'urgent':
+        modified = `🚨 URGENT: ${suggestedResponse} This is time-sensitive - please respond ASAP!`;
+        break;
+      case 'friendly':
+        modified = `Hey ${leadName.split(' ')[0]}! 😊 ${suggestedResponse} Looking forward to hearing from you!`;
+        break;
+      case 'professional':
+        modified = suggestedResponse
+          .replace(/Hi /g, 'Dear ')
+          .replace(/Thanks/g, 'Thank you')
+          .replace(/I'd/g, 'I would')
+          .replace(/can't/g, 'cannot')
+          .replace(/we'd/g, 'we would');
+        break;
+    }
+    
+    setEditedResponse(modified);
+    setIsEditing(true);
+  };
 
   // Update editedResponse when suggestedResponse changes
   if (editedResponse !== suggestedResponse && !isEditing) {
@@ -82,6 +124,51 @@ export function ToastNotification({
                 />
               ) : (
                 <p className="text-sm text-foreground">{suggestedResponse}</p>
+              )}
+              
+              {/* AI Modification Options */}
+              {!isEditing && (
+                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
+                  <span className="text-xs text-muted-foreground">Quick AI edits:</span>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="h-6 px-2 text-xs"
+                    onClick={() => modifyResponse('shorter')}
+                  >
+                    Make Shorter
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="h-6 px-2 text-xs"
+                    onClick={() => modifyResponse('casual')}
+                  >
+                    Make Casual
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="h-6 w-6 p-0"
+                      >
+                        <ChevronDown className="h-3 w-3" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-40">
+                      <DropdownMenuItem onClick={() => modifyResponse('urgent')}>
+                        <span className="text-xs">🚨 Make Urgent</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => modifyResponse('friendly')}>
+                        <span className="text-xs">😊 Make Friendly</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => modifyResponse('professional')}>
+                        <span className="text-xs">👔 Make Professional</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               )}
             </div>
 

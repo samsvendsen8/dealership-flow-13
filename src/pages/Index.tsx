@@ -230,6 +230,7 @@ const Index = () => {
   const [selectedLead, setSelectedLead] = useState<Lead | undefined>();
   const [viewMode, setViewMode] = useState<'list' | 'focus'>('list');
   const [focusedLeadId, setFocusedLeadId] = useState<string | null>(null);
+  const [toastsPaused, setToastsPaused] = useState(false);
   const [toastQueue, setToastQueue] = useState<Array<{
     id: string;
     leadId: string;
@@ -295,8 +296,8 @@ const Index = () => {
     ];
 
     const interval = setInterval(() => {
-      // 40% chance of new lead every interval
-      if (Math.random() > 0.6) {
+      // Only add new toasts if not paused
+      if (!toastsPaused && Math.random() > 0.6) {
         const template = newLeadTemplates[Math.floor(Math.random() * newLeadTemplates.length)];
         const leadCount = leads.length;
         
@@ -341,12 +342,12 @@ const Index = () => {
     }, 12000); // New lead every 12 seconds on average
 
     return () => clearInterval(interval);
-  }, [leads.length]);
+  }, [leads.length, toastsPaused]);
 
   // Random activity updates for existing leads
   useEffect(() => {
     const interval = setInterval(() => {
-      if (Math.random() > 0.7) {
+      if (!toastsPaused && Math.random() > 0.7) {
         const randomLead = leads[Math.floor(Math.random() * leads.length)];
         if (randomLead && randomLead.priority === 'hot') {
           const activities = [
@@ -370,7 +371,7 @@ const Index = () => {
     }, 20000); // Activity notification every 20 seconds
 
     return () => clearInterval(interval);
-  }, [leads]);
+  }, [leads, toastsPaused]);
 
   const [contactMethod, setContactMethod] = useState<'phone' | 'email' | 'text' | undefined>();
   const [aiSuggestedResponse, setAiSuggestedResponse] = useState<string>('');
@@ -430,6 +431,10 @@ const Index = () => {
         suggestedResponse: `Hi ${randomLead.name}, I noticed you were looking at the ${randomLead.vehicle}. I'm here to answer any questions and can schedule a test drive whenever convenient for you!`
       }]);
     }
+  };
+
+  const handlePauseToasts = () => {
+    setToastsPaused(!toastsPaused);
   };
 
   const handleSendResponse = (toastId: string, message: string) => {
@@ -528,6 +533,8 @@ const Index = () => {
             onViewDetails={handleViewDetails}
             onToggleNotifications={handleToggleNotifications}
             onTriggerToast={handleTriggerToast}
+            onPauseToasts={handlePauseToasts}
+            toastsPaused={toastsPaused}
             hasNotifications={isNotificationPanelOpen || toastQueue.length > 0}
           />
         </div>

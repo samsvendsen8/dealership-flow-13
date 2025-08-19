@@ -17,6 +17,8 @@ interface LeadsPriorityListProps {
   onViewDetails: (leadId: string) => void;
   onToggleNotifications: () => void;
   onTriggerToast: () => void;
+  onPauseToasts: () => void;
+  toastsPaused: boolean;
   hasNotifications?: boolean;
 }
 
@@ -29,6 +31,8 @@ export function LeadsPriorityList({
   onViewDetails, 
   onToggleNotifications,
   onTriggerToast,
+  onPauseToasts,
+  toastsPaused,
   hasNotifications = false 
 }: LeadsPriorityListProps) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -228,6 +232,14 @@ export function LeadsPriorityList({
           >
             <Zap className="h-4 w-4" />
             Trigger Toast
+          </Button>
+          <Button 
+            variant="outline" 
+            className="gap-2"
+            onClick={onPauseToasts}
+          >
+            {toastsPaused ? '▶️' : '⏸️'} 
+            {toastsPaused ? 'Resume' : 'Pause'} Toasts
           </Button>
           <Button 
             variant="outline" 
