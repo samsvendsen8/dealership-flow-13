@@ -7,6 +7,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { cn } from '@/lib/utils';
 import { Timeline } from '@/components/ui/timeline';
 import { WorkPlanProgress } from '@/components/WorkPlanProgress';
+import { LeadDetailsSlideOver } from '@/components/LeadDetailsSlideOver';
 
 interface TimelineEvent {
   date: string;
@@ -97,6 +98,7 @@ const journeyStages = {
 
 export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, isFocused = false }: LeadCardProps) {
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   
   // Get recommended quick actions based on journey stage and contact history
   const getQuickActions = () => {
@@ -340,26 +342,34 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
             <span className="text-xs font-medium text-muted-foreground">Journey Stage</span>
             <span className="text-xs text-muted-foreground">{lead.stageProgress}%</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div 
+            className="flex items-center gap-2 cursor-pointer hover:bg-muted/20 p-2 -m-2 rounded transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsDetailsOpen(true);
+            }}
+            title="Click to view detailed journey progress"
+          >
             <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-xs text-white", journeyStages[lead.journeyStage].color)}>
               {journeyStages[lead.journeyStage].icon}
             </div>
             <span className="text-sm font-medium">{journeyStages[lead.journeyStage].label}</span>
-            <div className="flex-1 mx-2">
+            <div className="flex-1 mx-2 relative">
               <div className="w-full bg-muted rounded-full h-2">
                 <div 
                   className={cn("h-2 rounded-full transition-all duration-500", journeyStages[lead.journeyStage].color)}
                   style={{ width: `${lead.stageProgress}%` }}
                 />
               </div>
+              {/* Timeline dots on the progress bar */}
+              {lead.timeline && lead.timeline.length > 0 && (
+                <div className="absolute inset-0 flex items-center">
+                  <Timeline events={lead.timeline} className="relative" />
+                </div>
+              )}
             </div>
             <ArrowRight className="h-3 w-3 text-muted-foreground" />
           </div>
-          
-          {/* Timeline dots */}
-          {lead.timeline && lead.timeline.length > 0 && (
-            <Timeline events={lead.timeline} />
-          )}
           
           {/* Work plan for current journey stage */}
           {lead.workPlan && lead.workPlan.length > 0 && (
@@ -409,156 +419,155 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
             <h4 className="font-medium text-sm">Contact Information</h4>
             {lead.preferredContact && (
               <Badge variant="outline" className="text-xs">
-                Prefers {lead.preferredContact}
+                Prefers: {lead.preferredContact}
               </Badge>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <span>{lead.lastActivity}</span>
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <div>
+              <p className="text-muted-foreground">Last Activity</p>
+              <p className="font-medium">{lead.lastActivity}</p>
             </div>
-            {lead.lastAppointment && (
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span>Last: {lead.lastAppointment}</span>
-              </div>
-            )}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">Source:</span>
-              <span className="text-xs font-medium">{lead.source}</span>
+            <div>
+              <p className="text-muted-foreground">Source</p>
+              <p className="font-medium">{lead.source}</p>
             </div>
           </div>
+          {lead.lastAppointment && (
+            <div className="mt-2">
+              <p className="text-muted-foreground text-xs">Last Appointment: {lead.lastAppointment}</p>
+            </div>
+          )}
         </div>
 
-        {/* Quick Actions Bar */}
-        <div className="bg-muted/20 rounded-lg p-3 space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="text-xs font-medium text-muted-foreground">Recommended Actions</div>
-            <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-              {quickActions.map((action, idx) => (
-                <Button
-                  key={idx}
-                  size="sm"
-                  variant="outline"
-                  className="h-7 px-2 text-xs gap-1"
-                  onClick={action.action}
-                >
-                  <action.icon className="h-3 w-3" />
-                  {action.label}
-                </Button>
-              ))}
-            </div>
-          </div>
-          <div className="text-xs text-muted-foreground">
-            <strong>Context:</strong> {quickActions[0]?.context}
-          </div>
-        </div>
-
-        {/* AI Journey Analysis */}
-        <Collapsible open={isAnalysisOpen} onOpenChange={setIsAnalysisOpen}>
-          <div className="bg-gradient-to-r from-primary/5 to-hot-lead/5 border border-primary/20 rounded-lg p-3 space-y-2">
-            <CollapsibleTrigger 
-              className="flex items-center justify-between w-full hover:opacity-80 transition-opacity"
-              onClick={(e) => e.stopPropagation()}
+        {/* Action Buttons */}
+        <div className="flex gap-2">
+          {quickActions.map((action, idx) => (
+            <Button
+              key={idx}
+              size="sm"
+              variant={idx === 0 ? "default" : "outline"}
+              className="flex-1"
+              onClick={(e) => {
+                e.stopPropagation();
+                action.action();
+              }}
             >
-              <div className="flex items-center gap-2">
-                <div className="p-1 rounded-full bg-gradient-primary text-white">
-                  <MessageCircle className="h-3 w-3" />
+              <action.icon className="h-4 w-4 mr-2" />
+              {action.label}
+            </Button>
+          ))}
+        </div>
+
+        {/* Analysis Section - Collapsible */}
+        <Collapsible open={isAnalysisOpen} onOpenChange={setIsAnalysisOpen}>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="sm" className="w-full justify-between">
+              <span className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                AI Analysis & Insights
+              </span>
+              <ChevronDown className={cn("h-4 w-4 transition-transform", isAnalysisOpen && "rotate-180")} />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-2">
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 space-y-3">
+              {/* Recommended Actions */}
+              <div>
+                <h5 className="font-medium text-sm flex items-center gap-2 mb-2">
+                  <Target className="h-4 w-4 text-primary" />
+                  Recommended Actions
+                </h5>
+                <div className="space-y-2">
+                  {quickActions.map((action, idx) => (
+                    <div key={idx} className="flex items-start gap-3 text-sm">
+                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium">{action.label}</p>
+                        <p className="text-muted-foreground text-xs">{action.context}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <h4 className="font-medium text-primary text-sm">AI Journey Analysis</h4>
               </div>
-              <ChevronDown className={cn("h-4 w-4 text-primary transition-transform duration-200", isAnalysisOpen && "rotate-180")} />
-            </CollapsibleTrigger>
-            
-            <CollapsibleContent className="space-y-2 text-xs">
-              <p className="text-foreground">
-                <strong>Overview:</strong> {lead.name} has progressed {
-                  lead.journeyStage === 'inquiry' ? 'through initial inquiry stage' :
-                  lead.journeyStage === 'engaged' ? 'to active engagement with positive responses' :
-                  lead.journeyStage === 'visit' ? 'to showroom visit with strong buying signals' :
-                  lead.journeyStage === 'test-drive' ? 'to test drive completion with purchase intent' :
-                  'through the sales pipeline'
-                }.
-              </p>
-              
-              {/* Notable Patterns */}
-              {lead.journeyStage === 'engaged' && (
-                <div className="bg-success/10 border border-success/20 rounded-md p-2">
-                  <p className="text-success text-xs font-medium">✓ Notable: Quick response shows high engagement</p>
+
+              {/* Risk Indicators */}
+              <div className="border-t border-primary/20 pt-3">
+                <h5 className="font-medium text-sm flex items-center gap-2 mb-2">
+                  <AlertCircle className="h-4 w-4 text-warning" />
+                  Risk Assessment
+                </h5>
+                <div className="space-y-2 text-sm">
+                  {lead.daysSinceLastContact && lead.daysSinceLastContact > 3 && (
+                    <div className="flex items-center gap-2 text-warning">
+                      <Clock className="h-3 w-3" />
+                      <span>Extended silence - follow up urgently</span>
+                    </div>
+                  )}
+                  {lead.sentiment === 'negative' && (
+                    <div className="flex items-center gap-2 text-destructive">
+                      <AlertCircle className="h-3 w-3" />
+                      <span>Negative sentiment detected - address concerns</span>
+                    </div>
+                  )}
+                  {lead.contactAttempts && lead.contactAttempts > 2 && !lead.responseRate && (
+                    <div className="flex items-center gap-2 text-warning">
+                      <MessageCircle className="h-3 w-3" />
+                      <span>Multiple attempts, no response - try different approach</span>
+                    </div>
+                  )}
+                  {(!lead.daysSinceLastContact || lead.daysSinceLastContact <= 1) && lead.sentiment !== 'negative' && (
+                    <div className="flex items-center gap-2 text-success">
+                      <CheckCircle className="h-3 w-3" />
+                      <span>Lead is actively engaged</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Opportunity Score */}
+              {lead.dealProbability && (
+                <div className="border-t border-primary/20 pt-3">
+                  <h5 className="font-medium text-sm flex items-center gap-2 mb-2">
+                    <Heart className="h-4 w-4 text-success" />
+                    Opportunity Score
+                  </h5>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 bg-muted rounded-full h-2">
+                      <div 
+                        className="bg-gradient-to-r from-destructive via-warning to-success h-2 rounded-full transition-all"
+                        style={{ width: `${lead.dealProbability}%` }}
+                      />
+                    </div>
+                    <span className="font-bold text-sm">{lead.dealProbability}%</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Based on engagement level, response rate, and journey progress
+                  </p>
                 </div>
               )}
-              
-              {lead.journeyStage === 'visit' && (
-                <div className="bg-hot-lead/10 border border-hot-lead/20 rounded-md p-2">
-                  <p className="text-hot-lead text-xs font-medium">🔥 Hot Signal: Extended visit with financing questions</p>
-                </div>
-              )}
-              
-              {lead.journeyStage === 'test-drive' && (
-                <div className="bg-success/10 border border-success/20 rounded-md p-2">
-                  <p className="text-success text-xs font-medium">🎯 Purchase Ready: Asked about trade-in - strong buying intent</p>
-                </div>
-              )}
-              
-              {lead.priority === 'hot' && (
-                <div className="bg-warning/10 border border-warning/20 rounded-md p-2">
-                  <p className="text-warning text-xs font-medium">⚠️ Irregular: High-value lead with rapid progression - prioritize follow-up</p>
-                </div>
-              )}
-              
-              <p className="text-muted-foreground text-xs">
-                <strong>Next action:</strong> {
-                  lead.journeyStage === 'inquiry' ? 'Follow up with alternative contact method' :
-                  lead.journeyStage === 'engaged' ? 'Confirm weekend appointment details' :
-                  lead.journeyStage === 'visit' ? 'Schedule test drive immediately' :
-                  lead.journeyStage === 'test-drive' ? 'Present purchase proposal with trade-in evaluation' :
-                  'Continue nurturing relationship'
-                }
-              </p>
-            </CollapsibleContent>
-          </div>
+            </div>
+          </CollapsibleContent>
         </Collapsible>
 
         {lead.timeOnLot && (
-          <div className="bg-warning/10 border border-warning/20 rounded-md p-3">
-            <p className="text-sm font-medium text-warning flex items-center gap-2">
-              <AlertCircle className="h-4 w-4" />
-              Customer on lot: {lead.timeOnLot}
-            </p>
+          <div className="bg-warning/10 border border-warning/20 rounded-lg p-3">
+            <div className="flex items-center gap-2 text-warning">
+              <Car className="h-4 w-4" />
+              <span className="font-medium text-sm">Customer on lot: {lead.timeOnLot}</span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">Immediate action recommended</p>
           </div>
         )}
-
-        <div className="flex gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
-          <Button
-            size="sm"
-            variant="outline"
-            className="flex-1 gap-2"
-            onClick={() => onContact(lead.id, 'phone')}
-          >
-            <Phone className="h-4 w-4" />
-            Call
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="flex-1 gap-2"
-            onClick={() => onContact(lead.id, 'text')}
-          >
-            <MessageCircle className="h-4 w-4" />
-            Text
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="flex-1 gap-2"
-            onClick={() => onContact(lead.id, 'email')}
-          >
-            <Mail className="h-4 w-4" />
-            Email
-          </Button>
-        </div>
       </CardContent>
+
+      {/* Lead Details Slide Over */}
+      <LeadDetailsSlideOver
+        lead={lead}
+        open={isDetailsOpen}
+        onOpenChange={setIsDetailsOpen}
+        onContact={onContact}
+      />
     </Card>
   );
 }

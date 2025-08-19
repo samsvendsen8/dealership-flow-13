@@ -34,37 +34,39 @@ export function Timeline({ events, className }: TimelineProps) {
 
   return (
     <TooltipProvider>
-      <div className={cn('flex items-center gap-2 py-2', className)}>
-        <span className="text-xs text-muted-foreground font-medium">Timeline:</span>
-        <div className="flex items-center gap-1">
-          {events.slice(-6).map((event, index) => {
-            const Icon = timelineIcons[event.type];
-            return (
-              <Tooltip key={index}>
-                <TooltipTrigger>
-                  <div 
-                    className={cn(
-                      'w-3 h-3 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-125 cursor-pointer',
-                      timelineColors[event.type]
-                    )}
-                  >
-                    <Icon className="h-1.5 w-1.5 text-white" />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-xs">
-                  <div className="text-xs">
-                    <div className="font-medium">{event.action}</div>
-                    <div className="text-muted-foreground">{event.date}</div>
-                    <div className="mt-1">{event.details}</div>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            );
-          })}
-          {events.length > 6 && (
-            <span className="text-xs text-muted-foreground ml-1">+{events.length - 6}</span>
-          )}
-        </div>
+      <div className={cn('flex items-center gap-1', className)}>
+        {events.slice(-6).map((event, index) => {
+          const Icon = timelineIcons[event.type];
+          // Calculate position along the progress bar (0-100%)
+          const position = ((index + 1) / 6) * 100;
+          
+          return (
+            <Tooltip key={index}>
+              <TooltipTrigger>
+                <div 
+                  className={cn(
+                    'absolute w-2 h-2 rounded-full border flex items-center justify-center transition-all duration-200 hover:scale-150 cursor-pointer z-10',
+                    timelineColors[event.type]
+                  )}
+                  style={{ 
+                    left: `${position}%`, 
+                    top: '50%',
+                    transform: 'translate(-50%, -50%)'
+                  }}
+                >
+                  <Icon className="h-1 w-1 text-white" />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-xs">
+                <div className="text-xs">
+                  <div className="font-medium">{event.action}</div>
+                  <div className="text-muted-foreground">{event.date}</div>
+                  <div className="mt-1">{event.details}</div>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          );
+        })}
       </div>
     </TooltipProvider>
   );
