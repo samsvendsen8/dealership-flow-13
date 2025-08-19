@@ -174,10 +174,10 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
         }
       }
 
-      await sendMessage(lead.id, responseText, method === 'phone' ? 'call' : method, lead.journeyStage);
-      
-      // Trigger screen-wide celebration
+      // Trigger screen-wide celebration first
       onCommunicationSent?.(lead.id, method);
+      
+      await sendMessage(lead.id, responseText, method === 'phone' ? 'call' : method, lead.journeyStage);
       
       // Show celebration animation and trigger work item slide-out
       setShowCelebration(true);
@@ -209,7 +209,8 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
     if (method === 'phone') {
       setShowCallModal(true);
     } else {
-      onOpenNotificationPanel?.(lead.id, method);
+      // Directly trigger message sending for work plan items
+      handleQuickMessage(method);
     }
   };
 
@@ -610,7 +611,11 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                 tasks={lead.workPlan} 
                 journeyStage={selectedJourneyStage}
                 currentLeadStage={lead.journeyStage}
-                onContactMethodClick={(method) => handleContactMethodClick(method)}
+                onContactMethodClick={(method, task) => {
+                  // Set response text based on task
+                  setResponseText(`Quick follow-up for: ${task.title}`);
+                  handleContactMethodClick(method);
+                }}
               />
             </WorkItemSlideOut>
           )}

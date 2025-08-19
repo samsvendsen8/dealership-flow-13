@@ -203,20 +203,6 @@ export function LeadsPriorityList({
 
     return (
       <div className="space-y-6 padding-top-20">
-        {/* Quick Stats Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-4">
-              <Badge variant="secondary" className="px-3 py-2">
-                <span className="text-sm font-medium">{priorityStats.total} Total Leads</span>
-              </Badge>
-              <Badge variant="outline" className="px-3 py-2 border-hot-lead text-hot-lead">
-                <span className="text-sm font-medium">{priorityStats.hot} Hot</span>
-              </Badge>
-            </div>
-          </div>
-        </div>
-
         {/* Header */}
       <div className="flex items-center justify-between">
         <div>
