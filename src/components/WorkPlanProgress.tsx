@@ -49,34 +49,90 @@ const contactIcons = {
 };
 
 export function WorkPlanProgress({ tasks, journeyStage, currentLeadStage, className }: WorkPlanProgressProps) {
-  if (!tasks || tasks.length === 0) return null;
+  const isViewingCurrentStage = !currentLeadStage || journeyStage.toLowerCase() === currentLeadStage.toLowerCase();
+  const stageOrder = ['engaged', 'visit', 'proposal', 'sold', 'delivered'];
+  const currentStageIndex = stageOrder.indexOf(currentLeadStage?.toLowerCase() || '');
+  const viewingStageIndex = stageOrder.indexOf(journeyStage.toLowerCase());
+  const isViewingCompletedStage = currentStageIndex !== -1 && viewingStageIndex !== -1 && viewingStageIndex < currentStageIndex;
 
-  // Filter tasks for current journey stage (case insensitive)
-  const currentStageTasks = tasks.filter(t => t.journeyStage.toLowerCase() === journeyStage.toLowerCase());
-  const completedCount = currentStageTasks.filter(t => t.status === 'completed' || t.status === 'customer_replied').length;
-  const reachedOutCount = currentStageTasks.filter(t => t.status === 'reached_out').length;
-  const missedCount = currentStageTasks.filter(t => t.status === 'missed').length;
-  const customerReplied = currentStageTasks.some(t => t.status === 'customer_replied');
-  const currentTask = currentStageTasks.find(t => t.status === 'pending');
+  // Generate mock historical data for completed stages
+  const getHistoricalTasks = (stage: string): WorkPlanTask[] => {
+    const baseId = `${stage}_task`;
+    const mockTasks: WorkPlanTask[] = [
+      {
+        id: `${baseId}_1`,
+        title: `${stage.charAt(0).toUpperCase() + stage.slice(1)} Attempt 1`,
+        description: stage === 'engaged' 
+          ? 'Initial contact to gauge interest and schedule visit'
+          : stage === 'visit'
+          ? 'Call to discuss budget and payment options'  
+          : 'Follow up on proposal details',
+        dueDate: 'Today',
+        status: 'customer_replied', // First attempt succeeded
+        attemptNumber: 1,
+        contactMethod: 'phone' as const,
+        customerResponse: true,
+        journeyStage: stage
+      },
+      {
+        id: `${baseId}_2`,
+        title: `${stage.charAt(0).toUpperCase() + stage.slice(1)} Attempt 2`, 
+        description: stage === 'engaged'
+          ? 'Email current inventory and pricing'
+          : stage === 'visit'
+          ? 'Email current inventory and pricing'
+          : 'Send detailed proposal document',
+        dueDate: 'Tomorrow',
+        status: 'not_needed', // Not needed since customer replied on attempt 1
+        attemptNumber: 2,
+        contactMethod: 'email' as const,
+        journeyStage: stage
+      },
+      {
+        id: `${baseId}_3`,
+        title: `${stage.charAt(0).toUpperCase() + stage.slice(1)} Attempt 3`,
+        description: stage === 'engaged'
+          ? 'Text to schedule viewing appointment' 
+          : stage === 'visit'
+          ? 'Text to schedule viewing appointment'
+          : 'Final follow-up call',
+        dueDate: 'Day 3',
+        status: 'not_needed', // Not needed since customer replied on attempt 1
+        attemptNumber: 3,
+        contactMethod: 'text' as const,
+        journeyStage: stage
+      }
+    ];
+    
+    return mockTasks;
+  };
+
+  // Use historical tasks for completed stages, otherwise filter current tasks
+  const displayTasks = isViewingCompletedStage 
+    ? getHistoricalTasks(journeyStage)
+    : tasks.filter(t => t.journeyStage.toLowerCase() === journeyStage.toLowerCase());
+
+  if (!displayTasks || displayTasks.length === 0) return null;
+
+  const completedCount = displayTasks.filter(t => t.status === 'completed' || t.status === 'customer_replied').length;
+  const reachedOutCount = displayTasks.filter(t => t.status === 'reached_out').length;
+  const missedCount = displayTasks.filter(t => t.status === 'missed').length;
+  const customerReplied = displayTasks.some(t => t.status === 'customer_replied');
+  const currentTask = displayTasks.find(t => t.status === 'pending');
   
   // If customer replied, mark tasks after the replied task as not needed (greyed out)
   let customerRepliedIndex = -1;
   if (customerReplied) {
-    customerRepliedIndex = currentStageTasks.findIndex(t => t.status === 'customer_replied');
+    customerRepliedIndex = displayTasks.findIndex(t => t.status === 'customer_replied');
   }
   
-  const displayTasks = customerReplied 
-    ? currentStageTasks.map((task, index) => {
+  const finalDisplayTasks = customerReplied 
+    ? displayTasks.map((task, index) => {
         if (task.status === 'customer_replied') return task;
         if (index > customerRepliedIndex) return { ...task, status: 'not_needed' as const };
         return task;
       })
-    : currentStageTasks;
-
-  const isViewingCurrentStage = !currentLeadStage || journeyStage.toLowerCase() === currentLeadStage.toLowerCase();
-  const isViewingCompletedStage = currentLeadStage && 
-    Object.keys({engaged: 1, visit: 2, proposal: 3, sold: 4, delivered: 5}).indexOf(journeyStage) < 
-    Object.keys({engaged: 1, visit: 2, proposal: 3, sold: 4, delivered: 5}).indexOf(currentLeadStage);
+    : displayTasks;
 
   return (
     <div className={cn('space-y-3', className)}>
@@ -102,9 +158,13 @@ export function WorkPlanProgress({ tasks, journeyStage, currentLeadStage, classN
             <Badge variant="outline" className="text-xs text-primary border-primary">
               → Attempt #{currentTask.attemptNumber}/3 pending
             </Badge>
+          ) : isViewingCompletedStage ? (
+            <Badge className="text-xs bg-success text-white">
+              ✅ Completed Successfully
+            </Badge>
           ) : (
             <Badge variant="outline" className="text-xs">
-              {completedCount}/{currentStageTasks.length} completed
+              {completedCount}/{displayTasks.length} completed
             </Badge>
           )}
         </div>
@@ -116,7 +176,7 @@ export function WorkPlanProgress({ tasks, journeyStage, currentLeadStage, classN
       </div>
 
       <div className="space-y-2">
-        {displayTasks.map((task) => {
+        {finalDisplayTasks.map((task) => {
           const StatusIcon = statusIcons[task.status];
           const ContactIcon = contactIcons[task.contactMethod];
           
@@ -165,13 +225,13 @@ export function WorkPlanProgress({ tasks, journeyStage, currentLeadStage, classN
         })}
       </div>
 
-      {currentStageTasks.length === 3 && !customerReplied && (
+      {displayTasks.length === 3 && !customerReplied && !isViewingCompletedStage && (
         <div className="text-xs text-muted-foreground text-center">
           3 attempts planned for {journeyStage} stage - goal is customer response
         </div>
       )}
       
-      {customerReplied && (
+      {customerReplied && !isViewingCompletedStage && (
         <div className="text-xs text-center p-2 bg-success/5 border border-success/20 rounded-md">
           <span className="text-success font-medium">🎉 {journeyStage.charAt(0).toUpperCase() + journeyStage.slice(1)} Stage Complete!</span>
           <span className="text-muted-foreground ml-1">Customer responded - moving to next stage</span>
