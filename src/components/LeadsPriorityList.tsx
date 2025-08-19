@@ -201,43 +201,23 @@ export function LeadsPriorityList({
     return stats;
   }, [leads]);
 
-  return (
-    <div className="space-y-6 padding-top-20">
-      {/* Monthly Goals - Gamified */}
-      <div className="bg-gradient-primary/10 border border-primary/20 rounded-lg p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <div className="text-center">
-              <div className="relative">
-                <p className="text-2xl font-bold text-primary">47</p>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-success rounded-full"></div>
-              </div>
-              <p className="text-xs text-primary/70">This Month</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-primary/60">60</p>
-              <p className="text-xs text-primary/70">Goal</p>
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-bold text-success">🏆</p>
-              <p className="text-xs text-success">On Track</p>
-            </div>
-          </div>
-          <div className="flex-1 max-w-xs ml-6">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-primary/70">Progress to Goal</span>
-              <span className="text-sm font-semibold text-primary">78%</span>
-            </div>
-            <Progress value={78} className="h-3" />
-            <div className="flex justify-between mt-1 text-xs text-primary/60">
-              <span>13 to go</span>
-              <span>🎯 Next: 50</span>
+    return (
+      <div className="space-y-6 padding-top-20">
+        {/* Quick Stats Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4">
+              <Badge variant="secondary" className="px-3 py-2">
+                <span className="text-sm font-medium">{priorityStats.total} Total Leads</span>
+              </Badge>
+              <Badge variant="outline" className="px-3 py-2 border-hot-lead text-hot-lead">
+                <span className="text-sm font-medium">{priorityStats.hot} Hot</span>
+              </Badge>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Header */}
+        {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Lead Priority Dashboard</h1>
