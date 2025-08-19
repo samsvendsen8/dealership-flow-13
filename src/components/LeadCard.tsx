@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { Timeline } from '@/components/ui/timeline';
 import { WorkPlanProgress } from '@/components/WorkPlanProgress';
@@ -337,9 +338,71 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
         {/* Journey Stage Progress with Timeline */}
         <div className="mt-3 p-3 bg-muted/30 rounded-md space-y-3">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-medium text-muted-foreground">Journey Stage</span>
+            <span className="text-xs font-medium text-muted-foreground">Journey Progress</span>
             <span className="text-xs text-muted-foreground">{lead.stageProgress}%</span>
           </div>
+          
+          {/* Journey Timeline Progress Bar */}
+          <TooltipProvider>
+            <div className="relative">
+              <div className="w-full bg-muted rounded-full h-3 mb-2">
+                <div 
+                  className="h-3 bg-gradient-to-r from-primary/60 to-primary rounded-full transition-all duration-500"
+                  style={{ width: `${lead.stageProgress}%` }}
+                />
+              </div>
+              
+              {/* Journey Stage Icons */}
+              <div className="relative h-8">
+                {Object.entries(journeyStages).map(([stage, config], index, array) => {
+                  const position = array.length > 1 ? (index / (array.length - 1)) * 100 : 50;
+                  const isCompleted = Object.keys(journeyStages).indexOf(lead.journeyStage) >= index;
+                  const completedEvent = lead.timeline?.find(event => 
+                    event.action.toLowerCase().includes(stage) || 
+                    event.details.toLowerCase().includes(stage)
+                  );
+                  
+                  return (
+                    <Tooltip key={stage}>
+                      <TooltipTrigger asChild>
+                        <div 
+                          className={cn(
+                            'absolute w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-110 cursor-pointer z-10',
+                            isCompleted 
+                              ? 'bg-primary border-primary/20 text-white' 
+                              : 'bg-muted border-muted-foreground/30 text-muted-foreground'
+                          )}
+                          style={{ 
+                            left: `${Math.min(Math.max(position, 4), 96)}%`, 
+                            top: '50%',
+                            transform: 'translate(-50%, -50%)'
+                          }}
+                        >
+                          <span className="text-sm">{config.icon}</span>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-xs">
+                        <div className="text-xs">
+                          <div className="font-medium">{config.label}</div>
+                          <div className="text-muted-foreground">
+                            {isCompleted ? 'Completed' : 'Pending'}
+                          </div>
+                          {completedEvent && (
+                            <div className="mt-1">
+                              <div className="text-success">✓ {completedEvent.date}</div>
+                              <div>{completedEvent.details}</div>
+                            </div>
+                          )}
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  );
+                })}
+              </div>
+            </div>
+          </TooltipProvider>
+          
+          {/* Current Stage Info */}
           <div 
             className="flex items-center gap-2 cursor-pointer hover:bg-muted/20 p-2 -m-2 rounded transition-colors"
             onClick={(e) => {
@@ -351,21 +414,7 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
             <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-xs text-white", journeyStages[lead.journeyStage].color)}>
               {journeyStages[lead.journeyStage].icon}
             </div>
-            <span className="text-sm font-medium">{journeyStages[lead.journeyStage].label}</span>
-            <div className="flex-1 mx-2 relative">
-              <div className="w-full bg-muted rounded-full h-2">
-                <div 
-                  className={cn("h-2 rounded-full transition-all duration-500", journeyStages[lead.journeyStage].color)}
-                  style={{ width: `${lead.stageProgress}%` }}
-                />
-              </div>
-              {/* Timeline dots on the progress bar */}
-              {lead.timeline && lead.timeline.length > 0 && (
-                <div className="absolute inset-0 flex items-center">
-                  <Timeline events={lead.timeline} className="relative" />
-                </div>
-              )}
-            </div>
+            <span className="text-sm font-medium">Current: {journeyStages[lead.journeyStage].label}</span>
             <ArrowRight className="h-3 w-3 text-muted-foreground" />
           </div>
           
