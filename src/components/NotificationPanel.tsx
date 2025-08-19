@@ -32,8 +32,8 @@ const statusStyles = {
 };
 
 export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, contactMethod, aiSuggestedResponse }: NotificationPanelProps) {
-  const [activeMainTab, setActiveMainTab] = useState<'customer-info' | 'journey'>('customer-info');
-  const [activeSubTab, setActiveSubTab] = useState<'overview' | 'history' | 'notes' | 'response'>('response');
+  const [activeMainTab, setActiveMainTab] = useState<'contact' | 'customer-info' | 'journey'>('contact');
+  const [activeSubTab, setActiveSubTab] = useState<'overview' | 'notes'>('overview');
   const [responseText, setResponseText] = useState('');
   const [expandedHistoryItems, setExpandedHistoryItems] = useState<Set<string>>(new Set());
   const [selectedJourneyStage, setSelectedJourneyStage] = useState<string | null>(null);
@@ -79,9 +79,8 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
     if (method === 'phone') {
       setShowCallModal(true);
     } else {
-      // Auto-switch to response tab and set contact method
-      setActiveMainTab('customer-info');
-      setActiveSubTab('response');
+      // Auto-switch to contact tab for messaging
+      setActiveMainTab('contact');
     }
   };
 
@@ -268,11 +267,20 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
               </div>
             </div>
 
-            <Separator />
-
-            {/* Tab Navigation */}
+            {/* Tab Navigation - moved up below user info */}
             <div className="space-y-4">
               <div className="flex gap-1 p-1 bg-muted rounded-lg">
+                <button
+                  onClick={() => setActiveMainTab('contact')}
+                  className={cn(
+                    "flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors",
+                    activeMainTab === 'contact' 
+                      ? "bg-background text-foreground shadow-sm" 
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Contact
+                </button>
                 <button
                   onClick={() => setActiveMainTab('customer-info')}
                   className={cn(
@@ -297,22 +305,115 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                 </button>
               </div>
 
+              {/* Contact Tab Content */}
+              {activeMainTab === 'contact' && (
+                <div className="space-y-4">
+                  {/* AI Response Section */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base">AI Suggested Response</CardTitle>
+                      <p className="text-xs text-muted-foreground">
+                        Method: {contactMethod === 'phone' ? 'Phone Call' : contactMethod === 'email' ? 'Email' : 'Text Message'}
+                      </p>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="p-3 bg-muted/50 rounded-lg text-sm whitespace-pre-line">
+                        {currentAIResponse}
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="text-xs font-medium text-muted-foreground">Your Response</label>
+                        <textarea
+                          value={responseText}
+                          onChange={(e) => setResponseText(e.target.value)}
+                          placeholder={`Edit the AI suggestion or write your own ${contactMethod || 'text'} message...`}
+                          className="w-full p-3 border border-input rounded-lg text-sm resize-none"
+                          rows={4}
+                        />
+                      </div>
+
+                      {/* Quick AI Edit Actions */}
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {[
+                          "Quick check-in about test drive",
+                          "Follow up on financing options", 
+                          "Schedule appointment this week",
+                          "Send vehicle pricing details"
+                        ].map((quickEdit, index) => (
+                          <Button
+                            key={index}
+                            variant="outline"
+                            size="sm"
+                            className="text-xs h-8"
+                            onClick={() => setResponseText(quickEdit)}
+                          >
+                            {quickEdit}
+                          </Button>
+                        ))}
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button 
+                          className="flex-1 gap-2 bg-gradient-primary hover:opacity-90"
+                          onClick={async () => {
+                            const messageToSend = responseText.trim() || currentAIResponse;
+                            if (messageToSend && selectedLead) {
+                              try {
+                                await sendMessage(
+                                  selectedLead.id,
+                                  messageToSend,
+                                  contactMethod === 'phone' ? 'call' : contactMethod === 'email' ? 'email' : 'text',
+                                  selectedLead.journeyStage
+                                );
+                                
+                                toast({
+                                  title: "Message Sent",
+                                  description: `Your ${contactMethod || 'text'} has been sent and customer will auto-respond in 15 seconds.`,
+                                });
+                                
+                                setResponseText('');
+                                onContact(selectedLead.id, contactMethod || 'text');
+                              } catch (error) {
+                                toast({
+                                  title: "Error",
+                                  description: "Failed to send message. Please try again.",
+                                  variant: "destructive"
+                                });
+                              }
+                            }
+                          }}
+                          disabled={isLoading}
+                        >
+                          <Send className="h-4 w-4" />
+                          {isLoading ? "Sending..." : `Send ${contactMethod === 'phone' ? 'Call' : contactMethod === 'email' ? 'Email' : 'Text'}`}
+                        </Button>
+                        <Button 
+                          variant="outline"
+                          onClick={() => setResponseText(currentAIResponse)}
+                        >
+                          <Edit3 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Communication History */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base">Communication History</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <MessageHistory leadId={selectedLead.id} />
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+
               {/* Customer Info Content */}
               {activeMainTab === 'customer-info' && (
                 <div className="space-y-4">
                   {/* Sub-tabs for customer info */}
                   <div className="flex gap-1 p-1 bg-secondary/50 rounded-lg">
-                    <button
-                      onClick={() => setActiveSubTab('response')}
-                      className={cn(
-                        "flex-1 py-1.5 px-2 text-xs font-medium rounded transition-colors",
-                        activeSubTab === 'response' 
-                          ? "bg-background text-foreground shadow-sm" 
-                          : "text-muted-foreground hover:text-foreground"
-                      )}
-                    >
-                      Response
-                    </button>
                     <button
                       onClick={() => setActiveSubTab('overview')}
                       className={cn(
@@ -323,17 +424,6 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                       )}
                     >
                       Overview
-                    </button>
-                    <button
-                      onClick={() => setActiveSubTab('history')}
-                      className={cn(
-                        "flex-1 py-1.5 px-2 text-xs font-medium rounded transition-colors",
-                        activeSubTab === 'history' 
-                          ? "bg-background text-foreground shadow-sm" 
-                          : "text-muted-foreground hover:text-foreground"
-                      )}
-                    >
-                      History
                     </button>
                     <button
                       onClick={() => setActiveSubTab('notes')}
@@ -347,97 +437,6 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                       Notes
                     </button>
                   </div>
-
-                  {/* Response Tab Content */}
-                  {activeSubTab === 'response' && (
-                    <Card>
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-base">AI Suggested Response</CardTitle>
-                        <p className="text-xs text-muted-foreground">
-                          Method: {contactMethod === 'phone' ? 'Phone Call' : contactMethod === 'email' ? 'Email' : 'Text Message'}
-                        </p>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="p-3 bg-muted/50 rounded-lg text-sm whitespace-pre-line">
-                          {currentAIResponse}
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <label className="text-xs font-medium text-muted-foreground">Your Response</label>
-                          <textarea
-                            value={responseText}
-                            onChange={(e) => setResponseText(e.target.value)}
-                            placeholder={`Edit the AI suggestion or write your own ${contactMethod || 'text'} message...`}
-                            className="w-full p-3 border border-input rounded-lg text-sm resize-none"
-                            rows={4}
-                          />
-                        </div>
-
-                        {/* Quick AI Edit Actions */}
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {[
-                            "Quick check-in about test drive",
-                            "Follow up on financing options", 
-                            "Schedule appointment this week",
-                            "Send vehicle pricing details"
-                          ].map((quickEdit, index) => (
-                            <Button
-                              key={index}
-                              variant="outline"
-                              size="sm"
-                              className="text-xs h-8"
-                              onClick={() => setResponseText(quickEdit)}
-                            >
-                              {quickEdit}
-                            </Button>
-                          ))}
-                        </div>
-
-                        <div className="flex gap-2">
-                          <Button 
-                            className="flex-1 gap-2 bg-gradient-primary hover:opacity-90"
-                            onClick={async () => {
-                              const messageToSend = responseText.trim() || currentAIResponse;
-                              if (messageToSend && selectedLead) {
-                                try {
-                                  await sendMessage(
-                                    selectedLead.id,
-                                    messageToSend,
-                                    contactMethod === 'phone' ? 'call' : contactMethod === 'email' ? 'email' : 'text',
-                                    selectedLead.journeyStage
-                                  );
-                                  
-                                  toast({
-                                    title: "Message Sent",
-                                    description: `Your ${contactMethod || 'text'} has been sent and customer will auto-respond in 15 seconds.`,
-                                  });
-                                  
-                                  setResponseText('');
-                                  onContact(selectedLead.id, contactMethod || 'text');
-                                } catch (error) {
-                                  toast({
-                                    title: "Error",
-                                    description: "Failed to send message. Please try again.",
-                                    variant: "destructive"
-                                  });
-                                }
-                              }
-                            }}
-                            disabled={isLoading}
-                          >
-                            <Send className="h-4 w-4" />
-                            {isLoading ? "Sending..." : `Send ${contactMethod === 'phone' ? 'Call' : contactMethod === 'email' ? 'Email' : 'Text'}`}
-                          </Button>
-                          <Button 
-                            variant="outline"
-                            onClick={() => setResponseText(currentAIResponse)}
-                          >
-                            <Edit3 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
 
                   {/* Overview Tab Content */}
                   {activeSubTab === 'overview' && (
@@ -496,11 +495,6 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                         )}
                       </CardContent>
                     </Card>
-                  )}
-
-                  {/* History Tab Content */}
-                  {activeSubTab === 'history' && (
-                    <MessageHistory leadId={selectedLead.id} />
                   )}
 
                   {/* Notes Tab Content */}
