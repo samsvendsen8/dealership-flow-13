@@ -5,7 +5,6 @@ import { LeadFocusView } from '@/components/LeadFocusView';
 import { NotificationPanel } from '@/components/NotificationPanel';
 import { ToastNotification } from '@/components/ToastNotification';
 import { GoalsDashboard } from '@/components/GoalsDashboard';
-import { ScreenCelebration } from '@/components/ScreenCelebration';
 import { useToast } from '@/hooks/use-toast';
 import { useRealTimeUpdates } from '@/hooks/useRealTimeUpdates';
 import { Button } from '@/components/ui/button';
@@ -426,8 +425,6 @@ const Index = () => {
 
   const [contactMethod, setContactMethod] = useState<'phone' | 'email' | 'text' | undefined>();
   const [aiSuggestedResponse, setAiSuggestedResponse] = useState<string>('');
-  const [showScreenCelebration, setShowScreenCelebration] = useState(false);
-  const [celebrationMessage, setCelebrationMessage] = useState('');
 
   const handleContact = (leadId: string, method: 'phone' | 'email' | 'text') => {
     const lead = leads.find(l => l.id === leadId);
@@ -576,9 +573,36 @@ const Index = () => {
     const lead = leads.find(l => l.id === leadId);
     if (lead) {
       const methodText = method === 'phone' ? 'call' : method;
-      setCelebrationMessage(`${methodText.charAt(0).toUpperCase() + methodText.slice(1)} sent to ${lead.name}! 🚀`);
-      setShowScreenCelebration(true);
+      
+      // Show simple toast with confetti effect
+      toast({
+        title: "🎉 Message Sent!",
+        description: `${methodText.charAt(0).toUpperCase() + methodText.slice(1)} sent to ${lead.name} successfully`,
+        className: "celebration-toast",
+      });
+      
+      // Add confetti elements
+      createConfetti();
     }
+  };
+
+  const createConfetti = () => {
+    const confettiContainer = document.createElement('div');
+    confettiContainer.className = 'fixed top-0 right-0 pointer-events-none z-[60]';
+    confettiContainer.innerHTML = Array.from({ length: 20 }, (_, i) => 
+      `<div class="confetti-piece animate-bounce" style="
+        left: ${80 + Math.random() * 15}%; 
+        animation-delay: ${i * 50}ms; 
+        animation-duration: ${800 + Math.random() * 400}ms;
+        background: hsl(var(--primary));
+      "></div>`
+    ).join('');
+    
+    document.body.appendChild(confettiContainer);
+    
+    setTimeout(() => {
+      document.body.removeChild(confettiContainer);
+    }, 2000);
   };
 
   const handleTaskCompleted = (leadId: string) => {
@@ -729,14 +753,6 @@ const Index = () => {
           />
         ))}
       </div>
-      
-      {/* Screen-wide Celebration */}
-      <ScreenCelebration
-        isVisible={showScreenCelebration}
-        onComplete={() => setShowScreenCelebration(false)}
-        message={celebrationMessage}
-        type="communication"
-      />
     </div>
   );
 };

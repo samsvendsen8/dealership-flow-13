@@ -174,10 +174,10 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
         }
       }
 
-      // Trigger screen-wide celebration first
-      onCommunicationSent?.(lead.id, method);
-      
       await sendMessage(lead.id, responseText, method === 'phone' ? 'call' : method, lead.journeyStage);
+      
+      // Trigger celebration toast and confetti
+      onCommunicationSent?.(lead.id, method);
       
       // Show celebration animation and trigger work item slide-out
       setShowCelebration(true);
