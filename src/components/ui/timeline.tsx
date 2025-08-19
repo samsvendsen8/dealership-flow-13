@@ -37,8 +37,10 @@ export function Timeline({ events, className }: TimelineProps) {
       <div className={cn('flex items-center gap-1', className)}>
         {events.slice(-6).map((event, index) => {
           const Icon = timelineIcons[event.type];
-          // Calculate position along the progress bar (0-100%)
-          const position = ((index + 1) / 6) * 100;
+          // Spread dots across the timeline based on journey progression
+          // Each dot represents a point in time across the full journey
+          const totalEvents = events.length;
+          const position = totalEvents > 1 ? (index / (totalEvents - 1)) * 100 : 50;
           
           return (
             <Tooltip key={index}>
@@ -49,7 +51,7 @@ export function Timeline({ events, className }: TimelineProps) {
                     timelineColors[event.type]
                   )}
                   style={{ 
-                    left: `${position}%`, 
+                    left: `${Math.min(Math.max(position, 5), 95)}%`, 
                     top: '50%',
                     transform: 'translate(-50%, -50%)'
                   }}
