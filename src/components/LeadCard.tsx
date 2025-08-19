@@ -38,6 +38,7 @@ import { cn } from '@/lib/utils';
 import { WorkPlanProgress } from './WorkPlanProgress';
 import JourneyAdvanceButton from './JourneyAdvanceButton';
 import { CallSimulationModal } from './CallSimulationModal';
+import { CelebrationAnimation } from './CelebrationAnimation';
 import { useMessaging } from '@/hooks/useMessaging';
 import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -99,6 +100,7 @@ interface LeadCardProps {
   onContact: (leadId: string, method: 'phone' | 'email' | 'text') => void;
   onViewDetails: (leadId: string) => void;
   onOpenNotificationPanel?: (leadId: string, method: 'phone' | 'email' | 'text') => void;
+  onTaskCompleted?: (leadId: string) => void;
   isCondensed?: boolean;
   isFocused?: boolean;
 }
@@ -130,15 +132,21 @@ const journeyStages = {
   delivered: { label: 'Delivered', icon: '🚚', color: 'bg-emerald-500' }
 };
 
-function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, isCondensed = false, isFocused = false }: LeadCardProps) {
+function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onTaskCompleted, isCondensed = false, isFocused = false }: LeadCardProps) {
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
   const [showQuickResponse, setShowQuickResponse] = useState(false);
   const [responseText, setResponseText] = useState('');
   const [selectedJourneyStage, setSelectedJourneyStage] = useState(lead.journeyStage);
   const [showCallModal, setShowCallModal] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
   const { sendMessage, advanceJourneyStage, isLoading } = useMessaging();
   const { toast } = useToast();
   
+  // Reset selectedJourneyStage when lead changes to current stage
+  useEffect(() => {
+    setSelectedJourneyStage(lead.journeyStage);
+  }, [lead.id, lead.journeyStage]);
+
   const handleQuickMessage = async (method: 'phone' | 'email' | 'text') => {
     if (!responseText.trim()) {
       // Generate default message if empty
@@ -164,6 +172,14 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, isC
       }
 
       await sendMessage(lead.id, responseText, method === 'phone' ? 'call' : method, lead.journeyStage);
+      
+      // Show celebration animation for completing work plan item
+      setShowCelebration(true);
+      
+      // Notify parent to advance to next lead after celebration
+      setTimeout(() => {
+        onTaskCompleted?.(lead.id);
+      }, 2000);
       
       toast({
         title: "Message Sent",
@@ -855,6 +871,13 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, isC
         onClose={() => setShowCallModal(false)}
         leadName={lead.name}
         phoneNumber={lead.phone}
+      />
+      
+      {/* Celebration Animation */}
+      <CelebrationAnimation
+        isVisible={showCelebration}
+        onComplete={() => setShowCelebration(false)}
+        message="Work plan item completed! 🚀"
       />
     </Card>
   );

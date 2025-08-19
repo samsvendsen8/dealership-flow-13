@@ -5,6 +5,7 @@ import { LeadFocusView } from '@/components/LeadFocusView';
 import { NotificationPanel } from '@/components/NotificationPanel';
 import { ToastNotification } from '@/components/ToastNotification';
 import { useToast } from '@/hooks/use-toast';
+import { useRealTimeUpdates } from '@/hooks/useRealTimeUpdates';
 import { Button } from '@/components/ui/button';
 import { Eye, List, Target } from 'lucide-react';
 import type { Lead } from '@/components/LeadCard';
@@ -240,6 +241,17 @@ const Index = () => {
     suggestedResponse: string;
   }>>([]);
   const { toast } = useToast();
+
+  // Real-time updates for lead changes
+  useRealTimeUpdates((leadId: string, updates: any) => {
+    setLeads(prevLeads => 
+      prevLeads.map(lead => 
+        lead.id === leadId 
+          ? { ...lead, ...updates, lastActivity: updates.hasNewMessage ? 'Just replied' : lead.lastActivity }
+          : lead
+      )
+    );
+  });
 
   // Real-time new lead generation - simulates incoming leads
   useEffect(() => {

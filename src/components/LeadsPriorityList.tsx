@@ -44,6 +44,18 @@ export function LeadsPriorityList({
   const [selectedLeadId, setSelectedLeadId] = useState<string | undefined>();
   const [activeTab, setActiveTab] = useState('action-required');
 
+  // Handle task completion - auto-advance to next lead
+  const handleTaskCompleted = (completedLeadId: string) => {
+    const currentLeads = getFilteredAndSortedLeads(leadsByCategory[activeTab as keyof typeof leadsByCategory]);
+    const currentIndex = currentLeads.findIndex(lead => lead.id === completedLeadId);
+    
+    // Move to next lead, or first if was last
+    const nextIndex = currentIndex < currentLeads.length - 1 ? currentIndex + 1 : 0;
+    if (currentLeads[nextIndex]) {
+      setSelectedLeadId(currentLeads[nextIndex].id);
+    }
+  };
+
   // Handle tab change and reset to first lead
   const handleTabChange = (newTab: string) => {
     setActiveTab(newTab);
@@ -410,6 +422,7 @@ export function LeadsPriorityList({
                               onContact={onContact}
                               onViewDetails={onViewDetails}
                               onOpenNotificationPanel={onOpenNotificationPanel}
+                              onTaskCompleted={handleTaskCompleted}
                               isCondensed={false}
                               isFocused={false}
                             />
