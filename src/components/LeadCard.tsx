@@ -356,7 +356,7 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
           
           {/* Journey Timeline Progress Bar */}
           <TooltipProvider>
-            <div className="relative z-50">
+            <div className="relative z-50 px-3">
               {/* Progress Bar */}
               <div className="w-full bg-muted rounded-full h-2 relative">
                 <div 

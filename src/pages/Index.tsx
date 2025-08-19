@@ -42,9 +42,9 @@ const mockLeads: Lead[] = [
       { date: 'Today 10am', action: 'Test Drive', details: 'Completed 15-minute test drive', type: 'milestone' }
     ],
     workPlan: [
-      { id: '1', title: 'Immediate Follow-up', description: 'Approach customer on lot and assist with viewing', dueDate: 'Now', status: 'pending', attemptNumber: 1, contactMethod: 'phone' },
-      { id: '2', title: 'Financing Discussion', description: 'Present financing options and run credit check', dueDate: 'Today 2pm', status: 'scheduled', attemptNumber: 1, contactMethod: 'phone' },
-      { id: '3', title: 'Trade-in Appraisal', description: 'Evaluate trade-in vehicle if applicable', dueDate: 'Today 3pm', status: 'pending', attemptNumber: 1, contactMethod: 'phone' }
+      { id: '1', title: 'Immediate Contact', description: 'Reach out while customer is on lot', dueDate: 'Now', status: 'pending', attemptNumber: 1, contactMethod: 'phone' },
+      { id: '2', title: 'Follow-up Call', description: 'Call if initial contact unsuccessful', dueDate: 'In 30 min', status: 'scheduled', attemptNumber: 2, contactMethod: 'phone' },
+      { id: '3', title: 'Text Message', description: 'Send text if calls go unanswered', dueDate: 'In 1 hour', status: 'scheduled', attemptNumber: 3, contactMethod: 'text' }
     ]
   },
   {
@@ -80,9 +80,9 @@ const mockLeads: Lead[] = [
       { date: '1 hour ago', action: 'Price Negotiation', details: 'Discussed pricing and trade-in value', type: 'contact' }
     ],
     workPlan: [
-      { id: '1', title: 'Trade-in Appraisal', description: 'Complete appraisal of 2018 Honda Accord', dueDate: 'Today 4pm', status: 'pending', attemptNumber: 1, contactMethod: 'phone' },
-      { id: '2', title: 'Final Proposal', description: 'Present final offer including trade-in value', dueDate: 'Tomorrow 10am', status: 'scheduled', attemptNumber: 1, contactMethod: 'email' },
-      { id: '3', title: 'Contract Review', description: 'Review purchase agreement and terms', dueDate: 'Tomorrow 2pm', status: 'pending', attemptNumber: 1, contactMethod: 'phone' }
+      { id: '1', title: 'Present Proposal', description: 'Email detailed offer and trade-in value', dueDate: 'Today', status: 'pending', attemptNumber: 1, contactMethod: 'email' },
+      { id: '2', title: 'Follow-up Call', description: 'Call to discuss proposal questions', dueDate: 'Tomorrow 10am', status: 'scheduled', attemptNumber: 2, contactMethod: 'phone' },
+      { id: '3', title: 'Final Negotiation', description: 'Text to address any final concerns', dueDate: 'Day 3', status: 'scheduled', attemptNumber: 3, contactMethod: 'text' }
     ]
   },
   {
@@ -116,9 +116,9 @@ const mockLeads: Lead[] = [
       { date: '2 hours ago', action: 'Follow-up Email', details: 'Sent lease comparison document', type: 'contact' }
     ],
     workPlan: [
-      { id: '1', title: 'Joint Call Setup', description: 'Schedule call with both spouses for Friday morning', dueDate: 'Friday 10am', status: 'scheduled', attemptNumber: 1, contactMethod: 'phone' },
-      { id: '2', title: 'Lease Documentation', description: 'Prepare detailed lease agreement and terms', dueDate: 'Thursday 3pm', status: 'pending', attemptNumber: 1, contactMethod: 'email' },
-      { id: '3', title: 'Credit Application', description: 'Process joint credit application if approved', dueDate: 'Friday 2pm', status: 'pending', attemptNumber: 1, contactMethod: 'phone' }
+      { id: '1', title: 'Lease Proposal', description: 'Send detailed lease options and terms', dueDate: 'Today', status: 'pending', attemptNumber: 1, contactMethod: 'email' },
+      { id: '2', title: 'Spouse Discussion', description: 'Schedule call to include spouse in decision', dueDate: 'Tomorrow', status: 'scheduled', attemptNumber: 2, contactMethod: 'phone' },
+      { id: '3', title: 'Final Follow-up', description: 'Text to confirm final decision timeline', dueDate: 'Day 3', status: 'scheduled', attemptNumber: 3, contactMethod: 'text' }
     ]
   },
   {
@@ -151,9 +151,9 @@ const mockLeads: Lead[] = [
       { date: '30 min ago', action: 'Arrived for Test Drive', details: 'Currently test driving F-150', type: 'visit' }
     ],
     workPlan: [
-      { id: '1', title: 'Price Comparison', description: 'Prepare competitive pricing analysis vs competitors', dueDate: 'Today 5pm', status: 'pending', attemptNumber: 1, contactMethod: 'email' },
-      { id: '2', title: 'Business Use Benefits', description: 'Present tax advantages and commercial financing', dueDate: 'Monday 9am', status: 'scheduled', attemptNumber: 1, contactMethod: 'text' },
-      { id: '3', title: 'Follow-up Call', description: 'Check decision timeline and address concerns', dueDate: 'Monday 2pm', status: 'pending', attemptNumber: 1, contactMethod: 'phone' }
+      { id: '1', title: 'Budget Discussion', description: 'Call to discuss budget and payment options', dueDate: 'Today', status: 'pending', attemptNumber: 1, contactMethod: 'phone' },
+      { id: '2', title: 'Vehicle Availability', description: 'Email current inventory and pricing', dueDate: 'Tomorrow', status: 'scheduled', attemptNumber: 2, contactMethod: 'email' },
+      { id: '3', title: 'Appointment Booking', description: 'Text to schedule viewing appointment', dueDate: 'Day 3', status: 'scheduled', attemptNumber: 3, contactMethod: 'text' }
     ]
   },
   {
@@ -185,9 +185,9 @@ const mockLeads: Lead[] = [
       { date: '1 day ago', action: 'Email Response', details: 'Replied asking about safety features', type: 'contact' }
     ],
     workPlan: [
-      { id: '1', title: 'Educational Follow-up', description: 'Send safety ratings and feature comparison', dueDate: 'Today 4pm', status: 'pending', attemptNumber: 1, contactMethod: 'email' },
-      { id: '2', title: 'Financing Information', description: 'Provide financing options and calculator', dueDate: 'Tomorrow 10am', status: 'pending', attemptNumber: 2, contactMethod: 'email' },
-      { id: '3', title: 'Showroom Invitation', description: 'Invite for test drive and vehicle viewing', dueDate: 'Friday 2pm', status: 'pending', attemptNumber: 3, contactMethod: 'phone' }
+      { id: '1', title: 'Educational Follow-up', description: 'Send safety ratings and feature comparison', dueDate: 'Today', status: 'customer_replied', attemptNumber: 1, contactMethod: 'email', customerResponse: true },
+      { id: '2', title: 'Follow-up Call', description: 'Call to answer questions and schedule visit', dueDate: 'Tomorrow', status: 'scheduled', attemptNumber: 2, contactMethod: 'phone' },
+      { id: '3', title: 'Visit Scheduling', description: 'Text to confirm showroom appointment', dueDate: 'Day 3', status: 'scheduled', attemptNumber: 3, contactMethod: 'text' }
     ]
   },
   {
@@ -217,9 +217,9 @@ const mockLeads: Lead[] = [
       { date: '30 min ago', action: 'Website Inquiry', details: 'Submitted urgent purchase form for Tesla Model 3', type: 'contact' }
     ],
     workPlan: [
-      { id: '1', title: 'Immediate Contact', description: 'Call within 30 minutes of inquiry', dueDate: 'Now', status: 'pending', attemptNumber: 1, contactMethod: 'phone' },
-      { id: '2', title: 'Vehicle Availability', description: 'Confirm Tesla Model 3 availability and options', dueDate: 'Today 4pm', status: 'pending', attemptNumber: 1, contactMethod: 'phone' },
-      { id: '3', title: 'Purchase Documentation', description: 'Prepare cash purchase paperwork', dueDate: 'Today 6pm', status: 'pending', attemptNumber: 1, contactMethod: 'email' }
+      { id: '1', title: 'Immediate Contact', description: 'Call within 15 minutes to secure deal', dueDate: 'Now', status: 'pending', attemptNumber: 1, contactMethod: 'phone' },
+      { id: '2', title: 'Vehicle Confirmation', description: 'Email to confirm availability and options', dueDate: 'In 1 hour', status: 'scheduled', attemptNumber: 2, contactMethod: 'email' },
+      { id: '3', title: 'Paperwork Preparation', description: 'Text to coordinate purchase documentation', dueDate: 'Today 6pm', status: 'scheduled', attemptNumber: 3, contactMethod: 'text' }
     ]
   }
 ];
