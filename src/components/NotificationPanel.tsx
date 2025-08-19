@@ -94,23 +94,6 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
 
     // Add journey-specific history based on current stage
     const stageHistory: Record<string, HistoryItem[]> = {
-      'inquiry': [
-        {
-          id: 'first-contact',
-          type: 'outbound',
-          title: 'Initial Phone Call',
-          timestamp: '2 days ago',
-          icon: Phone,
-          color: 'border-status-contacted',
-          description: 'Left voicemail - no answer',
-          expandable: true,
-          content: {
-            type: 'voicemail',
-            duration: '45 seconds',
-            transcript: `Hi ${selectedLead.name}, this is Alex from Premier Auto. Thanks for your interest in the ${selectedLead.vehicle}. I'd love to discuss your needs and schedule a test drive. Please call me back at (555) 123-4567. Looking forward to hearing from you!`
-          }
-        }
-      ],
       'engaged': [
         {
           id: 'text-response',
@@ -163,36 +146,16 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
             actions: ['Vehicle inspection completed', 'Financing discussion initiated', 'Test drive scheduled']
           }
         }
-      ],
-      'test-drive': [
-        {
-          id: 'test-drive',
-          type: 'meeting',
-          title: 'Test Drive Completed',
-          timestamp: '2 hours ago',
-          icon: Check,
-          color: 'border-success',
-          description: 'Successful test drive - customer very positive',
-          expandable: true,
-          content: {
-            type: 'meeting',
-            duration: '30 minutes',
-            notes: `Excellent test drive! ${selectedLead.name} loved the handling and comfort. Asked about trade-in value for current vehicle. Ready to move forward with purchase.`,
-            actions: ['Trade-in evaluation completed', 'Financing pre-approval started', 'Purchase proposal prepared']
-          }
-        }
       ]
     };
 
     // Add history based on current journey stage
-    const currentStageIndex = ['inquiry', 'engaged', 'visit', 'test-drive', 'proposal', 'financing', 'sold', 'delivered'].indexOf(selectedLead.journeyStage);
+    const currentStageIndex = ['engaged', 'visit', 'proposal', 'sold', 'delivered'].indexOf(selectedLead.journeyStage);
     
     let allHistory: HistoryItem[] = [...baseHistory];
     
-    if (currentStageIndex >= 0) allHistory.push(...(stageHistory.inquiry || []));
-    if (currentStageIndex >= 1) allHistory.push(...(stageHistory.engaged || []));
-    if (currentStageIndex >= 2) allHistory.push(...(stageHistory.visit || []));
-    if (currentStageIndex >= 3) allHistory.push(...(stageHistory['test-drive'] || []));
+    if (currentStageIndex >= 0) allHistory.push(...(stageHistory.engaged || []));
+    if (currentStageIndex >= 1) allHistory.push(...(stageHistory.visit || []));
 
     return allHistory.reverse(); // Most recent first
   };
@@ -433,10 +396,11 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                       <div className="space-y-2 text-sm">
                         <p className="text-foreground">
                           <strong>Journey Overview:</strong> {selectedLead.name} has progressed {
-                            selectedLead.journeyStage === 'inquiry' ? 'through initial inquiry stage' :
                             selectedLead.journeyStage === 'engaged' ? 'to active engagement with positive text responses' :
                             selectedLead.journeyStage === 'visit' ? 'to showroom visit with strong buying signals' :
-                            selectedLead.journeyStage === 'test-drive' ? 'to test drive completion with purchase intent' :
+                            selectedLead.journeyStage === 'proposal' ? 'to proposal stage with purchase intent' :
+                            selectedLead.journeyStage === 'sold' ? 'to deal completion' :
+                            selectedLead.journeyStage === 'delivered' ? 'to final delivery stage' :
                             'through the sales pipeline'
                           }.
                         </p>
@@ -454,24 +418,25 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                           </div>
                         )}
                         
-                        {selectedLead.journeyStage === 'test-drive' && (
+                        {selectedLead.journeyStage === 'proposal' && (
                           <div className="bg-success/10 border border-success/20 rounded-md p-2">
-                            <p className="text-success text-xs font-medium">🎯 Purchase Ready: Asked about trade-in value - strong buying intent</p>
+                            <p className="text-success text-xs font-medium">🎯 Purchase Ready: Proposal presented - strong buying intent</p>
                           </div>
                         )}
                         
                         {selectedLead.priority === 'hot' && (
                           <div className="bg-warning/10 border border-warning/20 rounded-md p-2">
-                            <p className="text-warning text-xs font-medium">⚠️ Irregular: High-value lead with rapid progression - prioritize immediate follow-up</p>
+                            <p className="text-warning text-xs font-medium">⚠️ Priority: High-value lead with rapid progression - prioritize immediate follow-up</p>
                           </div>
                         )}
                         
                         <p className="text-muted-foreground text-xs">
                           Next recommended action: {
-                            selectedLead.journeyStage === 'inquiry' ? 'Follow up with alternative contact method' :
                             selectedLead.journeyStage === 'engaged' ? 'Confirm weekend appointment details' :
                             selectedLead.journeyStage === 'visit' ? 'Schedule test drive immediately' :
-                            selectedLead.journeyStage === 'test-drive' ? 'Present purchase proposal with trade-in evaluation' :
+                            selectedLead.journeyStage === 'proposal' ? 'Follow up on proposal with trade-in evaluation' :
+                            selectedLead.journeyStage === 'sold' ? 'Prepare for vehicle delivery' :
+                            selectedLead.journeyStage === 'delivered' ? 'Follow up for customer satisfaction' :
                             'Continue nurturing relationship'
                           }
                         </p>
@@ -632,19 +597,16 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                       
                       {(() => {
                         // Generate timeline events based on completed journey stages
-                        const allStages = ['inquiry', 'engaged', 'visit', 'test-drive', 'proposal', 'financing', 'sold', 'delivered'];
+                        const allStages = ['engaged', 'visit', 'proposal', 'sold', 'delivered'];
                         const currentStageIndex = allStages.indexOf(selectedLead.journeyStage);
                         const completedStages = allStages.slice(0, currentStageIndex + 1);
                         
                         const stageEvents = completedStages.map((stage, index) => {
                           const stageInfo = {
-                            inquiry: { action: 'Inquiry Received', type: 'contact' as const, date: '3 days ago', details: 'Customer submitted initial inquiry' },
                             engaged: { action: 'Engaged Customer', type: 'contact' as const, date: '2 days ago', details: 'Active communication established' },
                             visit: { action: 'Showroom Visit', type: 'visit' as const, date: '1 day ago', details: 'Customer visited showroom' },
-                            'test-drive': { action: 'Test Drive', type: 'milestone' as const, date: '5 hours ago', details: 'Customer completed test drive' },
                             proposal: { action: 'Proposal Sent', type: 'milestone' as const, date: '3 hours ago', details: 'Purchase proposal presented' },
-                            financing: { action: 'Financing Approved', type: 'milestone' as const, date: '1 hour ago', details: 'Financing arrangements completed' },
-                            sold: { action: 'Deal Closed', type: 'milestone' as const, date: '30 min ago', details: 'Sale successfully completed' },
+                            sold: { action: 'Deal Closed', type: 'milestone' as const, date: '1 hour ago', details: 'Sale successfully completed' },
                             delivered: { action: 'Vehicle Delivered', type: 'milestone' as const, date: 'Just now', details: 'Vehicle delivered to customer' }
                           };
                           
@@ -678,16 +640,13 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                     </div>
 
                     <div className="space-y-3">
-                      {['inquiry', 'engaged', 'visit', 'test-drive', 'proposal', 'financing', 'sold', 'delivered'].map((stageKey, index) => {
+                      {['engaged', 'visit', 'proposal', 'sold', 'delivered'].map((stageKey, index) => {
                         const journeyStages = {
-                          inquiry: { label: 'Inquiry', icon: '💬', color: 'bg-blue-500', description: 'Initial customer interest' },
-                          engaged: { label: 'Engaged', icon: '🎯', color: 'bg-teal-500', description: 'Active communication established' },
-                          visit: { label: 'Visit Scheduled', icon: '🏢', color: 'bg-purple-500', description: 'Customer visit arranged' },
-                          'test-drive': { label: 'Test Drive', icon: '🚗', color: 'bg-orange-500', description: 'Vehicle demonstration completed' },
-                          proposal: { label: 'Proposal Sent', icon: '📄', color: 'bg-yellow-500', description: 'Formal offer presented' },
-                          financing: { label: 'Financing', icon: '🏦', color: 'bg-indigo-500', description: 'Financial arrangements in progress' },
-                          sold: { label: 'Sold', icon: '✅', color: 'bg-green-500', description: 'Deal closed successfully' },
-                          delivered: { label: 'Delivered', icon: '🎉', color: 'bg-emerald-500', description: 'Vehicle delivered to customer' }
+                          engaged: { label: 'Engaged', icon: '💬', color: 'bg-teal-500', description: 'Active communication established' },
+                          visit: { label: 'Visit', icon: '📍', color: 'bg-purple-500', description: 'Customer visit arranged' },
+                          proposal: { label: 'Proposal', icon: '📄', color: 'bg-yellow-500', description: 'Formal offer presented' },
+                          sold: { label: 'Sold', icon: '👍', color: 'bg-green-500', description: 'Deal closed successfully' },
+                          delivered: { label: 'Delivered', icon: '🚚', color: 'bg-emerald-500', description: 'Vehicle delivered to customer' }
                         };
                         
                         const stage = journeyStages[stageKey as keyof typeof journeyStages];
@@ -706,7 +665,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                           attemptNumber: number;
                           contactMethod: 'phone' | 'email' | 'text';
                         }>> = {
-                          inquiry: [
+                          engaged: [
                             {
                               id: '1',
                               title: 'Initial Contact',
@@ -724,14 +683,74 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                               status: 'completed',
                               attemptNumber: 2,
                               contactMethod: 'email'
-                            }
-                          ],
-                          engaged: [
+                            },
                             {
                               id: '3',
-                              title: 'Schedule Appointment',
+                              title: 'Schedule Visit',
                               description: 'Book showroom visit or test drive',
                               dueDate: '2024-01-17',
+                              status: 'pending',
+                              attemptNumber: 3,
+                              contactMethod: 'phone'
+                            }
+                          ],
+                          visit: [
+                            {
+                              id: '4',
+                              title: 'Pre-visit Confirmation',
+                              description: 'Confirm appointment 24 hours before',
+                              dueDate: '2024-01-18',
+                              status: 'scheduled',
+                              attemptNumber: 1,
+                              contactMethod: 'phone'
+                            },
+                            {
+                              id: '5',
+                              title: 'Prepare Vehicle',
+                              description: 'Ensure vehicle is ready for demonstration',
+                              dueDate: '2024-01-19',
+                              status: 'pending',
+                              attemptNumber: 1,
+                              contactMethod: 'text'
+                            }
+                          ],
+                          proposal: [
+                            {
+                              id: '6',
+                              title: 'Send Proposal',
+                              description: 'Email detailed purchase proposal',
+                              dueDate: '2024-01-20',
+                              status: 'pending',
+                              attemptNumber: 1,
+                              contactMethod: 'email'
+                            },
+                            {
+                              id: '7',
+                              title: 'Follow-up on Proposal',
+                              description: 'Check if they have questions about the offer',
+                              dueDate: '2024-01-22',
+                              status: 'pending',
+                              attemptNumber: 2,
+                              contactMethod: 'phone'
+                            }
+                          ],
+                          sold: [
+                            {
+                              id: '8',
+                              title: 'Finalize Paperwork',
+                              description: 'Complete all sales documentation',
+                              dueDate: '2024-01-25',
+                              status: 'pending',
+                              attemptNumber: 1,
+                              contactMethod: 'phone'
+                            }
+                          ],
+                          delivered: [
+                            {
+                              id: '9',
+                              title: 'Delivery Confirmation',
+                              description: 'Confirm vehicle delivery satisfaction',
+                              dueDate: '2024-01-30',
                               status: 'pending',
                               attemptNumber: 1,
                               contactMethod: 'phone'

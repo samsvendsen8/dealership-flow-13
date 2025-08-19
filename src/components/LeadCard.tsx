@@ -39,7 +39,7 @@ export interface Lead {
   source: string;
   timeOnLot?: string;
   notes?: string;
-  journeyStage: 'inquiry' | 'engaged' | 'visit' | 'test-drive' | 'proposal' | 'financing' | 'sold' | 'delivered';
+  journeyStage: 'engaged' | 'visit' | 'proposal' | 'sold' | 'delivered';
   stageProgress: number; // 0-100 percentage
   // Enhanced data fields
   contactAttempts?: number;
@@ -105,18 +105,6 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
                           lead.lastActivity.includes('min ago');
 
     switch (lead.journeyStage) {
-      case 'inquiry':
-        if (isRecentlyContacted) {
-          return [
-            { label: 'Try different method', icon: MessageCircle, action: () => onContact(lead.id, 'text'), context: 'No response to last contact' },
-            { label: 'Check voicemail', icon: Phone, action: () => onContact(lead.id, 'phone'), context: 'Follow up on initial inquiry' }
-          ];
-        }
-        return [
-          { label: 'Initial contact', icon: Phone, action: () => onContact(lead.id, 'phone'), context: 'First outreach - establish connection' },
-          { label: 'Send brochure', icon: Mail, action: () => onContact(lead.id, 'email'), context: 'Share vehicle information' }
-        ];
-      
       case 'engaged':
         if (hasNewActivity) {
           return [
@@ -141,7 +129,7 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
           { label: 'Address concerns', icon: Phone, action: () => onContact(lead.id, 'phone'), context: 'Extended visit shows serious interest' }
         ];
       
-      case 'test-drive':
+      case 'proposal':
         return [
           { label: 'Present offer', icon: FileText, action: () => onContact(lead.id, 'email'), context: 'High purchase intent after test drive' },
           { label: 'Trade-in discussion', icon: Phone, action: () => onContact(lead.id, 'phone'), context: 'Customer asked about trade-in value' }

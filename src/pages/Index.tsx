@@ -97,7 +97,7 @@ const mockLeads: Lead[] = [
     value: 45000,
     source: 'Google Ads',
     notes: 'Interested in lease options, needs to discuss with spouse',
-    journeyStage: 'financing',
+    journeyStage: 'proposal',
     stageProgress: 90,
     contactAttempts: 4,
     responseRate: 75,
@@ -134,7 +134,7 @@ const mockLeads: Lead[] = [
     source: 'Facebook',
     timeOnLot: '5 minutes',
     notes: 'Looking for work truck, budget conscious',
-    journeyStage: 'test-drive',
+    journeyStage: 'visit',
     stageProgress: 45,
     contactAttempts: 1,
     responseRate: 100,
@@ -202,7 +202,7 @@ const mockLeads: Lead[] = [
     value: 42000,
     source: 'Website',
     notes: 'Cash buyer, ready to purchase today',
-    journeyStage: 'inquiry',
+    journeyStage: 'engaged',
     stageProgress: 15,
     contactAttempts: 0,
     responseRate: 0,
@@ -250,7 +250,7 @@ const Index = () => {
         source: 'Website',
         value: 31000,
         notes: 'Interested in safety features and warranty',
-        journeyStage: 'inquiry' as const,
+        journeyStage: 'engaged' as const,
         stageProgress: 10
       },
       {
@@ -260,7 +260,7 @@ const Index = () => {
         source: 'Facebook',
         value: 52000,
         notes: 'Looking for heavy-duty truck for business',
-        journeyStage: 'inquiry' as const,
+        journeyStage: 'engaged' as const,
         stageProgress: 15
       },
       {
@@ -280,7 +280,7 @@ const Index = () => {
         source: 'Referral',
         value: 35000,
         notes: 'First-time buyer, needs financing help',
-        journeyStage: 'inquiry' as const,
+        journeyStage: 'engaged' as const,
         stageProgress: 8
       },
       {
@@ -449,7 +449,7 @@ const Index = () => {
     setLeads(prevLeads => 
       prevLeads.map(lead => {
         if (lead.id === toastItem.leadId) {
-          const stages: Lead['journeyStage'][] = ['inquiry', 'engaged', 'visit', 'test-drive', 'proposal', 'financing', 'sold', 'delivered'];
+          const stages: Lead['journeyStage'][] = ['engaged', 'visit', 'proposal', 'sold', 'delivered'];
           const currentIndex = stages.indexOf(lead.journeyStage);
           const nextStage = currentIndex < stages.length - 1 ? stages[currentIndex + 1] : lead.journeyStage;
           
@@ -565,7 +565,7 @@ const Index = () => {
             setLeads(prevLeads => 
               prevLeads.map(l => {
                 if (l.id === leadId) {
-                  const stages: Lead['journeyStage'][] = ['inquiry', 'engaged', 'visit', 'test-drive', 'proposal', 'financing', 'sold', 'delivered'];
+                  const stages: Lead['journeyStage'][] = ['engaged', 'visit', 'proposal', 'sold', 'delivered'];
                   const currentIndex = stages.indexOf(l.journeyStage);
                   const nextStage = currentIndex < stages.length - 1 ? stages[currentIndex + 1] : l.journeyStage;
                   
