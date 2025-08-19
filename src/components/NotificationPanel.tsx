@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { X, Phone, Mail, MessageCircle, User, Calendar, DollarSign, Car, Send, Edit3, ChevronDown, ChevronRight, PlayCircle, Timer, Check, MessageSquare, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { Timeline } from '@/components/ui/timeline';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,7 +26,8 @@ const statusStyles = {
 };
 
 export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, contactMethod, aiSuggestedResponse }: NotificationPanelProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'history' | 'notes' | 'response' | 'journey'>('response');
+  const [activeMainTab, setActiveMainTab] = useState<'customer-info' | 'journey'>('customer-info');
+  const [activeSubTab, setActiveSubTab] = useState<'overview' | 'history' | 'notes' | 'response'>('response');
   const [responseText, setResponseText] = useState('');
   const [expandedHistoryItems, setExpandedHistoryItems] = useState<Set<string>>(new Set());
   const [selectedJourneyStage, setSelectedJourneyStage] = useState<string | null>(null);
@@ -280,28 +282,51 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
               </CardContent>
             </Card>
 
-            {/* Tabs */}
+            {/* Main Tabs */}
             <div className="flex space-x-1 bg-muted p-1 rounded-lg">
-              {['response', 'overview', 'history', 'journey', 'notes'].map((tab) => (
+              {[
+                { key: 'customer-info', label: 'Customer Info' },
+                { key: 'journey', label: 'Journey' }
+              ].map((tab) => (
                 <button
-                  key={tab}
+                  key={tab.key}
                   className={cn(
                     'flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors',
-                    activeTab === tab 
+                    activeMainTab === tab.key 
                       ? 'bg-background text-foreground shadow-sm' 
                       : 'text-muted-foreground hover:text-foreground'
                   )}
-                  onClick={() => setActiveTab(tab as any)}
+                  onClick={() => setActiveMainTab(tab.key as any)}
                 >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  {tab.label}
                 </button>
               ))}
             </div>
 
+            {/* Customer Info Sub-tabs */}
+            {activeMainTab === 'customer-info' && (
+              <div className="flex space-x-1 bg-muted/50 p-1 rounded-lg">
+                {['response', 'overview', 'history', 'notes'].map((tab) => (
+                  <button
+                    key={tab}
+                    className={cn(
+                      'flex-1 py-2 px-2 rounded-md text-xs font-medium transition-colors',
+                      activeSubTab === tab 
+                        ? 'bg-background text-foreground shadow-sm' 
+                        : 'text-muted-foreground hover:text-foreground'
+                    )}
+                    onClick={() => setActiveSubTab(tab as any)}
+                  >
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  </button>
+                ))}
+              </div>
+            )}
+
             {/* Tab Content */}
             <Card>
               <CardContent className="pt-6">
-                {activeTab === 'response' && contactMethod && (
+                {activeMainTab === 'customer-info' && activeSubTab === 'response' && contactMethod && (
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 mb-4">
                       {contactMethod === 'phone' && <Phone className="h-5 w-5 text-primary" />}
@@ -352,7 +377,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                   </div>
                 )}
                 
-                {activeTab === 'overview' && (
+                {activeMainTab === 'customer-info' && activeSubTab === 'overview' && (
                   <div className="space-y-4">
                     <div>
                       <h4 className="font-medium mb-2">Lead Priority</h4>
@@ -389,7 +414,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                   </div>
                 )}
 
-                {activeTab === 'history' && (
+                {activeMainTab === 'customer-info' && activeSubTab === 'history' && (
                   <div className="space-y-4">
                     {/* AI Journey Summary */}
                     <div className="bg-gradient-to-r from-primary/5 to-hot-lead/5 border border-primary/20 rounded-lg p-4 space-y-3">
@@ -579,7 +604,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                   </div>
                 )}
 
-                {activeTab === 'notes' && (
+                {activeMainTab === 'customer-info' && activeSubTab === 'notes' && (
                   <div className="space-y-3">
                     <textarea 
                       className="w-full h-32 p-3 border border-input rounded-md text-sm resize-none"
@@ -592,22 +617,59 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                   </div>
                 )}
 
-                {activeTab === 'journey' && (
+                {activeMainTab === 'journey' && (
                   <div className="space-y-4">
-                    <div className="mb-4">
-                      <h4 className="font-medium mb-2 flex items-center gap-2">
+                    <div className="mb-6">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
                         <Calendar className="h-4 w-4" />
                         Journey Progress
                       </h4>
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="flex-1 bg-muted rounded-full h-2 relative">
-                          <div 
-                            className="bg-primary h-2 rounded-full transition-all duration-500"
-                            style={{ width: `${selectedLead.stageProgress}%` }}
-                          />
-                        </div>
-                        <span className="text-sm text-muted-foreground">{selectedLead.stageProgress}%</span>
-                      </div>
+                      
+                      {(() => {
+                        // Generate timeline events based on completed journey stages
+                        const allStages = ['inquiry', 'engaged', 'visit', 'test-drive', 'proposal', 'financing', 'sold', 'delivered'];
+                        const currentStageIndex = allStages.indexOf(selectedLead.journeyStage);
+                        const completedStages = allStages.slice(0, currentStageIndex + 1);
+                        
+                        const stageEvents = completedStages.map((stage, index) => {
+                          const stageInfo = {
+                            inquiry: { action: 'Inquiry Received', type: 'contact' as const, date: '3 days ago', details: 'Customer submitted initial inquiry' },
+                            engaged: { action: 'Engaged Customer', type: 'contact' as const, date: '2 days ago', details: 'Active communication established' },
+                            visit: { action: 'Showroom Visit', type: 'visit' as const, date: '1 day ago', details: 'Customer visited showroom' },
+                            'test-drive': { action: 'Test Drive', type: 'milestone' as const, date: '5 hours ago', details: 'Customer completed test drive' },
+                            proposal: { action: 'Proposal Sent', type: 'milestone' as const, date: '3 hours ago', details: 'Purchase proposal presented' },
+                            financing: { action: 'Financing Approved', type: 'milestone' as const, date: '1 hour ago', details: 'Financing arrangements completed' },
+                            sold: { action: 'Deal Closed', type: 'milestone' as const, date: '30 min ago', details: 'Sale successfully completed' },
+                            delivered: { action: 'Vehicle Delivered', type: 'milestone' as const, date: 'Just now', details: 'Vehicle delivered to customer' }
+                          };
+                          
+                          return stageInfo[stage as keyof typeof stageInfo];
+                        });
+
+                        // Calculate progress percentage
+                        const progressPercentage = ((currentStageIndex + 1) / allStages.length) * 100;
+
+                        return (
+                          <div className="space-y-4">
+                            <div className="flex items-center gap-2">
+                              <div className="flex-1 bg-muted rounded-full h-3 relative">
+                                <div 
+                                  className="bg-primary h-3 rounded-full transition-all duration-500"
+                                  style={{ width: `${progressPercentage}%` }}
+                                />
+                                <Timeline 
+                                  events={stageEvents}
+                                  className="absolute inset-0 h-3"
+                                />
+                              </div>
+                              <span className="text-sm text-muted-foreground font-medium">{Math.round(progressPercentage)}%</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              Progress: {currentStageIndex + 1} of {allStages.length} stages completed
+                            </p>
+                          </div>
+                        );
+                      })()}
                     </div>
 
                     <div className="space-y-3">

@@ -34,29 +34,27 @@ export function Timeline({ events, className }: TimelineProps) {
 
   return (
     <TooltipProvider>
-      <div className={cn('flex items-center gap-1', className)}>
-        {events.slice(-6).map((event, index) => {
+      <div className={cn('relative flex items-center', className)}>
+        {events.map((event, index) => {
           const Icon = timelineIcons[event.type];
-          // Spread dots across the timeline based on journey progression
-          // Each dot represents a point in time across the full journey
-          const totalEvents = events.length;
-          const position = totalEvents > 1 ? (index / (totalEvents - 1)) * 100 : 50;
+          // Evenly distribute dots across the timeline
+          const position = events.length > 1 ? (index / (events.length - 1)) * 100 : 50;
           
           return (
             <Tooltip key={index}>
-              <TooltipTrigger>
+              <TooltipTrigger asChild>
                 <div 
                   className={cn(
-                    'absolute w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-125 cursor-pointer z-10',
+                    'absolute w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-110 cursor-pointer z-10',
                     timelineColors[event.type]
                   )}
                   style={{ 
-                    left: `${Math.min(Math.max(position, 5), 95)}%`, 
+                    left: `${Math.min(Math.max(position, 3), 97)}%`, 
                     top: '50%',
                     transform: 'translate(-50%, -50%)'
                   }}
                 >
-                  <Icon className="h-2 w-2 text-white" />
+                  <Icon className="h-3 w-3 text-white" />
                 </div>
               </TooltipTrigger>
               <TooltipContent side="top" className="max-w-xs">
