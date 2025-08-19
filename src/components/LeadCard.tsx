@@ -21,9 +21,10 @@ interface WorkPlanTask {
   title: string;
   description: string;
   dueDate: string;
-  status: 'pending' | 'completed' | 'missed' | 'scheduled';
+  status: 'pending' | 'completed' | 'missed' | 'scheduled' | 'customer_replied';
   attemptNumber: number;
   contactMethod: 'phone' | 'email' | 'text';
+  customerResponse?: boolean;
 }
 
 export interface Lead {
