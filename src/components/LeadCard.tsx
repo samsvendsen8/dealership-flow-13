@@ -132,6 +132,7 @@ function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, isFocus
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
   const [showQuickResponse, setShowQuickResponse] = useState(false);
   const [responseText, setResponseText] = useState('');
+  const [selectedJourneyStage, setSelectedJourneyStage] = useState(lead.journeyStage);
   const { sendMessage, advanceJourneyStage, isLoading } = useMessaging();
   const { toast } = useToast();
   
@@ -520,23 +521,29 @@ function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, isFocus
                   return (
                     <Tooltip key={stage}>
                       <TooltipTrigger asChild>
-                        <div 
-                          className={cn(
-                            'absolute w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-125 cursor-pointer z-50',
-                            isCompleted 
-                              ? 'bg-primary border-white text-white shadow-md' 
-                              : isCurrentStep
-                              ? 'bg-primary/20 border-primary text-primary animate-pulse'
-                              : 'bg-muted border-muted-foreground/30 text-muted-foreground'
-                          )}
-                          style={{ 
-                            left: `${position}%`, 
-                            top: '50%',
-                            transform: 'translate(-50%, -50%)'
-                          }}
-                        >
-                          <span className="text-xs">{config.icon}</span>
-                        </div>
+                         <div 
+                           className={cn(
+                             'absolute w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-125 cursor-pointer z-50',
+                             selectedJourneyStage === stage
+                               ? 'bg-primary border-white text-white shadow-lg ring-2 ring-primary/50'
+                               : isCompleted 
+                               ? 'bg-primary/70 border-white text-white shadow-md' 
+                               : isCurrentStep
+                               ? 'bg-primary/20 border-primary text-primary animate-pulse'
+                               : 'bg-muted border-muted-foreground/30 text-muted-foreground'
+                           )}
+                           style={{ 
+                             left: `${position}%`, 
+                             top: '50%',
+                             transform: 'translate(-50%, -50%)'
+                           }}
+                           onClick={(e) => {
+                             e.stopPropagation();
+                             setSelectedJourneyStage(stage as Lead['journeyStage']);
+                           }}
+                         >
+                           <span className="text-xs">{config.icon}</span>
+                         </div>
                       </TooltipTrigger>
                       <TooltipContent side="top" className="max-w-xs z-[9999] bg-popover border shadow-md">
                         <div className="text-xs">
@@ -559,11 +566,12 @@ function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, isFocus
             </div>
           </TooltipProvider>
           
-          {/* Work plan for current journey stage */}
-          {lead.workPlan && lead.workPlan.length > 0 && journeyStages[lead.journeyStage] && (
+          {/* Work plan for selected journey stage */}
+          {lead.workPlan && lead.workPlan.length > 0 && journeyStages[selectedJourneyStage] && (
             <WorkPlanProgress 
               tasks={lead.workPlan} 
-              journeyStage={lead.journeyStage}
+              journeyStage={selectedJourneyStage}
+              currentLeadStage={lead.journeyStage}
             />
           )}
           

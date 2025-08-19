@@ -18,6 +18,7 @@ interface WorkPlanTask {
 interface WorkPlanProgressProps {
   tasks: WorkPlanTask[];
   journeyStage: string;
+  currentLeadStage?: string;
   className?: string;
 }
 
@@ -47,7 +48,7 @@ const contactIcons = {
   text: MessageCircle,
 };
 
-export function WorkPlanProgress({ tasks, journeyStage, className }: WorkPlanProgressProps) {
+export function WorkPlanProgress({ tasks, journeyStage, currentLeadStage, className }: WorkPlanProgressProps) {
   if (!tasks || tasks.length === 0) return null;
 
   // Filter tasks for current journey stage (case insensitive)
@@ -72,11 +73,23 @@ export function WorkPlanProgress({ tasks, journeyStage, className }: WorkPlanPro
       })
     : currentStageTasks;
 
+  const isViewingCurrentStage = !currentLeadStage || journeyStage.toLowerCase() === currentLeadStage.toLowerCase();
+  const isViewingCompletedStage = currentLeadStage && 
+    Object.keys({engaged: 1, visit: 2, proposal: 3, sold: 4, delivered: 5}).indexOf(journeyStage) < 
+    Object.keys({engaged: 1, visit: 2, proposal: 3, sold: 4, delivered: 5}).indexOf(currentLeadStage);
+
   return (
     <div className={cn('space-y-3', className)}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-muted-foreground">Work Plan ({journeyStage})</span>
+          <span className="text-xs font-medium text-muted-foreground">
+            Work Plan ({journeyStage}) 
+            {!isViewingCurrentStage && (
+              <span className="ml-1 text-xs">
+                {isViewingCompletedStage ? '✅ Completed' : '⏳ Future'}
+              </span>
+            )}
+          </span>
           {customerReplied ? (
             <Badge className="text-xs bg-success text-white">
               ✅ Customer Responded - Stage Complete!
