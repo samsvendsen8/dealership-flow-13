@@ -5,6 +5,7 @@ import { LeadFocusView } from '@/components/LeadFocusView';
 import { NotificationPanel } from '@/components/NotificationPanel';
 import { ToastNotification } from '@/components/ToastNotification';
 import { GoalsDashboard } from '@/components/GoalsDashboard';
+import { ScreenCelebration } from '@/components/ScreenCelebration';
 import { useToast } from '@/hooks/use-toast';
 import { useRealTimeUpdates } from '@/hooks/useRealTimeUpdates';
 import { Button } from '@/components/ui/button';
@@ -425,6 +426,8 @@ const Index = () => {
 
   const [contactMethod, setContactMethod] = useState<'phone' | 'email' | 'text' | undefined>();
   const [aiSuggestedResponse, setAiSuggestedResponse] = useState<string>('');
+  const [showScreenCelebration, setShowScreenCelebration] = useState(false);
+  const [celebrationMessage, setCelebrationMessage] = useState('');
 
   const handleContact = (leadId: string, method: 'phone' | 'email' | 'text') => {
     const lead = leads.find(l => l.id === leadId);
@@ -569,6 +572,31 @@ const Index = () => {
     setToastQueue(prev => prev.filter(t => t.id !== toastId));
   };
 
+  const handleCommunicationSent = (leadId: string, method: 'phone' | 'email' | 'text') => {
+    const lead = leads.find(l => l.id === leadId);
+    if (lead) {
+      const methodText = method === 'phone' ? 'call' : method;
+      setCelebrationMessage(`${methodText.charAt(0).toUpperCase() + methodText.slice(1)} sent to ${lead.name}! 🚀`);
+      setShowScreenCelebration(true);
+    }
+  };
+
+  const handleTaskCompleted = (leadId: string) => {
+    // Auto-advance to the next priority lead in the list
+    const currentIndex = leads.findIndex(l => l.id === leadId);
+    const nextLead = leads[currentIndex + 1];
+    
+    if (nextLead) {
+      // Smooth scroll to next lead and focus it
+      setTimeout(() => {
+        const nextCard = document.querySelector(`[data-lead-id="${nextLead.id}"]`);
+        if (nextCard) {
+          nextCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 500);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {viewMode === 'focus' ? (
@@ -633,6 +661,8 @@ const Index = () => {
             onToggleNotifications={handleToggleNotifications}
             onTriggerToast={handleTriggerToast}
             onPauseToasts={handlePauseToasts}
+            onTaskCompleted={handleTaskCompleted}
+            onCommunicationSent={handleCommunicationSent}
             toastsPaused={toastsPaused}
             hasNotifications={isNotificationPanelOpen || toastQueue.length > 0}
           />
@@ -699,6 +729,14 @@ const Index = () => {
           />
         ))}
       </div>
+      
+      {/* Screen-wide Celebration */}
+      <ScreenCelebration
+        isVisible={showScreenCelebration}
+        onComplete={() => setShowScreenCelebration(false)}
+        message={celebrationMessage}
+        type="communication"
+      />
     </div>
   );
 };

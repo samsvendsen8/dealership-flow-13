@@ -102,6 +102,7 @@ interface LeadCardProps {
   onViewDetails: (leadId: string) => void;
   onOpenNotificationPanel?: (leadId: string, method: 'phone' | 'email' | 'text') => void;
   onTaskCompleted?: (leadId: string) => void;
+  onCommunicationSent?: (leadId: string, method: 'phone' | 'email' | 'text') => void;
   isCondensed?: boolean;
   isFocused?: boolean;
 }
@@ -133,7 +134,7 @@ const journeyStages = {
   delivered: { label: 'Delivered', icon: '🚚', color: 'bg-emerald-500' }
 };
 
-function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onTaskCompleted, isCondensed = false, isFocused = false }: LeadCardProps) {
+function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onTaskCompleted, onCommunicationSent, isCondensed = false, isFocused = false }: LeadCardProps) {
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
   const [showQuickResponse, setShowQuickResponse] = useState(false);
   const [responseText, setResponseText] = useState('');
@@ -174,6 +175,9 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
       }
 
       await sendMessage(lead.id, responseText, method === 'phone' ? 'call' : method, lead.journeyStage);
+      
+      // Trigger screen-wide celebration
+      onCommunicationSent?.(lead.id, method);
       
       // Show celebration animation and trigger work item slide-out
       setShowCelebration(true);

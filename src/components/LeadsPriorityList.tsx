@@ -19,6 +19,8 @@ interface LeadsPriorityListProps {
   onToggleNotifications: () => void;
   onTriggerToast: () => void;
   onPauseToasts: () => void;
+  onTaskCompleted?: (leadId: string) => void;
+  onCommunicationSent?: (leadId: string, method: 'phone' | 'email' | 'text') => void;
   toastsPaused: boolean;
   hasNotifications?: boolean;
 }
@@ -29,13 +31,15 @@ type FilterOption = 'all' | 'hot' | 'warm' | 'cold' | 'new' | 'contacted';
 export function LeadsPriorityList({ 
   leads, 
   onContact, 
-  onViewDetails,
+  onViewDetails, 
   onOpenNotificationPanel,
   onToggleNotifications,
   onTriggerToast,
   onPauseToasts,
+  onTaskCompleted,
+  onCommunicationSent,
   toastsPaused,
-  hasNotifications = false 
+  hasNotifications = false
 }: LeadsPriorityListProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('priority');
@@ -45,7 +49,7 @@ export function LeadsPriorityList({
   const [activeTab, setActiveTab] = useState('action-required');
 
   // Handle task completion - auto-advance to next lead
-  const handleTaskCompleted = (completedLeadId: string) => {
+  const handleLocalTaskCompleted = (completedLeadId: string) => {
     const currentLeads = getFilteredAndSortedLeads(leadsByCategory[activeTab as keyof typeof leadsByCategory]);
     const currentIndex = currentLeads.findIndex(lead => lead.id === completedLeadId);
     
@@ -54,6 +58,9 @@ export function LeadsPriorityList({
     if (currentLeads[nextIndex]) {
       setSelectedLeadId(currentLeads[nextIndex].id);
     }
+    
+    // Also call the parent's task completed handler
+    onTaskCompleted?.(completedLeadId);
   };
 
   // Handle tab change and reset to first lead
@@ -422,7 +429,8 @@ export function LeadsPriorityList({
                               onContact={onContact}
                               onViewDetails={onViewDetails}
                               onOpenNotificationPanel={onOpenNotificationPanel}
-                              onTaskCompleted={handleTaskCompleted}
+                              onTaskCompleted={handleLocalTaskCompleted}
+                              onCommunicationSent={onCommunicationSent}
                               isCondensed={false}
                               isFocused={false}
                             />
