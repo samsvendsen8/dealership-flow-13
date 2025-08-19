@@ -8,7 +8,7 @@ interface WorkPlanTask {
   title: string;
   description: string;
   dueDate: string;
-  status: 'pending' | 'completed' | 'missed' | 'scheduled' | 'customer_replied' | 'not_needed';
+  status: 'pending' | 'completed' | 'missed' | 'scheduled' | 'customer_replied' | 'not_needed' | 'reached_out';
   attemptNumber: number;
   contactMethod: 'phone' | 'email' | 'text';
   customerResponse?: boolean;
@@ -28,6 +28,7 @@ const statusIcons = {
   scheduled: Calendar,
   customer_replied: CheckCircle,
   not_needed: Clock,
+  reached_out: MessageCircle,
 };
 
 const statusColors = {
@@ -37,6 +38,7 @@ const statusColors = {
   scheduled: 'text-muted-foreground bg-muted/10 border-muted/20',
   customer_replied: 'text-success bg-gradient-to-r from-success/10 to-success/5 border-success/30',
   not_needed: 'text-muted-foreground/60 bg-muted/5 border-muted/10',
+  reached_out: 'text-warning bg-warning/10 border-warning/20',
 };
 
 const contactIcons = {
@@ -51,6 +53,7 @@ export function WorkPlanProgress({ tasks, journeyStage, className }: WorkPlanPro
   // Filter tasks for current journey stage (case insensitive)
   const currentStageTasks = tasks.filter(t => t.journeyStage.toLowerCase() === journeyStage.toLowerCase());
   const completedCount = currentStageTasks.filter(t => t.status === 'completed' || t.status === 'customer_replied').length;
+  const reachedOutCount = currentStageTasks.filter(t => t.status === 'reached_out').length;
   const missedCount = currentStageTasks.filter(t => t.status === 'missed').length;
   const customerReplied = currentStageTasks.some(t => t.status === 'customer_replied');
   const currentTask = currentStageTasks.find(t => t.status === 'pending');
@@ -77,6 +80,10 @@ export function WorkPlanProgress({ tasks, journeyStage, className }: WorkPlanPro
           {customerReplied ? (
             <Badge className="text-xs bg-success text-white">
               ✅ Customer Responded - Stage Complete!
+            </Badge>
+          ) : reachedOutCount > 0 ? (
+            <Badge variant="outline" className="text-xs text-warning border-warning">
+              📤 Reached Out - Waiting Response ({reachedOutCount})
             </Badge>
           ) : currentTask ? (
             <Badge variant="outline" className="text-xs text-primary border-primary">
@@ -118,6 +125,7 @@ export function WorkPlanProgress({ tasks, journeyStage, className }: WorkPlanPro
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-medium truncate">
                     {task.status === 'customer_replied' ? '✅ Customer Replied!' : 
+                     task.status === 'reached_out' ? `📤 Reached Out - Attempt ${task.attemptNumber}/3 (Waiting Response)` :
                      task.status === 'pending' ? `🎯 ${journeyStage.charAt(0).toUpperCase() + journeyStage.slice(1)} - Attempt ${task.attemptNumber}/3` :
                      task.status === 'not_needed' ? `⚫ Attempt ${task.attemptNumber}/3 (not needed)` :
                      `Attempt ${task.attemptNumber}/3: ${task.contactMethod} contact`}
@@ -128,6 +136,7 @@ export function WorkPlanProgress({ tasks, journeyStage, className }: WorkPlanPro
                 </div>
                 <p className="text-muted-foreground mt-0.5 text-xs">
                   {task.status === 'customer_replied' ? 'Goal achieved! Customer responded - stage complete, moving to next journey step.' :
+                   task.status === 'reached_out' ? 'Message sent successfully - waiting for customer response (~15 seconds)' :
                    task.status === 'pending' ? `Next: ${task.description}` :
                    task.status === 'not_needed' ? 'Customer responded on earlier attempt - this step was not needed.' :
                    task.description}

@@ -9,6 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import type { Lead } from './LeadCard';
 import MessageHistory from './MessageHistory';
+import JourneyAdvanceButton from './JourneyAdvanceButton';
 import { useMessaging } from '@/hooks/useMessaging';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -430,10 +431,22 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                 {activeMainTab === 'journey' && (
                   <div className="space-y-4">
                     <div className="mb-6">
-                      <h4 className="font-medium mb-3 flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        Journey Progress
-                      </h4>
+                                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                                    <Calendar className="h-4 w-4" />
+                                    Journey Progress
+                                  </h4>
+                                  
+                                  {/* Show journey advance button if customer has replied */}
+                                  <JourneyAdvanceButton
+                                    leadId={selectedLead.id}
+                                    leadName={selectedLead.name}
+                                    currentStage={selectedLead.journeyStage}
+                                    leadStatus={selectedLead.status}
+                                    hasCustomerReplied={selectedLead.status === 'qualified'}
+                                    onStageAdvanced={() => {
+                                      // Refresh could be handled here if needed
+                                    }}
+                                  />
                       
                       {(() => {
                         // Generate timeline events based on completed journey stages

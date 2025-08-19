@@ -54,6 +54,19 @@ export const useMessaging = () => {
 
       if (outboundError) throw outboundError;
 
+      // Update lead to show we reached out (but don't advance stage yet)
+      const { error: updateError } = await supabase
+        .from('leads')
+        .update({ 
+          last_contact: new Date().toISOString(),
+          status: 'contacted'
+        })
+        .eq('id', leadId);
+
+      if (updateError) {
+        console.error('Error updating lead status:', updateError);
+      }
+
       // Simulate customer response after 15 seconds
       setTimeout(async () => {
         const randomResponse = customerResponses[Math.floor(Math.random() * customerResponses.length)];
@@ -74,20 +87,16 @@ export const useMessaging = () => {
           return;
         }
 
-        // Update journey stage to next stage
-        const nextStage = journeyStageMap[currentJourneyStage];
-        if (nextStage) {
-          const { error: updateError } = await supabase
-            .from('leads')
-            .update({ 
-              journey_stage: nextStage,
-              last_contact: new Date().toISOString()
-            })
-            .eq('id', leadId);
+        // Update lead to show customer replied (still don't advance stage)
+        const { error: replyUpdateError } = await supabase
+          .from('leads')
+          .update({ 
+            status: 'qualified' // Customer replied, ready for next step
+          })
+          .eq('id', leadId);
 
-          if (updateError) {
-            console.error('Error updating journey stage:', updateError);
-          }
+        if (replyUpdateError) {
+          console.error('Error updating lead after reply:', replyUpdateError);
         }
       }, 15000); // 15 seconds
 
@@ -97,6 +106,27 @@ export const useMessaging = () => {
     } finally {
       setIsLoading(false);
     }
+  }, []);
+
+  const advanceJourneyStage = useCallback(async (leadId: string, currentJourneyStage: string) => {
+    const nextStage = journeyStageMap[currentJourneyStage];
+    if (nextStage) {
+      const { error } = await supabase
+        .from('leads')
+        .update({ 
+          journey_stage: nextStage,
+          status: 'new' // Reset status for next stage
+        })
+        .eq('id', leadId);
+
+      if (error) {
+        console.error('Error advancing journey stage:', error);
+        throw error;
+      }
+      
+      return nextStage;
+    }
+    return null;
   }, []);
 
   const getMessages = useCallback(async (leadId: string): Promise<Message[]> => {
@@ -125,6 +155,7 @@ export const useMessaging = () => {
   return {
     sendMessage,
     getMessages,
+    advanceJourneyStage,
     isLoading
   };
 };
