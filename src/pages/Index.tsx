@@ -515,32 +515,22 @@ const Index = () => {
               variant="outline"
               size="sm"
               onClick={() => {
-                // Scroll to top of page
-                window.scrollTo({ 
-                  top: 0, 
-                  behavior: 'smooth' 
-                });
-                
-                // Try to zoom out the viewport if possible
-                if (document.body.style.zoom !== undefined) {
-                  document.body.style.zoom = '0.85';
-                  
-                  // Reset zoom after a delay
-                  setTimeout(() => {
-                    document.body.style.zoom = '1';
-                  }, 300);
-                } else {
-                  // Fallback: try to adjust viewport scale
-                  const viewport = document.querySelector('meta[name=viewport]');
-                  if (viewport) {
-                    const originalContent = viewport.getAttribute('content') || '';
-                    viewport.setAttribute('content', 'width=device-width, initial-scale=0.85');
-                    
-                    setTimeout(() => {
-                      viewport.setAttribute('content', originalContent);
-                    }, 300);
-                  }
+                // Scroll to center the main container
+                const mainContainer = document.querySelector('.container');
+                if (mainContainer) {
+                  mainContainer.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                  });
                 }
+                
+                // Also scroll window to top with some padding
+                setTimeout(() => {
+                  window.scrollTo({ 
+                    top: Math.max(0, window.scrollY - 100), 
+                    behavior: 'smooth' 
+                  });
+                }, 100);
               }}
               className="gap-2 bg-background/95 backdrop-blur-sm border shadow-lg"
             >

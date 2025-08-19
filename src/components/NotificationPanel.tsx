@@ -592,7 +592,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                     <div className="mb-6">
                       <h4 className="font-medium mb-3 flex items-center gap-2">
                         <Calendar className="h-4 w-4" />
-                        Journey Progress
+                        Journey Progress & Contact History
                       </h4>
                       
                       {(() => {
@@ -637,6 +637,90 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                           </div>
                         );
                       })()}
+                    </div>
+
+                    {/* Contact History for Journey */}
+                    <div className="space-y-3">
+                      <h5 className="font-medium text-sm">Recent Interactions</h5>
+                      {generateFakeHistory().slice(0, 3).map((item) => {
+                        const IconComponent = item.icon;
+                        const isExpanded = expandedHistoryItems.has(item.id);
+                        
+                        return (
+                          <div key={item.id} className={`border-l-3 ${item.color} pl-4 pb-3`}>
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-start space-x-3 flex-1">
+                                <div className={`p-2 rounded-full ${
+                                  item.type === 'inbound' ? 'bg-success/10 text-success' :
+                                  item.type === 'outbound' ? 'bg-primary/10 text-primary' :
+                                  item.type === 'meeting' ? 'bg-hot-lead/10 text-hot-lead' :
+                                  'bg-muted text-muted-foreground'
+                                }`}>
+                                  <IconComponent className="h-3 w-3" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center justify-between">
+                                    <h4 className="font-medium text-xs">{item.title}</h4>
+                                    <span className="text-xs text-muted-foreground">{item.timestamp}</span>
+                                  </div>
+                                  <p className="text-xs text-muted-foreground mt-1 break-words">{item.description}</p>
+                                  
+                                  {item.expandable && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="mt-1 h-auto p-1 text-xs"
+                                      onClick={() => toggleHistoryItem(item.id)}
+                                    >
+                                      {isExpanded ? <ChevronDown className="h-3 w-3 mr-1" /> : <ChevronRight className="h-3 w-3 mr-1" />}
+                                      {isExpanded ? 'Hide' : 'View'}
+                                    </Button>
+                                  )}
+                                  
+                                  {isExpanded && item.content && (
+                                    <div className="mt-2 p-2 bg-muted/50 rounded-md border text-xs max-w-xs break-words">
+                                       {item.content.type === 'text' && 'messages' in item.content && (
+                                        <div className="space-y-1">
+                                          {item.content.messages.slice(-2).map((msg, idx) => (
+                                            <div key={idx} className={`p-1 rounded text-xs ${
+                                              msg.sender === 'customer' 
+                                                ? 'bg-primary/10 text-primary' 
+                                                : 'bg-muted text-foreground'
+                                            }`}>
+                                              <div className="font-medium">{msg.sender === 'customer' ? selectedLead.name : 'Me'}</div>
+                                              <div className="break-words">{msg.text}</div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+                                       
+                                       {item.content.type === 'email' && 'subject' in item.content && (
+                                         <div>
+                                           <div><strong>Subject:</strong> {item.content.subject}</div>
+                                         </div>
+                                       )}
+                                       
+                                       {item.content.type === 'meeting' && 'notes' in item.content && (
+                                        <div>
+                                          <div><strong>Notes:</strong></div>
+                                          <div className="break-words">{item.content.notes}</div>
+                                        </div>
+                                      )}
+                                       
+                                       {item.content.type === 'form' && 'data' in item.content && (
+                                        <div>
+                                          <div><strong>Interest:</strong> {item.content.data['Vehicle Interest']}</div>
+                                          <div><strong>Budget:</strong> {item.content.data['Budget Range']}</div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
 
                     <div className="space-y-3">
@@ -798,7 +882,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                             {selectedJourneyStage === stageKey && workPlan.length > 0 && (
                               <div className="ml-9 space-y-2 border-l-2 border-muted pl-3 max-w-xs">
                                 <h5 className="text-xs font-medium text-muted-foreground">Work Plan Tasks</h5>
-                                {workPlan.map((task) => {
+                                {workPlan.map((task, taskIndex) => {
                                   const statusIcons = {
                                     completed: CheckCircle,
                                     pending: Clock,
@@ -807,9 +891,9 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                                   };
                                   
                                   const statusColors = {
-                                    completed: 'text-success bg-success/10 border-success/20',
-                                    pending: 'text-warning bg-warning/10 border-warning/20',
-                                    missed: 'text-destructive bg-destructive/10 border-destructive/20',
+                                    completed: 'text-white bg-success border-success shadow-sm',
+                                    pending: 'text-white bg-primary border-primary shadow-sm ring-2 ring-primary/30',
+                                    missed: 'text-white bg-destructive border-destructive shadow-sm',
                                     scheduled: 'text-primary bg-primary/10 border-primary/20',
                                   };
                                   
@@ -821,6 +905,18 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                                   
                                   const StatusIcon = statusIcons[task.status];
                                   const ContactIcon = contactIcons[task.contactMethod];
+                                  
+                                  // Mock response data for completed tasks
+                                  const getCompletedStatus = () => {
+                                    if (task.status === 'completed' && taskIndex === 0) {
+                                      return { hasResponse: true, responseType: 'positive', message: 'Customer responded positively' };
+                                    } else if (task.status === 'completed') {
+                                      return { hasResponse: false, responseType: 'no-response', message: 'No response received' };
+                                    }
+                                    return null;
+                                  };
+                                  
+                                  const completedStatus = getCompletedStatus();
                                   
                                   return (
                                     <div 
@@ -837,16 +933,38 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                                       
                                       <div className="flex-1 min-w-0">
                                         <div className="flex items-start justify-between gap-2">
-                                          <span className="font-medium text-xs break-words">
-                                            Attempt #{task.attemptNumber}: {task.title}
+                                          <span className={cn("font-medium text-xs break-words",
+                                            task.status === 'pending' && 'text-white'
+                                          )}>
+                                            {task.status === 'pending' && '→ '} Attempt #{task.attemptNumber}: {task.title}
                                           </span>
-                                          <span className="text-muted-foreground whitespace-nowrap text-xs flex-shrink-0">
+                                          <span className={cn("whitespace-nowrap text-xs flex-shrink-0",
+                                            task.status === 'pending' ? 'text-white/80' : 'text-muted-foreground'
+                                          )}>
                                             {task.dueDate}
                                           </span>
                                         </div>
-                                        <p className="text-muted-foreground mt-0.5 text-xs break-words">
+                                        <p className={cn("mt-0.5 text-xs break-words",
+                                          task.status === 'pending' ? 'text-white/90' : 'text-muted-foreground'
+                                        )}>
                                           {task.description}
                                         </p>
+                                        
+                                        {/* Status badges for completed tasks */}
+                                        {completedStatus && (
+                                          <div className="mt-1">
+                                            <Badge 
+                                              variant={completedStatus.hasResponse ? "default" : "secondary"}
+                                              className={cn("text-xs", 
+                                                completedStatus.hasResponse 
+                                                  ? "bg-emerald-100 text-emerald-800 border-emerald-200" 
+                                                  : "bg-gray-100 text-gray-600 border-gray-200"
+                                              )}
+                                            >
+                                              {completedStatus.hasResponse ? '✓ Contact Made' : '○ No Response'}
+                                            </Badge>
+                                          </div>
+                                        )}
                                       </div>
                                     </div>
                                   );

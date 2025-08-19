@@ -325,7 +325,7 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
         </div>
         
         {/* Journey Stage Progress with Timeline */}
-        <div className="mt-3 p-3 bg-muted/30 rounded-md space-y-3 relative z-50">
+        <div className="mt-3 p-3 bg-muted/30 rounded-md space-y-3 relative z-[9999]">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-medium text-muted-foreground">Journey Progress</span>
             {journeyStages[lead.journeyStage] && (
@@ -355,7 +355,7 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
           
           {/* Journey Timeline Progress Bar */}
           <TooltipProvider>
-            <div className="relative z-50">
+            <div className="relative z-[9999]">
               {/* Progress Bar */}
               <div className="w-full bg-muted rounded-full h-2 relative">
                 <div 
@@ -383,7 +383,7 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
                       <TooltipTrigger asChild>
                         <div 
                           className={cn(
-                            'absolute w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-125 cursor-pointer z-50',
+                            'absolute w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-125 cursor-pointer z-[9999]',
                             isCompleted 
                               ? 'bg-primary border-white text-white shadow-md' 
                               : isCurrentStep
