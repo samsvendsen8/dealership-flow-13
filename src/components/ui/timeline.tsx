@@ -45,7 +45,7 @@ export function Timeline({ events, className }: TimelineProps) {
               <TooltipTrigger>
                 <div 
                   className={cn(
-                    'absolute w-2 h-2 rounded-full border flex items-center justify-center transition-all duration-200 hover:scale-150 cursor-pointer z-10',
+                    'absolute w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-125 cursor-pointer z-10',
                     timelineColors[event.type]
                   )}
                   style={{ 
@@ -54,7 +54,7 @@ export function Timeline({ events, className }: TimelineProps) {
                     transform: 'translate(-50%, -50%)'
                   }}
                 >
-                  <Icon className="h-1 w-1 text-white" />
+                  <Icon className="h-2 w-2 text-white" />
                 </div>
               </TooltipTrigger>
               <TooltipContent side="top" className="max-w-xs">

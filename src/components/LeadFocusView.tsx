@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { ArrowLeft, ChevronUp, ChevronDown } from 'lucide-react';
+import { ArrowLeft, ChevronUp, ChevronDown, Calendar, Phone, Mail, MessageCircle, CheckCircle, Clock, AlertCircle, Target, Car, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
 import { LeadCard, type Lead } from './LeadCard';
 import { cn } from '@/lib/utils';
 
@@ -16,6 +19,37 @@ interface LeadFocusViewProps {
   onBack: () => void;
 }
 
+const journeyStages = {
+  inquiry: { label: 'Inquiry', icon: '💬', color: 'bg-blue-500', description: 'Initial customer interest' },
+  engaged: { label: 'Engaged', icon: '🎯', color: 'bg-teal-500', description: 'Active communication established' },
+  visit: { label: 'Visit Scheduled', icon: '🏢', color: 'bg-purple-500', description: 'Customer visit arranged' },
+  'test-drive': { label: 'Test Drive', icon: '🚗', color: 'bg-orange-500', description: 'Vehicle demonstration completed' },
+  proposal: { label: 'Proposal Sent', icon: '📄', color: 'bg-yellow-500', description: 'Formal offer presented' },
+  financing: { label: 'Financing', icon: '🏦', color: 'bg-indigo-500', description: 'Financial arrangements in progress' },
+  sold: { label: 'Sold', icon: '✅', color: 'bg-green-500', description: 'Deal closed successfully' },
+  delivered: { label: 'Delivered', icon: '🎉', color: 'bg-emerald-500', description: 'Vehicle delivered to customer' }
+};
+
+const statusIcons = {
+  completed: CheckCircle,
+  pending: Clock,
+  missed: AlertCircle,
+  scheduled: Calendar,
+};
+
+const statusColors = {
+  completed: 'text-success bg-success/10 border-success/20',
+  pending: 'text-warning bg-warning/10 border-warning/20',
+  missed: 'text-destructive bg-destructive/10 border-destructive/20',
+  scheduled: 'text-primary bg-primary/10 border-primary/20',
+};
+
+const contactIcons = {
+  phone: Phone,
+  email: Mail,
+  text: MessageCircle,
+};
+
 export function LeadFocusView({ 
   leads, 
   selectedLeadId, 
@@ -26,6 +60,7 @@ export function LeadFocusView({
 }: LeadFocusViewProps) {
   const selectedLead = leads.find(lead => lead.id === selectedLeadId);
   const [isNavCollapsed, setIsNavCollapsed] = useState(false);
+  const [selectedJourneyStage, setSelectedJourneyStage] = useState<string | null>(null);
 
   const getLeadPriorityColor = (lead: Lead) => {
     switch (lead.priority) {
@@ -39,6 +74,55 @@ export function LeadFocusView({
   const currentIndex = leads.findIndex(lead => lead.id === selectedLeadId);
   const nextLead = currentIndex < leads.length - 1 ? leads[currentIndex + 1] : null;
   const prevLead = currentIndex > 0 ? leads[currentIndex - 1] : null;
+
+  const allStages = Object.keys(journeyStages) as (keyof typeof journeyStages)[];
+  const currentStageIndex = selectedLead ? allStages.indexOf(selectedLead.journeyStage) : 0;
+
+  const getStageWorkPlan = (stageKey: string) => {
+    // Mock work plan data for each stage - in real app this would come from the lead data
+    const mockWorkPlans: Record<string, Array<{
+      id: string;
+      title: string;
+      description: string;
+      dueDate: string;
+      status: 'pending' | 'completed' | 'missed' | 'scheduled';
+      attemptNumber: number;
+      contactMethod: 'phone' | 'email' | 'text';
+    }>> = {
+      inquiry: [
+        {
+          id: '1',
+          title: 'Initial Contact',
+          description: 'Make first contact within 15 minutes',
+          dueDate: '2024-01-15',
+          status: 'completed',
+          attemptNumber: 1,
+          contactMethod: 'phone'
+        },
+        {
+          id: '2',
+          title: 'Follow-up Call',
+          description: 'Follow up if no response to initial contact',
+          dueDate: '2024-01-16',
+          status: 'completed',
+          attemptNumber: 2,
+          contactMethod: 'email'
+        }
+      ],
+      engaged: [
+        {
+          id: '3',
+          title: 'Schedule Appointment',
+          description: 'Book showroom visit or test drive',
+          dueDate: '2024-01-17',
+          status: 'pending',
+          attemptNumber: 1,
+          contactMethod: 'phone'
+        }
+      ]
+    };
+    return mockWorkPlans[stageKey] || [];
+  };
 
   return (
     <div className="h-screen flex bg-background">
@@ -223,13 +307,127 @@ export function LeadFocusView({
               </div>
             </div>
             
-            <LeadCard
-              lead={selectedLead}
-              onContact={onContact}
-              onViewDetails={onViewDetails}
-              isCondensed={false}
-              isFocused={true}
-            />
+            <Tabs defaultValue="customer-info" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="customer-info">Customer Info</TabsTrigger>
+                <TabsTrigger value="journey">Journey</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="customer-info" className="mt-4">
+                <LeadCard
+                  lead={selectedLead}
+                  onContact={onContact}
+                  onViewDetails={onViewDetails}
+                  isCondensed={false}
+                  isFocused={true}
+                />
+              </TabsContent>
+
+              <TabsContent value="journey" className="mt-4 space-y-4">
+                {/* Journey Progress Tab */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Calendar className="h-5 w-5" />
+                      Journey Progress
+                    </CardTitle>
+                    <div className="flex items-center gap-2">
+                      <Progress value={(currentStageIndex + 1) / allStages.length * 100} className="flex-1" />
+                      <span className="text-sm text-muted-foreground">
+                        {currentStageIndex + 1}/{allStages.length}
+                      </span>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {allStages.map((stageKey, index) => {
+                        const stage = journeyStages[stageKey];
+                        const isCompleted = index < currentStageIndex;
+                        const isCurrent = index === currentStageIndex;
+                        const isFuture = index > currentStageIndex;
+                        const workPlan = getStageWorkPlan(stageKey);
+
+                        return (
+                          <div key={stageKey} className="space-y-2">
+                            <div 
+                              className={cn(
+                                "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all",
+                                isCompleted && "bg-success/10 border-success/20",
+                                isCurrent && "bg-primary/10 border-primary/20 ring-1 ring-primary/30",
+                                isFuture && "bg-muted/30 border-muted opacity-60"
+                              )}
+                              onClick={() => setSelectedJourneyStage(selectedJourneyStage === stageKey ? null : stageKey)}
+                            >
+                              <div className={cn(
+                                "w-8 h-8 rounded-full flex items-center justify-center text-sm text-white font-medium",
+                                isCompleted && "bg-success",
+                                isCurrent && stage.color,
+                                isFuture && "bg-muted-foreground"
+                              )}>
+                                {isCompleted ? <CheckCircle className="h-4 w-4" /> : stage.icon}
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2">
+                                  <h4 className="font-medium">{stage.label}</h4>
+                                  {isCurrent && (
+                                    <Badge variant="secondary" className="text-xs">Current</Badge>
+                                  )}
+                                </div>
+                                <p className="text-sm text-muted-foreground">{stage.description}</p>
+                              </div>
+                              {workPlan.length > 0 && (
+                                <Badge variant="outline" className="text-xs">
+                                  {workPlan.length} tasks
+                                </Badge>
+                              )}
+                            </div>
+
+                            {selectedJourneyStage === stageKey && workPlan.length > 0 && (
+                              <div className="ml-11 space-y-2 border-l-2 border-muted pl-4">
+                                <h5 className="text-sm font-medium text-muted-foreground">Work Plan Tasks</h5>
+                                {workPlan.map((task) => {
+                                  const StatusIcon = statusIcons[task.status];
+                                  const ContactIcon = contactIcons[task.contactMethod];
+                                  
+                                  return (
+                                    <div 
+                                      key={task.id}
+                                      className={cn(
+                                        'flex items-start gap-3 p-2 rounded-lg border text-xs',
+                                        statusColors[task.status]
+                                      )}
+                                    >
+                                      <div className="flex items-center gap-1 mt-0.5">
+                                        <StatusIcon className="h-3 w-3" />
+                                        <ContactIcon className="h-2.5 w-2.5" />
+                                      </div>
+                                      
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between gap-2">
+                                          <span className="font-medium truncate">
+                                            Attempt #{task.attemptNumber}: {task.title}
+                                          </span>
+                                          <span className="text-muted-foreground whitespace-nowrap">
+                                            {task.dueDate}
+                                          </span>
+                                        </div>
+                                        <p className="text-muted-foreground mt-0.5 text-xs">
+                                          {task.description}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </div>
         ) : (
           <div className="flex items-center justify-center h-full">

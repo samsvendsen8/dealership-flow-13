@@ -7,7 +7,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { cn } from '@/lib/utils';
 import { Timeline } from '@/components/ui/timeline';
 import { WorkPlanProgress } from '@/components/WorkPlanProgress';
-import { LeadDetailsSlideOver } from '@/components/LeadDetailsSlideOver';
 
 interface TimelineEvent {
   date: string;
@@ -98,7 +97,6 @@ const journeyStages = {
 
 export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, isFocused = false }: LeadCardProps) {
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   
   // Get recommended quick actions based on journey stage and contact history
   const getQuickActions = () => {
@@ -346,7 +344,7 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
             className="flex items-center gap-2 cursor-pointer hover:bg-muted/20 p-2 -m-2 rounded transition-colors"
             onClick={(e) => {
               e.stopPropagation();
-              setIsDetailsOpen(true);
+              onViewDetails(lead.id);
             }}
             title="Click to view detailed journey progress"
           >
@@ -560,14 +558,6 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
           </div>
         )}
       </CardContent>
-
-      {/* Lead Details Slide Over */}
-      <LeadDetailsSlideOver
-        lead={lead}
-        open={isDetailsOpen}
-        onOpenChange={setIsDetailsOpen}
-        onContact={onContact}
-      />
     </Card>
   );
 }
