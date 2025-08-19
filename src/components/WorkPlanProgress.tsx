@@ -8,7 +8,7 @@ interface WorkPlanTask {
   title: string;
   description: string;
   dueDate: string;
-  status: 'pending' | 'completed' | 'missed' | 'scheduled' | 'customer_replied';
+  status: 'pending' | 'completed' | 'missed' | 'scheduled' | 'customer_replied' | 'not_needed';
   attemptNumber: number;
   contactMethod: 'phone' | 'email' | 'text';
   customerResponse?: boolean;
@@ -27,6 +27,7 @@ const statusIcons = {
   missed: AlertTriangle,
   scheduled: Calendar,
   customer_replied: CheckCircle,
+  not_needed: Clock,
 };
 
 const statusColors = {
@@ -35,6 +36,7 @@ const statusColors = {
   missed: 'text-destructive bg-destructive/10 border-destructive/20',
   scheduled: 'text-muted-foreground bg-muted/10 border-muted/20',
   customer_replied: 'text-success bg-gradient-to-r from-success/10 to-success/5 border-success/30',
+  not_needed: 'text-muted-foreground/60 bg-muted/5 border-muted/10',
 };
 
 const contactIcons = {
@@ -53,9 +55,18 @@ export function WorkPlanProgress({ tasks, journeyStage, className }: WorkPlanPro
   const customerReplied = currentStageTasks.some(t => t.status === 'customer_replied');
   const currentTask = currentStageTasks.find(t => t.status === 'pending');
   
-  // If customer replied, mark remaining tasks as completed (greyed out)
+  // If customer replied, mark tasks after the replied task as not needed (greyed out)
+  let customerRepliedIndex = -1;
+  if (customerReplied) {
+    customerRepliedIndex = currentStageTasks.findIndex(t => t.status === 'customer_replied');
+  }
+  
   const displayTasks = customerReplied 
-    ? currentStageTasks.map(task => task.status === 'customer_replied' ? task : { ...task, status: 'completed' as const })
+    ? currentStageTasks.map((task, index) => {
+        if (task.status === 'customer_replied') return task;
+        if (index > customerRepliedIndex) return { ...task, status: 'not_needed' as const };
+        return task;
+      })
     : currentStageTasks;
 
   return (
@@ -108,7 +119,7 @@ export function WorkPlanProgress({ tasks, journeyStage, className }: WorkPlanPro
                   <span className="font-medium truncate">
                     {task.status === 'customer_replied' ? '✅ Customer Replied!' : 
                      task.status === 'pending' ? `🎯 ${journeyStage.charAt(0).toUpperCase() + journeyStage.slice(1)} - Attempt ${task.attemptNumber}/3` :
-                     customerReplied && task.status === 'completed' ? `✅ Stage Complete (attempt ${task.attemptNumber} not needed)` :
+                     task.status === 'not_needed' ? `⚫ Attempt ${task.attemptNumber}/3 (not needed)` :
                      `Attempt ${task.attemptNumber}/3: ${task.contactMethod} contact`}
                   </span>
                   <span className="text-muted-foreground whitespace-nowrap">
@@ -118,7 +129,7 @@ export function WorkPlanProgress({ tasks, journeyStage, className }: WorkPlanPro
                 <p className="text-muted-foreground mt-0.5 text-xs">
                   {task.status === 'customer_replied' ? 'Goal achieved! Customer responded - stage complete, moving to next journey step.' :
                    task.status === 'pending' ? `Next: ${task.description}` :
-                   customerReplied && task.status === 'completed' ? 'Customer responded earlier - this attempt was not needed.' :
+                   task.status === 'not_needed' ? 'Customer responded on earlier attempt - this step was not needed.' :
                    task.description}
                 </p>
                 {task.status === 'customer_replied' && (

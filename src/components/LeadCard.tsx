@@ -21,7 +21,7 @@ interface WorkPlanTask {
   title: string;
   description: string;
   dueDate: string;
-  status: 'pending' | 'completed' | 'missed' | 'scheduled' | 'customer_replied';
+  status: 'pending' | 'completed' | 'missed' | 'scheduled' | 'customer_replied' | 'not_needed';
   attemptNumber: number;
   contactMethod: 'phone' | 'email' | 'text';
   customerResponse?: boolean;
