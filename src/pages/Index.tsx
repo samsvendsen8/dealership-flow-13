@@ -4,6 +4,7 @@ import { LeadsPriorityList } from '@/components/LeadsPriorityList';
 import { LeadFocusView } from '@/components/LeadFocusView';
 import { NotificationPanel } from '@/components/NotificationPanel';
 import { ToastNotification } from '@/components/ToastNotification';
+import { GoalsDashboard } from '@/components/GoalsDashboard';
 import { useToast } from '@/hooks/use-toast';
 import { useRealTimeUpdates } from '@/hooks/useRealTimeUpdates';
 import { Button } from '@/components/ui/button';
@@ -581,6 +582,9 @@ const Index = () => {
         />
       ) : (
         <div className="container mx-auto px-6 py-8">
+          {/* Goals Dashboard */}
+          <GoalsDashboard />
+          
           {/* View Toggle Button */}
           <div className="fixed top-4 left-4 z-40">
             <Button
