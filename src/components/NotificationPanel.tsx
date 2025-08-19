@@ -11,6 +11,7 @@ import type { Lead } from './LeadCard';
 import MessageHistory from './MessageHistory';
 import JourneyAdvanceButton from './JourneyAdvanceButton';
 import { WorkPlanProgress } from './WorkPlanProgress';
+import { CallSimulationModal } from './CallSimulationModal';
 import { useMessaging } from '@/hooks/useMessaging';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -36,6 +37,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
   const [responseText, setResponseText] = useState('');
   const [expandedHistoryItems, setExpandedHistoryItems] = useState<Set<string>>(new Set());
   const [selectedJourneyStage, setSelectedJourneyStage] = useState<string | null>(null);
+  const [showCallModal, setShowCallModal] = useState(false);
   const { sendMessage, isLoading } = useMessaging();
   const { toast } = useToast();
 
@@ -58,10 +60,30 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
     content: HistoryContent;
   };
 
-  // Update response text when AI suggestion changes
-  if (aiSuggestedResponse && responseText !== aiSuggestedResponse) {
-    setResponseText(aiSuggestedResponse);
-  }
+  // Generate AI responses for different contact methods
+  const generateAIResponse = (method: 'phone' | 'email' | 'text', lead: Lead) => {
+    const responses = {
+      phone: `Hi ${lead.name}! This is [Your Name] from [Dealership Name]. I noticed you've been interested in our ${lead.vehicle}. I wanted to personally reach out to see if you have any questions and help you schedule a test drive. What would be the best time for you to visit our showroom?`,
+      email: `Subject: Your ${lead.vehicle} - Next Steps & Special Pricing\n\nHi ${lead.name},\n\nThank you for your interest in the ${lead.vehicle}! I'm excited to help you through this process.\n\nBased on your inquiry, I've prepared:\n• Detailed vehicle specifications\n• Current financing options\n• Available appointment times for test drives\n\nI'm here to answer any questions and make this as easy as possible for you. When would be a good time to connect?\n\nBest regards,\n[Your Name]`,
+      text: `Hi ${lead.name}! This is [Your Name] from [Dealership]. Hope you're well! Still interested in the ${lead.vehicle}? I'd love to help schedule a test drive or answer any questions. When works best for you? 🚗`
+    };
+    
+    return responses[method];
+  };
+
+  const currentAIResponse = selectedLead && contactMethod ? 
+    aiSuggestedResponse || generateAIResponse(contactMethod, selectedLead) :
+    selectedLead ? generateAIResponse('text', selectedLead) : '';
+
+  const handleContactMethodClick = (method: 'phone' | 'email' | 'text') => {
+    if (method === 'phone') {
+      setShowCallModal(true);
+    } else {
+      // Auto-switch to response tab and set contact method
+      setActiveMainTab('customer-info');
+      setActiveSubTab('response');
+    }
+  };
 
   
   const toggleHistoryItem = (itemId: string) => {
@@ -301,33 +323,47 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
             {/* Tab Content */}
             <Card>
               <CardContent className="pt-6">
-                {activeMainTab === 'customer-info' && activeSubTab === 'response' && contactMethod && (
+                {activeMainTab === 'customer-info' && activeSubTab === 'response' && (
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 mb-4">
                       {contactMethod === 'phone' && <Phone className="h-5 w-5 text-primary" />}
                       {contactMethod === 'email' && <Mail className="h-5 w-5 text-primary" />}
                       {contactMethod === 'text' && <MessageCircle className="h-5 w-5 text-primary" />}
+                      {!contactMethod && <MessageCircle className="h-5 w-5 text-primary" />}
                       <h4 className="font-medium">
                         {contactMethod === 'phone' && 'Phone Call Script'}
                         {contactMethod === 'email' && 'Email Response'}
                         {contactMethod === 'text' && 'Text Message'}
+                        {!contactMethod && 'AI Suggested Response'}
                       </h4>
                     </div>
+                    
+                    {/* Show previous message as reference if available */}
+                    {selectedLead?.lastActivity.includes('contact made') && (
+                      <div className="bg-muted/10 border border-muted/20 rounded-md p-3 mb-4">
+                        <p className="text-xs font-medium text-muted-foreground mb-2">
+                          📄 Previous Message (Reference):
+                        </p>
+                        <p className="text-sm text-muted-foreground italic">
+                          "Hi {selectedLead.name}, I wanted to follow up on your interest in the {selectedLead.vehicle}..."
+                        </p>
+                      </div>
+                    )}
                     
                     <div className="bg-primary/5 border border-primary/20 rounded-md p-3 mb-4">
                       <p className="text-xs font-medium text-primary mb-2">
                         🤖 AI Suggested Response:
                       </p>
-                      <p className="text-sm text-foreground">{aiSuggestedResponse}</p>
+                      <p className="text-sm text-foreground whitespace-pre-line">{currentAIResponse}</p>
                     </div>
 
                     <div>
                       <label className="text-sm font-medium mb-2 block">Your Response:</label>
                       <textarea
-                        value={responseText}
+                        value={responseText || currentAIResponse}
                         onChange={(e) => setResponseText(e.target.value)}
                         className="w-full h-32 p-3 border border-input rounded-md text-sm resize-none"
-                        placeholder={`Type your ${contactMethod} message here...`}
+                        placeholder={`Type your ${contactMethod || 'message'} here...`}
                       />
                     </div>
 
@@ -335,22 +371,23 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                        <Button 
                          className="flex-1 gap-2 bg-gradient-primary hover:opacity-90"
                          onClick={async () => {
-                           if (responseText.trim()) {
+                           const messageToSend = responseText.trim() || currentAIResponse;
+                           if (messageToSend && selectedLead) {
                              try {
                                await sendMessage(
                                  selectedLead.id,
-                                 responseText,
+                                 messageToSend,
                                  contactMethod === 'phone' ? 'call' : contactMethod === 'email' ? 'email' : 'text',
                                  selectedLead.journeyStage
                                );
                                
                                toast({
                                  title: "Message Sent",
-                                 description: `Your ${contactMethod} has been sent and customer will auto-respond in 15 seconds.`,
+                                 description: `Your ${contactMethod || 'text'} has been sent and customer will auto-respond in 15 seconds.`,
                                });
                                
                                setResponseText('');
-                               onContact(selectedLead.id, contactMethod);
+                               onContact(selectedLead.id, contactMethod || 'text');
                              } catch (error) {
                                toast({
                                  title: "Error",
@@ -360,14 +397,14 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                              }
                            }
                          }}
-                         disabled={!responseText.trim() || isLoading}
+                         disabled={isLoading}
                        >
                          <Send className="h-4 w-4" />
                          {isLoading ? "Sending..." : `Send ${contactMethod === 'phone' ? 'Call' : contactMethod === 'email' ? 'Email' : 'Text'}`}
                        </Button>
                        <Button 
                          variant="outline"
-                         onClick={() => setResponseText(aiSuggestedResponse || '')}
+                         onClick={() => setResponseText(currentAIResponse)}
                        >
                          <Edit3 className="h-4 w-4" />
                        </Button>
@@ -546,11 +583,12 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
 
                             {selectedJourneyStage === stageKey && mockWorkPlanData.length > 0 && (
                               <div className="ml-9">
-                                <WorkPlanProgress 
-                                  tasks={mockWorkPlanData} 
-                                  journeyStage={stageKey}
-                                  currentLeadStage={selectedLead.journeyStage}
-                                />
+                                 <WorkPlanProgress 
+                                   tasks={mockWorkPlanData} 
+                                   journeyStage={stageKey}
+                                   currentLeadStage={selectedLead.journeyStage}
+                                   onContactMethodClick={(method) => handleContactMethodClick(method)}
+                                 />
                               </div>
                             )}
                           </div>
@@ -567,6 +605,16 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
         <div className="flex items-center justify-center h-full text-muted-foreground">
           <p>Select a lead to view details</p>
         </div>
+      )}
+      
+      {/* Call Simulation Modal */}
+      {selectedLead && (
+        <CallSimulationModal
+          isOpen={showCallModal}
+          onClose={() => setShowCallModal(false)}
+          leadName={selectedLead.name}
+          phoneNumber={selectedLead.phone}
+        />
       )}
     </div>
   );

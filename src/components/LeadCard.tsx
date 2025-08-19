@@ -37,6 +37,7 @@ import {
 import { cn } from '@/lib/utils';
 import { WorkPlanProgress } from './WorkPlanProgress';
 import JourneyAdvanceButton from './JourneyAdvanceButton';
+import { CallSimulationModal } from './CallSimulationModal';
 import { useMessaging } from '@/hooks/useMessaging';
 import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -97,6 +98,7 @@ interface LeadCardProps {
   lead: Lead;
   onContact: (leadId: string, method: 'phone' | 'email' | 'text') => void;
   onViewDetails: (leadId: string) => void;
+  onOpenNotificationPanel?: (leadId: string, method: 'phone' | 'email' | 'text') => void;
   isCondensed?: boolean;
   isFocused?: boolean;
 }
@@ -128,11 +130,12 @@ const journeyStages = {
   delivered: { label: 'Delivered', icon: '🚚', color: 'bg-emerald-500' }
 };
 
-function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, isFocused = false }: LeadCardProps) {
+function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, isCondensed = false, isFocused = false }: LeadCardProps) {
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
   const [showQuickResponse, setShowQuickResponse] = useState(false);
   const [responseText, setResponseText] = useState('');
   const [selectedJourneyStage, setSelectedJourneyStage] = useState(lead.journeyStage);
+  const [showCallModal, setShowCallModal] = useState(false);
   const { sendMessage, advanceJourneyStage, isLoading } = useMessaging();
   const { toast } = useToast();
   
@@ -176,6 +179,14 @@ function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, isFocus
         description: "Failed to send message. Please try again.",
         variant: "destructive"
       });
+    }
+  };
+
+  const handleContactMethodClick = (method: 'phone' | 'email' | 'text') => {
+    if (method === 'phone') {
+      setShowCallModal(true);
+    } else {
+      onOpenNotificationPanel?.(lead.id, method);
     }
   };
 
@@ -572,6 +583,7 @@ function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, isFocus
               tasks={lead.workPlan} 
               journeyStage={selectedJourneyStage}
               currentLeadStage={lead.journeyStage}
+              onContactMethodClick={(method) => handleContactMethodClick(method)}
             />
           )}
           
@@ -836,6 +848,14 @@ function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, isFocus
           </div>
         )}
       </CardContent>
+      
+      {/* Call Simulation Modal */}
+      <CallSimulationModal
+        isOpen={showCallModal}
+        onClose={() => setShowCallModal(false)}
+        leadName={lead.name}
+        phoneNumber={lead.phone}
+      />
     </Card>
   );
 }

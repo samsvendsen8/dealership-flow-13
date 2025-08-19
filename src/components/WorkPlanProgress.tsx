@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { CheckCircle, Clock, AlertTriangle, Phone, Mail, MessageCircle, Calendar } from 'lucide-react';
 
 interface WorkPlanTask {
@@ -20,6 +21,7 @@ interface WorkPlanProgressProps {
   journeyStage: string;
   currentLeadStage?: string;
   className?: string;
+  onContactMethodClick?: (method: 'phone' | 'email' | 'text', task: WorkPlanTask) => void;
 }
 
 const statusIcons = {
@@ -48,7 +50,7 @@ const contactIcons = {
   text: MessageCircle,
 };
 
-export function WorkPlanProgress({ tasks, journeyStage, currentLeadStage, className }: WorkPlanProgressProps) {
+export function WorkPlanProgress({ tasks, journeyStage, currentLeadStage, className, onContactMethodClick }: WorkPlanProgressProps) {
   const isViewingCurrentStage = !currentLeadStage || journeyStage.toLowerCase() === currentLeadStage.toLowerCase();
   const stageOrder = ['engaged', 'visit', 'proposal', 'sold', 'delivered'];
   const currentStageIndex = stageOrder.indexOf(currentLeadStage?.toLowerCase() || '');
@@ -214,6 +216,47 @@ export function WorkPlanProgress({ tasks, journeyStage, currentLeadStage, classN
                    task.status === 'not_needed' ? 'Customer responded on earlier attempt - this step was not needed.' :
                    task.description}
                 </p>
+                
+                {/* Contact Method Icons */}
+                <div className="flex items-center gap-1 mt-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-6 w-6 p-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onContactMethodClick?.('phone', task);
+                    }}
+                    title="Make phone call"
+                  >
+                    <Phone className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-6 w-6 p-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onContactMethodClick?.('email', task);
+                    }}
+                    title="Send email"
+                  >
+                    <Mail className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-6 w-6 p-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onContactMethodClick?.('text', task);
+                    }}
+                    title="Send text message"
+                  >
+                    <MessageCircle className="h-3 w-3" />
+                  </Button>
+                </div>
+                
                 {task.status === 'customer_replied' && (
                   <Badge className="mt-1 text-xs bg-success/20 text-success border-success/30">
                     Journey continues to next stage

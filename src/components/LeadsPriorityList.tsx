@@ -15,6 +15,7 @@ interface LeadsPriorityListProps {
   leads: Lead[];
   onContact: (leadId: string, method: 'phone' | 'email' | 'text') => void;
   onViewDetails: (leadId: string) => void;
+  onOpenNotificationPanel?: (leadId: string, method: 'phone' | 'email' | 'text') => void;
   onToggleNotifications: () => void;
   onTriggerToast: () => void;
   onPauseToasts: () => void;
@@ -28,7 +29,8 @@ type FilterOption = 'all' | 'hot' | 'warm' | 'cold' | 'new' | 'contacted';
 export function LeadsPriorityList({ 
   leads, 
   onContact, 
-  onViewDetails, 
+  onViewDetails,
+  onOpenNotificationPanel,
   onToggleNotifications,
   onTriggerToast,
   onPauseToasts,
@@ -407,6 +409,7 @@ export function LeadsPriorityList({
                               lead={displayLead}
                               onContact={onContact}
                               onViewDetails={onViewDetails}
+                              onOpenNotificationPanel={onOpenNotificationPanel}
                               isCondensed={false}
                               isFocused={false}
                             />

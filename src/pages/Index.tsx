@@ -433,6 +433,29 @@ const Index = () => {
     }
   };
 
+  const handleOpenNotificationPanel = (leadId: string, method: 'phone' | 'email' | 'text') => {
+    const lead = leads.find(l => l.id === leadId);
+    if (lead) {
+      setSelectedLead(lead);
+      setContactMethod(method);
+      setIsNotificationPanelOpen(true);
+      
+      // Generate AI response for the specific method and context
+      const contextualResponse = generateContextualResponse(lead, method);
+      setAiSuggestedResponse(contextualResponse);
+    }
+  };
+
+  const generateContextualResponse = (lead: Lead, method: 'phone' | 'email' | 'text') => {
+    const responses = {
+      phone: `Hi ${lead.name}! This is [Your Name] from [Dealership Name]. I noticed you've shown strong interest in our ${lead.vehicle} and wanted to personally reach out. I have some exciting updates and would love to help you take the next step. What would be the best time for you to visit our showroom for a test drive?`,
+      email: `Subject: Your ${lead.vehicle} - Exclusive Offer & Next Steps Available\n\nHi ${lead.name},\n\nI hope this email finds you well! I wanted to personally follow up on your interest in the ${lead.vehicle}.\n\nBased on your profile, I've secured:\n• Preferred pricing options tailored to your budget\n• Priority scheduling for test drives\n• Exclusive financing rates (subject to approval)\n\nI'm confident we can find the perfect solution for you. When would be convenient for a quick call to discuss your timeline and any questions you might have?\n\nLooking forward to helping you drive away in your new ${lead.vehicle}!\n\nBest regards,\n[Your Name]\n[Your Title]\n[Dealership Name]`,
+      text: `Hi ${lead.name}! 👋 Hope you're having a great day! I have some exciting updates about the ${lead.vehicle} you were interested in. Just secured some special pricing options! 🚗💰 When's a good time for a quick chat? Can schedule your test drive right away! 📅✨`
+    };
+    
+    return responses[method];
+  };
+
   const handleViewDetails = (leadId: string) => {
     const lead = leads.find(l => l.id === leadId);
     if (viewMode === 'focus') {
@@ -586,10 +609,11 @@ const Index = () => {
             </Button>
           </div>
 
-          <LeadsPriorityList
+          <LeadsPriorityList 
             leads={leads}
             onContact={handleContact}
             onViewDetails={handleViewDetails}
+            onOpenNotificationPanel={handleOpenNotificationPanel}
             onToggleNotifications={handleToggleNotifications}
             onTriggerToast={handleTriggerToast}
             onPauseToasts={handlePauseToasts}
