@@ -1,13 +1,46 @@
-import { useState } from 'react';
-import { Phone, Mail, MessageCircle, Clock, DollarSign, Car, ArrowRight, ChevronDown, Calendar, MapPin, FileText, TrendingUp, Heart, Target, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { 
+  Phone, 
+  Mail, 
+  MessageCircle, 
+  Star, 
+  TrendingUp, 
+  Calendar,
+  Eye,
+  ChevronDown,
+  ChevronUp,
+  User,
+  MapPin,
+  DollarSign,
+  Clock,
+  Target,
+  Zap,
+  Car,
+  Building,
+  CheckCircle,
+  AlertTriangle,
+  Activity,
+  BarChart3,
+  Send,
+  ArrowRight,
+  FileText,
+  RefreshCw,
+  Heart,
+  AlertCircle
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { WorkPlanProgress } from './WorkPlanProgress';
+import JourneyAdvanceButton from './JourneyAdvanceButton';
+import { useMessaging } from '@/hooks/useMessaging';
+import { useToast } from '@/hooks/use-toast';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Timeline } from '@/components/ui/timeline';
-import { WorkPlanProgress } from '@/components/WorkPlanProgress';
 
 interface TimelineEvent {
   date: string;
@@ -21,7 +54,7 @@ interface WorkPlanTask {
   title: string;
   description: string;
   dueDate: string;
-  status: 'pending' | 'completed' | 'missed' | 'scheduled' | 'customer_replied' | 'not_needed';
+  status: 'pending' | 'completed' | 'missed' | 'scheduled' | 'customer_replied' | 'not_needed' | 'reached_out';
   attemptNumber: number;
   contactMethod: 'phone' | 'email' | 'text';
   customerResponse?: boolean;
@@ -95,9 +128,74 @@ const journeyStages = {
   delivered: { label: 'Delivered', icon: '🚚', color: 'bg-emerald-500' }
 };
 
-export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, isFocused = false }: LeadCardProps) {
+export default function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, isFocused = false }: LeadCardProps) {
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
+  const [showQuickResponse, setShowQuickResponse] = useState(false);
+  const [responseText, setResponseText] = useState('');
+  const { sendMessage, advanceJourneyStage, isLoading } = useMessaging();
+  const { toast } = useToast();
   
+  const handleQuickMessage = async (method: 'phone' | 'email' | 'text') => {
+    if (!responseText.trim()) {
+      // Generate default message if empty
+      const defaultMessages = {
+        phone: `Hi ${lead.name}, this is [Your Name] from [Dealership]. I wanted to follow up on your interest in the ${lead.vehicle}. When would be a good time to chat?`,
+        email: `Hi ${lead.name}, I wanted to follow up on your interest in the ${lead.vehicle}. I'd be happy to answer any questions and schedule a convenient time to connect.`,
+        text: `Hi ${lead.name}! Following up on your interest in the ${lead.vehicle}. I'm here to help with any questions. What's the best time to call?`
+      };
+      setResponseText(defaultMessages[method]);
+      return;
+    }
+
+    try {
+      // Update work plan task status to "reached_out" (mock update)
+      if (lead.workPlan) {
+        const currentStageTask = lead.workPlan.find(
+          task => task.journeyStage.toLowerCase() === lead.journeyStage.toLowerCase() && 
+                 task.status === 'pending'
+        );
+        if (currentStageTask) {
+          currentStageTask.status = 'reached_out';
+        }
+      }
+
+      await sendMessage(lead.id, responseText, method === 'phone' ? 'call' : method, lead.journeyStage);
+      
+      toast({
+        title: "Message Sent",
+        description: `Your ${method} has been sent. Customer will auto-respond in 15 seconds.`,
+      });
+      
+      setResponseText('');
+      setShowQuickResponse(false);
+      onContact(lead.id, method);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleAdvanceJourney = async () => {
+    try {
+      const nextStage = await advanceJourneyStage(lead.id, lead.journeyStage);
+      if (nextStage) {
+        toast({
+          title: "Journey Stage Advanced",
+          description: `${lead.name} moved to ${nextStage.replace('_', ' ')} stage`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to advance journey stage",
+        variant: "destructive"
+      });
+    }
+  };
+
   // Get recommended quick actions based on journey stage and contact history
   const getQuickActions = () => {
     const isRecentlyContacted = lead.lastActivity.includes('contact sent') || 
@@ -227,7 +325,16 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
               
               {/* Quick Actions */}
               <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-                {quickActions.slice(0, 2).map((action, idx) => (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 w-7 p-0"
+                  onClick={() => setShowQuickResponse(!showQuickResponse)}
+                  title="Quick Message"
+                >
+                  <Send className="h-3 w-3" />
+                </Button>
+                {quickActions.slice(0, 1).map((action, idx) => (
                   <Button
                     key={idx}
                     size="sm"
@@ -242,6 +349,36 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
               </div>
             </div>
           </div>
+          
+          {/* Quick Response in Condensed View */}
+          {showQuickResponse && (
+            <div className="mt-2 bg-muted/20 border rounded-lg p-2 space-y-2" onClick={(e) => e.stopPropagation()}>
+              <textarea
+                value={responseText}
+                onChange={(e) => setResponseText(e.target.value)}
+                className="w-full h-16 p-2 border border-input rounded text-xs resize-none"
+                placeholder="Quick message..."
+              />
+              <div className="flex gap-1">
+                <Button
+                  size="sm"
+                  onClick={() => handleQuickMessage('text')}
+                  disabled={isLoading}
+                  className="flex-1 h-6 text-xs"
+                >
+                  {isLoading ? "..." : "Send"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowQuickResponse(false)}
+                  className="h-6 px-2 text-xs"
+                >
+                  ×
+                </Button>
+              </div>
+            </div>
+          )}
           
           {lead.timeOnLot && (
             <div className="mt-2 text-xs text-warning font-medium">
@@ -429,6 +566,18 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
               journeyStage={lead.journeyStage}
             />
           )}
+          
+          {/* Journey Advance Button for customer replies */}
+          <JourneyAdvanceButton
+            leadId={lead.id}
+            leadName={lead.name}
+            currentStage={lead.journeyStage}
+            leadStatus={lead.status}
+            hasCustomerReplied={lead.status === 'qualified'}
+            onStageAdvanced={() => {
+              // Could trigger a refresh here if needed
+            }}
+          />
         </div>
       </CardHeader>
 
@@ -492,22 +641,89 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2">
-          {quickActions.map((action, idx) => (
+        <div className="space-y-3">
+          {/* Quick Response Section */}
+          {showQuickResponse && (
+            <div className="bg-muted/20 border rounded-lg p-3 space-y-3" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between">
+                <h5 className="font-medium text-sm">Quick Message</h5>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowQuickResponse(false)}
+                  className="h-6 w-6 p-0"
+                >
+                  ×
+                </Button>
+              </div>
+              <textarea
+                value={responseText}
+                onChange={(e) => setResponseText(e.target.value)}
+                className="w-full h-20 p-2 border border-input rounded text-sm resize-none"
+                placeholder="Type your message here..."
+              />
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => handleQuickMessage('text')}
+                  disabled={isLoading}
+                  className="flex-1"
+                >
+                  <MessageCircle className="h-4 w-4 mr-1" />
+                  {isLoading ? "Sending..." : "Send Text"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleQuickMessage('phone')}
+                  disabled={isLoading}
+                >
+                  <Phone className="h-4 w-4 mr-1" />
+                  Call
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleQuickMessage('email')}
+                  disabled={isLoading}
+                >
+                  <Mail className="h-4 w-4 mr-1" />
+                  Email
+                </Button>
+              </div>
+            </div>
+          )}
+          
+          {/* Quick Action Buttons */}
+          <div className="flex gap-2">
             <Button
-              key={idx}
               size="sm"
-              variant={idx === 0 ? "default" : "outline"}
+              variant="outline"
               className="flex-1"
               onClick={(e) => {
                 e.stopPropagation();
-                action.action();
+                setShowQuickResponse(!showQuickResponse);
               }}
             >
-              <action.icon className="h-4 w-4 mr-2" />
-              {action.label}
+              <Send className="h-4 w-4 mr-2" />
+              Quick Message
             </Button>
-          ))}
+            {quickActions.slice(0, 2).map((action, idx) => (
+              <Button
+                key={idx}
+                size="sm"
+                variant={idx === 0 ? "default" : "outline"}
+                className="flex-1"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  action.action();
+                }}
+              >
+                <action.icon className="h-4 w-4 mr-2" />
+                {action.label}
+              </Button>
+            ))}
+          </div>
         </div>
 
         {/* Analysis Section - Collapsible */}
@@ -601,6 +817,7 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
           </CollapsibleContent>
         </Collapsible>
 
+        {/* Customer on Lot Alert */}
         {lead.timeOnLot && (
           <div className="bg-warning/10 border border-warning/20 rounded-lg p-3">
             <div className="flex items-center gap-2 text-warning">

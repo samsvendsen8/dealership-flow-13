@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { LeadCard, type Lead } from './LeadCard';
+import LeadCard, { type Lead } from './LeadCard';
 import { LeadsQuickList } from './LeadsQuickList';
 import { cn } from '@/lib/utils';
 
