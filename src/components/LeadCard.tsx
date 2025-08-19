@@ -39,6 +39,7 @@ import { WorkPlanProgress } from './WorkPlanProgress';
 import JourneyAdvanceButton from './JourneyAdvanceButton';
 import { CallSimulationModal } from './CallSimulationModal';
 import { CelebrationAnimation } from './CelebrationAnimation';
+import { WorkItemSlideOut } from './WorkItemSlideOut';
 import { useMessaging } from '@/hooks/useMessaging';
 import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -139,6 +140,7 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
   const [selectedJourneyStage, setSelectedJourneyStage] = useState(lead.journeyStage);
   const [showCallModal, setShowCallModal] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [completingWorkItem, setCompletingWorkItem] = useState(false);
   const { sendMessage, advanceJourneyStage, isLoading } = useMessaging();
   const { toast } = useToast();
   
@@ -173,13 +175,14 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
 
       await sendMessage(lead.id, responseText, method === 'phone' ? 'call' : method, lead.journeyStage);
       
-      // Show celebration animation for completing work plan item
+      // Show celebration animation and trigger work item slide-out
       setShowCelebration(true);
+      setCompletingWorkItem(true);
       
-      // Notify parent to advance to next lead after celebration
+      // Notify parent to advance to next lead after celebration completes fully
       setTimeout(() => {
         onTaskCompleted?.(lead.id);
-      }, 2000);
+      }, 4500); // Wait for full celebration (4s) + extra buffer (0.5s)
       
       toast({
         title: "Message Sent",
@@ -595,12 +598,17 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           
           {/* Work plan for selected journey stage */}
           {lead.workPlan && lead.workPlan.length > 0 && journeyStages[selectedJourneyStage] && (
-            <WorkPlanProgress 
-              tasks={lead.workPlan} 
-              journeyStage={selectedJourneyStage}
-              currentLeadStage={lead.journeyStage}
-              onContactMethodClick={(method) => handleContactMethodClick(method)}
-            />
+            <WorkItemSlideOut
+              isTriggered={completingWorkItem}
+              onComplete={() => setCompletingWorkItem(false)}
+            >
+              <WorkPlanProgress 
+                tasks={lead.workPlan} 
+                journeyStage={selectedJourneyStage}
+                currentLeadStage={lead.journeyStage}
+                onContactMethodClick={(method) => handleContactMethodClick(method)}
+              />
+            </WorkItemSlideOut>
           )}
           
           {/* Journey Advance Button for customer replies */}

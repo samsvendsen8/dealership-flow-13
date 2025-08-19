@@ -15,14 +15,14 @@ export function CelebrationAnimation({ isVisible, onComplete, message = "Great w
     if (isVisible) {
       setStage('entering');
       
-      // Progress through animation stages
+      // Progress through animation stages with longer visibility
       const timeouts = [
-        setTimeout(() => setStage('celebrating'), 100),
-        setTimeout(() => setStage('exiting'), 1500),
+        setTimeout(() => setStage('celebrating'), 200), // Enter faster
+        setTimeout(() => setStage('exiting'), 3500), // Celebrate for 3.3 seconds
         setTimeout(() => {
           setStage('hidden');
           onComplete();
-        }, 2000)
+        }, 4000) // Total 4 seconds
       ];
 
       return () => timeouts.forEach(clearTimeout);
@@ -98,22 +98,22 @@ export function CelebrationAnimation({ isVisible, onComplete, message = "Great w
           <h2 className="text-2xl font-bold text-success mb-2">Task Complete! 🎉</h2>
           <p className="text-lg text-foreground">{message}</p>
           <p className="text-sm text-muted-foreground mt-2">
-            Moving to next priority lead...
+            {stage === 'celebrating' ? 'Nice work! Keep the momentum going...' : 'Moving to next priority lead...'}
           </p>
         </div>
         
         {/* Progress indication */}
         <div className="flex justify-center">
-          <div className={cn(
-            "w-20 h-1 bg-success/20 rounded-full overflow-hidden",
-          )}>
-            <div 
-              className={cn(
-                "h-full bg-gradient-to-r from-success to-primary rounded-full transition-all duration-1000",
-                stage === 'celebrating' ? "w-full" : "w-0"
-              )}
-            />
-          </div>
+        <div className={cn(
+          "w-24 h-1 bg-success/20 rounded-full overflow-hidden",
+        )}>
+          <div 
+            className={cn(
+              "h-full bg-gradient-to-r from-success to-primary rounded-full transition-all ease-out",
+              stage === 'celebrating' ? "w-full duration-[3000ms]" : "w-0 duration-200"
+            )}
+          />
+        </div>
         </div>
       </div>
     </div>
