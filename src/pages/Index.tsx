@@ -186,8 +186,8 @@ const mockLeads: Lead[] = [
     ],
     workPlan: [
       { id: 'engaged-1', title: 'Engaged Stage - Attempt 1', description: 'Send safety ratings and feature comparison', dueDate: 'Today', status: 'customer_replied', attemptNumber: 1, contactMethod: 'email', customerResponse: true, journeyStage: 'engaged' },
-      { id: 'engaged-2', title: 'Engaged Stage - Attempt 2', description: 'Call to answer questions and schedule visit', dueDate: 'Tomorrow', status: 'completed', attemptNumber: 2, contactMethod: 'phone', journeyStage: 'engaged' },
-      { id: 'engaged-3', title: 'Engaged Stage - Attempt 3', description: 'Text to confirm showroom appointment', dueDate: 'Day 3', status: 'completed', attemptNumber: 3, contactMethod: 'text', journeyStage: 'engaged' }
+      { id: 'engaged-2', title: 'Engaged Stage - Attempt 2', description: 'Call to answer questions and schedule visit', dueDate: 'Tomorrow', status: 'not_needed', attemptNumber: 2, contactMethod: 'phone', journeyStage: 'engaged' },
+      { id: 'engaged-3', title: 'Engaged Stage - Attempt 3', description: 'Text to confirm showroom appointment', dueDate: 'Day 3', status: 'not_needed', attemptNumber: 3, contactMethod: 'text', journeyStage: 'engaged' }
     ]
   },
   {
