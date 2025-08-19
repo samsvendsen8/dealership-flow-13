@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import type { Lead } from './LeadCard';
 import MessageHistory from './MessageHistory';
 import JourneyAdvanceButton from './JourneyAdvanceButton';
+import { WorkPlanProgress } from './WorkPlanProgress';
 import { useMessaging } from '@/hooks/useMessaging';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -510,114 +511,8 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                         const isCurrent = index === currentStageIndex;
                         const isFuture = index > currentStageIndex;
                         
-                        const mockWorkPlans: Record<string, Array<{
-                          id: string;
-                          title: string;
-                          description: string;
-                          dueDate: string;
-                          status: 'pending' | 'completed' | 'missed' | 'scheduled' | 'customer_replied';
-                          attemptNumber: number;
-                          contactMethod: 'phone' | 'email' | 'text';
-                          customerResponse?: boolean;
-                        }>> = {
-                              engaged: [
-                                {
-                                  id: '1',
-                                  title: 'Initial Contact',
-                                  description: 'Reach out to acknowledge inquiry and express interest',
-                                  dueDate: 'Today',
-                                  status: isCurrent ? 'pending' : (isCompleted ? 'customer_replied' : 'scheduled'),
-                                  attemptNumber: 1,
-                                  contactMethod: 'phone',
-                                  customerResponse: isCompleted
-                                },
-                                {
-                                  id: '2', 
-                                  title: 'Follow-up Email',
-                                  description: 'Send detailed vehicle info and availability',
-                                  dueDate: 'Tomorrow',
-                                  status: isCurrent ? 'scheduled' : (isCompleted ? 'completed' : 'scheduled'),
-                                  attemptNumber: 2,
-                                  contactMethod: 'email'
-                                },
-                                {
-                                  id: '3',
-                                  title: 'Text Check-in',
-                                  description: 'Quick text to confirm interest and availability',
-                                  dueDate: 'Day 3',
-                                  status: 'scheduled',
-                                  attemptNumber: 3,
-                                  contactMethod: 'text'
-                                }
-                              ],
-                          visit: [
-                            {
-                              id: '4',
-                              title: 'Schedule Visit',
-                              description: 'Book showroom appointment and send calendar invite',
-                              dueDate: 'Today',
-                              status: isCurrent && selectedLead.journeyStage === 'visit' ? 'pending' : (isCompleted ? 'customer_replied' : 'scheduled'),
-                              attemptNumber: 1,
-                              contactMethod: 'phone',
-                              customerResponse: isCompleted && selectedLead.journeyStage !== 'visit'
-                            },
-                            {
-                              id: '5',
-                              title: 'Pre-visit Text',
-                              description: 'Send directions and what to bring',
-                              dueDate: 'Visit Day',
-                              status: 'scheduled',
-                              attemptNumber: 2,
-                              contactMethod: 'text'
-                            }
-                          ],
-                          proposal: [
-                            {
-                              id: '6',
-                              title: 'Present Proposal',
-                              description: 'Email formal offer and financing options',
-                              dueDate: 'Today',
-                              status: isCurrent && selectedLead.journeyStage === 'proposal' ? 'pending' : (isCompleted ? 'customer_replied' : 'scheduled'),
-                              attemptNumber: 1,
-                              contactMethod: 'email',
-                              customerResponse: isCompleted && selectedLead.journeyStage !== 'proposal'
-                            },
-                            {
-                              id: '7',
-                              title: 'Follow-up Call',
-                              description: 'Discuss questions and negotiate terms',
-                              dueDate: 'Day 2',
-                              status: 'scheduled',
-                              attemptNumber: 2,
-                              contactMethod: 'phone'
-                            }
-                          ],
-                          sold: [
-                            {
-                              id: '8',
-                              title: 'Contract Finalization',
-                              description: 'Complete paperwork and payment processing',
-                              dueDate: 'Today',
-                              status: isCurrent && selectedLead.journeyStage === 'sold' ? 'pending' : (isCompleted ? 'customer_replied' : 'scheduled'),
-                              attemptNumber: 1,
-                              contactMethod: 'email',
-                              customerResponse: isCompleted && selectedLead.journeyStage !== 'sold'
-                            }
-                          ],
-                          delivered: [
-                            {
-                              id: '9',
-                              title: 'Delivery Coordination',
-                              description: 'Schedule vehicle pickup and final inspection',
-                              dueDate: 'Today',
-                              status: isCurrent && selectedLead.journeyStage === 'delivered' ? 'pending' : 'completed',
-                              attemptNumber: 1,
-                              contactMethod: 'phone'
-                            }
-                          ]
-                        };
-                        
-                        const workPlan = mockWorkPlans[stageKey] || [];
+                        // Use the same mock workPlan data as LeadCard
+                        const mockWorkPlanData = selectedLead.workPlan || [];
 
                         return (
                           <div key={stageKey} className="space-y-2">
@@ -647,97 +542,15 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                                 </div>
                                 <p className="text-xs text-muted-foreground">{stage.description}</p>
                               </div>
-                              {workPlan.length > 0 && (
-                                <div className="flex items-center gap-1">
-                                  <Badge variant="outline" className="text-xs">
-                                     {workPlan.filter(t => t.status === 'customer_replied' || t.customerResponse).length > 0 ? 
-                                       '✅ Customer responded!' : 
-                                       `${workPlan.filter(t => t.status === 'pending').length} pending until response`}
-                                  </Badge>
-                                </div>
-                              )}
                             </div>
 
-                            {selectedJourneyStage === stageKey && workPlan.length > 0 && (
-                              <div className="ml-9 space-y-2 border-l-2 border-muted pl-3 max-w-xs">
-                                <h5 className="text-xs font-medium text-muted-foreground">
-                                  Outreach Plan (Until Customer Responds)
-                                </h5>
-                                {workPlan.map((task) => {
-                                  const statusIcons = {
-                                    completed: CheckCircle,
-                                    pending: Clock,
-                                    missed: AlertCircle,
-                                    scheduled: Calendar,
-                                    customer_replied: CheckCircle,
-                                  };
-                                  
-                                  const statusColors = {
-                                    completed: 'text-success bg-success/10 border-success/20',
-                                    pending: 'text-primary bg-primary/10 border-primary/20 ring-1 ring-primary/20',
-                                    missed: 'text-destructive bg-destructive/10 border-destructive/20',
-                                    scheduled: 'text-muted-foreground bg-muted/10 border-muted/20',
-                                    customer_replied: 'text-success bg-gradient-to-r from-success/10 to-success/5 border-success/30',
-                                  };
-                                  
-                                  const contactIcons = {
-                                    phone: Phone,
-                                    email: Mail,
-                                    text: MessageCircle,
-                                  };
-                                  
-                                  const StatusIcon = statusIcons[task.status];
-                                  const ContactIcon = contactIcons[task.contactMethod];
-                                  
-                                  return (
-                                    <div 
-                                      key={task.id}
-                                      className={cn(
-                                        'p-2 rounded-md border text-xs break-words',
-                                        statusColors[task.status]
-                                      )}
-                                    >
-                                      <div className="flex items-start gap-2">
-                                        <div className="flex items-center gap-1 mt-0.5 flex-shrink-0">
-                                          <StatusIcon className="h-3 w-3" />
-                                          <ContactIcon className="h-2.5 w-2.5" />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                          <p className="font-medium break-words">
-                                            {task.status === 'customer_replied' ? '✅ Customer Responded!' :
-                                             task.status === 'pending' ? `🎯 Attempt #${task.attemptNumber}: ${task.title}` :
-                                             `Attempt #${task.attemptNumber}: ${task.title}`}
-                                          </p>
-                                          <p className="text-muted-foreground mt-0.5 break-words">
-                                            {task.status === 'customer_replied' ? 'Goal achieved! Ready to move to next stage.' :
-                                             task.status === 'pending' ? `Current focus: ${task.description}` :
-                                             task.description}
-                                          </p>
-                                          <div className="flex items-center justify-between mt-1">
-                                            <span className="text-xs opacity-75">{task.dueDate}</span>
-                                            <span className="text-xs opacity-75">{task.contactMethod}</span>
-                                          </div>
-                                          {task.status === 'customer_replied' && (
-                                            <Badge className="mt-1 text-xs bg-success/20 text-success border-success/30">
-                                              Stage can advance
-                                            </Badge>
-                                          )}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                                
-                                {workPlan.some(t => t.status === 'customer_replied' || t.customerResponse) ? (
-                                  <div className="text-xs text-center p-2 bg-success/5 border border-success/20 rounded-md">
-                                    <span className="text-success font-medium">🎉 Success!</span>
-                                    <span className="text-muted-foreground ml-1">Customer engagement achieved</span>
-                                  </div>
-                                ) : (
-                                  <div className="text-xs text-center text-muted-foreground break-words">
-                                    Continue attempts until customer responds
-                                  </div>
-                                )}
+                            {selectedJourneyStage === stageKey && mockWorkPlanData.length > 0 && (
+                              <div className="ml-9">
+                                <WorkPlanProgress 
+                                  tasks={mockWorkPlanData} 
+                                  journeyStage={stageKey}
+                                  currentLeadStage={selectedLead.journeyStage}
+                                />
                               </div>
                             )}
                           </div>
