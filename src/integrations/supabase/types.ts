@@ -7,23 +7,447 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
   }
   public: {
     Tables: {
-      [_ in never]: never
+      customers: {
+        Row: {
+          address: string | null
+          city: string | null
+          created_at: string | null
+          email: string | null
+          first_name: string
+          id: string
+          last_name: string
+          phone: string | null
+          state: string | null
+          updated_at: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          created_at?: string | null
+          email?: string | null
+          first_name: string
+          id?: string
+          last_name: string
+          phone?: string | null
+          state?: string | null
+          updated_at?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          created_at?: string | null
+          email?: string | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          phone?: string | null
+          state?: string | null
+          updated_at?: string | null
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
+      interaction_history: {
+        Row: {
+          communication_type: Database["public"]["Enums"]["communication_type"]
+          completed_at: string | null
+          content: string | null
+          created_at: string | null
+          id: string
+          lead_id: string
+          outcome: string | null
+          scheduled_for: string | null
+          subject: string | null
+          user_id: string
+        }
+        Insert: {
+          communication_type: Database["public"]["Enums"]["communication_type"]
+          completed_at?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          lead_id: string
+          outcome?: string | null
+          scheduled_for?: string | null
+          subject?: string | null
+          user_id: string
+        }
+        Update: {
+          communication_type?: Database["public"]["Enums"]["communication_type"]
+          completed_at?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          lead_id?: string
+          outcome?: string | null
+          scheduled_for?: string | null
+          subject?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interaction_history_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "interaction_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_scores: {
+        Row: {
+          behavior_score: number | null
+          calculated_at: string | null
+          id: string
+          interaction_score: number | null
+          lead_id: string
+          source_score: number | null
+          timing_score: number | null
+          total_score: number | null
+        }
+        Insert: {
+          behavior_score?: number | null
+          calculated_at?: string | null
+          id?: string
+          interaction_score?: number | null
+          lead_id: string
+          source_score?: number | null
+          timing_score?: number | null
+          total_score?: number | null
+        }
+        Update: {
+          behavior_score?: number | null
+          calculated_at?: string | null
+          id?: string
+          interaction_score?: number | null
+          lead_id?: string
+          source_score?: number | null
+          timing_score?: number | null
+          total_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_scores_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_sources: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          quality_score: number | null
+          source_type: Database["public"]["Enums"]["lead_source"]
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          quality_score?: number | null
+          source_type: Database["public"]["Enums"]["lead_source"]
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          quality_score?: number | null
+          source_type?: Database["public"]["Enums"]["lead_source"]
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          assigned_to: string | null
+          budget_max: number | null
+          budget_min: number | null
+          created_at: string | null
+          customer_id: string
+          financing_needed: boolean | null
+          id: string
+          last_contact: string | null
+          lead_source_id: string | null
+          next_follow_up: string | null
+          notes: string | null
+          priority_score: number | null
+          response_time_minutes: number | null
+          status: Database["public"]["Enums"]["lead_status"] | null
+          temperature: Database["public"]["Enums"]["lead_temperature"] | null
+          trade_in_vehicle: string | null
+          updated_at: string | null
+          vehicle_interest: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          budget_max?: number | null
+          budget_min?: number | null
+          created_at?: string | null
+          customer_id: string
+          financing_needed?: boolean | null
+          id?: string
+          last_contact?: string | null
+          lead_source_id?: string | null
+          next_follow_up?: string | null
+          notes?: string | null
+          priority_score?: number | null
+          response_time_minutes?: number | null
+          status?: Database["public"]["Enums"]["lead_status"] | null
+          temperature?: Database["public"]["Enums"]["lead_temperature"] | null
+          trade_in_vehicle?: string | null
+          updated_at?: string | null
+          vehicle_interest?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          budget_max?: number | null
+          budget_min?: number | null
+          created_at?: string | null
+          customer_id?: string
+          financing_needed?: boolean | null
+          id?: string
+          last_contact?: string | null
+          lead_source_id?: string | null
+          next_follow_up?: string | null
+          notes?: string | null
+          priority_score?: number | null
+          response_time_minutes?: number | null
+          status?: Database["public"]["Enums"]["lead_status"] | null
+          temperature?: Database["public"]["Enums"]["lead_temperature"] | null
+          trade_in_vehicle?: string | null
+          updated_at?: string | null
+          vehicle_interest?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_lead_source_id_fkey"
+            columns: ["lead_source_id"]
+            isOneToOne: false
+            referencedRelation: "lead_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          is_urgent: boolean | null
+          lead_id: string | null
+          message: string | null
+          suggested_response: string | null
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          is_urgent?: boolean | null
+          lead_id?: string | null
+          message?: string | null
+          suggested_response?: string | null
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          is_urgent?: boolean | null
+          lead_id?: string | null
+          message?: string | null
+          suggested_response?: string | null
+          title?: string
+          type?: Database["public"]["Enums"]["notification_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          first_name: string | null
+          id: string
+          is_active: boolean | null
+          last_name: string | null
+          phone: string | null
+          role: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id: string
+          is_active?: boolean | null
+          last_name?: string | null
+          phone?: string | null
+          role?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_name?: string | null
+          phone?: string | null
+          role?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          assigned_to: string
+          completed_at: string | null
+          created_at: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          lead_id: string
+          priority: number | null
+          status: Database["public"]["Enums"]["task_status"] | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to: string
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          lead_id: string
+          priority?: number | null
+          status?: Database["public"]["Enums"]["task_status"] | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          lead_id?: string
+          priority?: number | null
+          status?: Database["public"]["Enums"]["task_status"] | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_lead_priority_score: {
+        Args: { lead_row: Database["public"]["Tables"]["leads"]["Row"] }
+        Returns: number
+      }
     }
     Enums: {
-      [_ in never]: never
+      communication_type: "call" | "email" | "text" | "in_person" | "other"
+      lead_source:
+        | "website"
+        | "phone"
+        | "email"
+        | "walk_in"
+        | "referral"
+        | "social_media"
+        | "advertising"
+        | "trade_show"
+        | "other"
+      lead_status:
+        | "new"
+        | "contacted"
+        | "qualified"
+        | "appointment_set"
+        | "test_drive"
+        | "proposal"
+        | "negotiation"
+        | "sold"
+        | "lost"
+        | "follow_up"
+      lead_temperature: "hot" | "warm" | "cold"
+      notification_type:
+        | "new_lead"
+        | "hot_lead_update"
+        | "task_due"
+        | "response_needed"
+        | "follow_up_reminder"
+      task_status: "pending" | "completed" | "overdue" | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +574,40 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      communication_type: ["call", "email", "text", "in_person", "other"],
+      lead_source: [
+        "website",
+        "phone",
+        "email",
+        "walk_in",
+        "referral",
+        "social_media",
+        "advertising",
+        "trade_show",
+        "other",
+      ],
+      lead_status: [
+        "new",
+        "contacted",
+        "qualified",
+        "appointment_set",
+        "test_drive",
+        "proposal",
+        "negotiation",
+        "sold",
+        "lost",
+        "follow_up",
+      ],
+      lead_temperature: ["hot", "warm", "cold"],
+      notification_type: [
+        "new_lead",
+        "hot_lead_update",
+        "task_due",
+        "response_needed",
+        "follow_up_reminder",
+      ],
+      task_status: ["pending", "completed", "overdue", "cancelled"],
+    },
   },
 } as const
