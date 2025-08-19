@@ -13,7 +13,7 @@ import type { Lead } from '@/components/LeadCard';
 // Mock data - in a real app this would come from your CRM API
 const mockLeads: Lead[] = [
   {
-    id: '1',
+    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
     name: 'Sarah Johnson',
     email: 'sarah.johnson@email.com',
     phone: '(555) 123-4567',
@@ -50,7 +50,7 @@ const mockLeads: Lead[] = [
     ]
   },
   {
-    id: '2',
+    id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22',
     name: 'Michael Chen',
     email: 'michael.chen@email.com',
     phone: '(555) 234-5678',
@@ -88,7 +88,7 @@ const mockLeads: Lead[] = [
     ]
   },
   {
-    id: '3',
+    id: 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33',
     name: 'Emily Rodriguez',
     email: 'emily.rodriguez@email.com',
     phone: '(555) 345-6789',
@@ -124,7 +124,7 @@ const mockLeads: Lead[] = [
     ]
   },
   {
-    id: '4',
+    id: 'd3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44',
     name: 'David Thompson',
     email: 'david.thompson@email.com',
     phone: '(555) 456-7890',
@@ -159,7 +159,7 @@ const mockLeads: Lead[] = [
     ]
   },
   {
-    id: '5',
+    id: 'e4eebc99-9c0b-4ef8-bb6d-6bb9bd380a55',
     name: 'Lisa Park',
     email: 'lisa.park@email.com',
     phone: '(555) 567-8901',
@@ -193,7 +193,7 @@ const mockLeads: Lead[] = [
     ]
   },
   {
-    id: '6',
+    id: 'f5eebc99-9c0b-4ef8-bb6d-6bb9bd380a66',
     name: 'James Wilson',
     email: 'james.wilson@email.com',
     phone: '(555) 678-9012',

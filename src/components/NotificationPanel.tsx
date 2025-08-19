@@ -99,404 +99,478 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
   const generateFakeHistory = (): HistoryItem[] => {
     if (!selectedLead) return [];
 
-    const baseHistory: HistoryItem[] = [
+    const historyItems: HistoryItem[] = [
       {
-        id: 'created',
-        type: 'system',
-        title: 'Lead Created',
-        timestamp: '3 days ago',
-        icon: Timer,
-        color: 'border-status-new',
-        description: `${selectedLead.name} submitted inquiry through ${selectedLead.source}`,
+        id: '1',
+        type: 'form',
+        title: 'Contact Form Submitted',
+        timestamp: '2 days ago',
+        icon: MessageSquare,
+        color: 'text-blue-600',
+        description: 'Customer filled out interest form online',
         expandable: true,
         content: {
           type: 'form',
           data: {
             'Vehicle Interest': selectedLead.vehicle,
-            'Preferred Contact': 'Phone',
-            'Budget Range': `$${(selectedLead.value * 0.8).toLocaleString()} - $${selectedLead.value.toLocaleString()}`,
-            'Additional Notes': selectedLead.notes || 'Interested in test driving soon'
+            'Budget Range': `$${selectedLead.budget?.min?.toLocaleString()} - $${selectedLead.budget?.max?.toLocaleString()}`,
+            'Preferred Contact': selectedLead.preferredContact || 'Phone',
+            'Timeline': 'Within 2 weeks',
+            'Comments': 'Looking for family vehicle with good safety ratings'
           }
+        }
+      },
+      {
+        id: '2',
+        type: 'phone',
+        title: 'Outbound Phone Call',
+        timestamp: '1 day ago',
+        icon: Phone,
+        color: 'text-green-600',
+        description: 'Initial contact call - discussed needs',
+        expandable: true,
+        content: {
+          type: 'voicemail',
+          duration: '12 minutes',
+          transcript: `Spoke with ${selectedLead.name} about their interest in ${selectedLead.vehicle}. Customer mentioned they are actively shopping and comparing options. Discussed financing options and scheduled a visit for today. Customer seems motivated and ready to make a decision soon.`
+        }
+      },
+      {
+        id: '3',
+        type: 'visit',
+        title: 'Showroom Visit',
+        timestamp: 'Today',
+        icon: Car,
+        color: 'text-purple-600',
+        description: 'Customer visited dealership for test drive',
+        expandable: true,
+        content: {
+          type: 'meeting',
+          duration: '45 minutes',
+          notes: `${selectedLead.name} arrived on time and test drove the ${selectedLead.vehicle}. Very impressed with the vehicle features and ride quality. Discussed pricing and trade-in options.`,
+          actions: [
+            'Provided detailed brochure and specifications',
+            'Ran preliminary credit check (approved)',
+            'Discussed extended warranty options',
+            'Scheduled follow-up call for tomorrow'
+          ]
         }
       }
     ];
 
-    // Add journey-specific history based on current stage
-    const stageHistory: Record<string, HistoryItem[]> = {
-      'engaged': [
-        {
-          id: 'text-response',
-          type: 'inbound',
-          title: 'Customer Text Reply',
-          timestamp: '1 day ago',
-          icon: MessageSquare,
-          color: 'border-success',
-          description: 'Customer responded via text',
-          expandable: true,
-          content: {
-            type: 'text',
-            messages: [
-              { sender: 'customer', text: 'Hi Alex, got your voicemail. Still interested in the car. When can I see it?', time: '1 day ago' },
-              { sender: 'me', text: `Great to hear from you! The ${selectedLead.vehicle} is available for viewing. Are you free this weekend?`, time: '1 day ago' },
-              { sender: 'customer', text: 'Saturday afternoon works for me', time: '1 day ago' }
-            ]
-          }
-        },
-        {
-          id: 'email-sent',
-          type: 'outbound', 
-          title: 'Vehicle Details Email',
-          timestamp: '1 day ago',
-          icon: Mail,
-          color: 'border-primary',
-          description: 'Sent detailed vehicle information',
-          expandable: true,
-          content: {
-            type: 'email',
-            subject: `${selectedLead.vehicle} - Complete Details & Pricing`,
-            body: `Hi ${selectedLead.name},\n\nAs promised, here are the complete details for the ${selectedLead.vehicle}:\n\n• Price: $${selectedLead.value.toLocaleString()}\n• Mileage: 12,450 miles\n• Features: Premium package, leather seats, navigation\n• Warranty: 3 years/36,000 miles remaining\n\nI've attached the vehicle history report and additional photos. Looking forward to our meeting this Saturday!\n\nBest regards,\nAlex`
-          }
-        }
-      ],
-      'visit': [
-        {
-          id: 'showroom-visit',
-          type: 'meeting',
-          title: 'Showroom Visit',
-          timestamp: '5 hours ago',
-          icon: Check,
-          color: 'border-hot-lead',
-          description: 'Customer visited showroom',
-          expandable: true,
-          content: {
-            type: 'meeting',
-            duration: '45 minutes',
-            notes: `${selectedLead.name} arrived on time and was very impressed with the ${selectedLead.vehicle}. Spent significant time examining the interior and asking detailed questions about financing options. Showed strong buying signals.`,
-            actions: ['Vehicle inspection completed', 'Financing discussion initiated', 'Test drive scheduled']
-          }
-        }
-      ]
-    };
-
-    // Add history based on current journey stage
-    const currentStageIndex = ['engaged', 'visit', 'proposal', 'sold', 'delivered'].indexOf(selectedLead.journeyStage);
-    
-    let allHistory: HistoryItem[] = [...baseHistory];
-    
-    if (currentStageIndex >= 0) allHistory.push(...(stageHistory.engaged || []));
-    if (currentStageIndex >= 1) allHistory.push(...(stageHistory.visit || []));
-
-    return allHistory.reverse(); // Most recent first
+    return historyItems;
   };
 
-  if (!isOpen) return null;
+  const historyData = generateFakeHistory();
+
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div className={cn(
-      'fixed right-0 top-0 h-full w-96 bg-card border-l border-border shadow-strong z-50 transition-transform duration-300',
-      isOpen ? 'translate-x-0' : 'translate-x-full'
+      "fixed right-0 top-0 h-full bg-background border-l border-border z-50 transition-all duration-300 ease-in-out",
+      isOpen ? "w-[500px] translate-x-0" : "w-0 translate-x-full"
     )}>
-      <div className="flex items-center justify-between p-4 border-b">
-        <h2 className="text-lg font-semibold">Lead Details</h2>
-        <Button variant="ghost" size="sm" onClick={onClose}>
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
-
-      {/* Main Tabs - Moved to Top */}
-      <div className="flex space-x-1 bg-muted p-1 mx-4 mt-4 rounded-lg">
-              {[
-                { key: 'customer-info', label: 'Customer Info' },
-                { key: 'journey', label: 'Journey' }
-              ].map((tab) => (
-                <button
-                  key={tab.key}
-                  className={cn(
-                    'flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors',
-                    activeMainTab === tab.key 
-                      ? 'bg-background text-foreground shadow-sm' 
-                      : 'text-muted-foreground hover:text-foreground'
-                  )}
-                  onClick={() => setActiveMainTab(tab.key as any)}
-                >
-                  {tab.label}
-                </button>
-              ))}
+      {selectedLead ? (
+        <ScrollArea className="h-full">
+          <div className="p-6 space-y-6">
+            {/* Header with close button */}
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-primary/10">
+                    <User className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-foreground">{selectedLead.name}</h2>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge className={statusStyles[selectedLead.status]}>{selectedLead.status}</Badge>
+                      <Badge variant="outline" className={cn(
+                        "capitalize",
+                        selectedLead.priority === 'hot' && 'border-hot-lead text-hot-lead',
+                        selectedLead.priority === 'warm' && 'border-warm-lead text-warm-lead',
+                        selectedLead.priority === 'cold' && 'border-cold-lead text-cold-lead'
+                      )}>
+                        {selectedLead.priority} priority
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" onClick={onClose}>
+                <X className="h-4 w-4" />
+              </Button>
             </div>
 
-      {selectedLead ? (
-        <ScrollArea className="h-full pb-20">
-          <div className="p-4 space-y-4">
-            {/* Show Lead Header and Quick Actions only for customer-info tab */}
-            {activeMainTab === 'customer-info' && (
-              <>
-                {/* Lead Header */}
+            {/* Lead Summary Card */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Lead Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Contact</p>
+                    <div className="text-sm">
+                      <p className="font-medium">{selectedLead.email}</p>
+                      <p>{selectedLead.phone}</p>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Vehicle Interest</p>
+                    <p className="text-sm font-medium">{selectedLead.vehicle}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Estimated Value</p>
+                    <p className="text-sm font-medium">${selectedLead.value.toLocaleString()}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Last Activity</p>
+                    <p className="text-sm">{selectedLead.lastActivity}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Actions */}
+            <div className="space-y-3">
+              <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Quick Actions</h3>
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  className="flex-1 gap-2"
+                  onClick={() => handleContactMethodClick('phone')}
+                >
+                  <Phone className="h-4 w-4" />
+                  Call
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="flex-1 gap-2"
+                  onClick={() => handleContactMethodClick('text')}
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  Text
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="flex-1 gap-2"
+                  onClick={() => handleContactMethodClick('email')}
+                >
+                  <Mail className="h-4 w-4" />
+                  Email
+                </Button>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Tab Navigation */}
+            <div className="space-y-4">
+              <div className="flex gap-1 p-1 bg-muted rounded-lg">
+                <button
+                  onClick={() => setActiveMainTab('customer-info')}
+                  className={cn(
+                    "flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors",
+                    activeMainTab === 'customer-info' 
+                      ? "bg-background text-foreground shadow-sm" 
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Customer Info
+                </button>
+                <button
+                  onClick={() => setActiveMainTab('journey')}
+                  className={cn(
+                    "flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors",
+                    activeMainTab === 'journey' 
+                      ? "bg-background text-foreground shadow-sm" 
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Journey
+                </button>
+              </div>
+
+              {/* Customer Info Content */}
+              {activeMainTab === 'customer-info' && (
+                <div className="space-y-4">
+                  {/* Sub-tabs for customer info */}
+                  <div className="flex gap-1 p-1 bg-secondary/50 rounded-lg">
+                    <button
+                      onClick={() => setActiveSubTab('response')}
+                      className={cn(
+                        "flex-1 py-1.5 px-2 text-xs font-medium rounded transition-colors",
+                        activeSubTab === 'response' 
+                          ? "bg-background text-foreground shadow-sm" 
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      Response
+                    </button>
+                    <button
+                      onClick={() => setActiveSubTab('overview')}
+                      className={cn(
+                        "flex-1 py-1.5 px-2 text-xs font-medium rounded transition-colors",
+                        activeSubTab === 'overview' 
+                          ? "bg-background text-foreground shadow-sm" 
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      Overview
+                    </button>
+                    <button
+                      onClick={() => setActiveSubTab('history')}
+                      className={cn(
+                        "flex-1 py-1.5 px-2 text-xs font-medium rounded transition-colors",
+                        activeSubTab === 'history' 
+                          ? "bg-background text-foreground shadow-sm" 
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      History
+                    </button>
+                    <button
+                      onClick={() => setActiveSubTab('notes')}
+                      className={cn(
+                        "flex-1 py-1.5 px-2 text-xs font-medium rounded transition-colors",
+                        activeSubTab === 'notes' 
+                          ? "bg-background text-foreground shadow-sm" 
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      Notes
+                    </button>
+                  </div>
+
+                  {/* Response Tab Content */}
+                  {activeSubTab === 'response' && (
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-base">AI Suggested Response</CardTitle>
+                        <p className="text-xs text-muted-foreground">
+                          Method: {contactMethod === 'phone' ? 'Phone Call' : contactMethod === 'email' ? 'Email' : 'Text Message'}
+                        </p>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="p-3 bg-muted/50 rounded-lg text-sm whitespace-pre-line">
+                          {currentAIResponse}
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <label className="text-xs font-medium text-muted-foreground">Your Response</label>
+                          <textarea
+                            value={responseText}
+                            onChange={(e) => setResponseText(e.target.value)}
+                            placeholder={`Edit the AI suggestion or write your own ${contactMethod || 'text'} message...`}
+                            className="w-full p-3 border border-input rounded-lg text-sm resize-none"
+                            rows={4}
+                          />
+                        </div>
+
+                        {/* Quick AI Edit Actions */}
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {[
+                            "Quick check-in about test drive",
+                            "Follow up on financing options", 
+                            "Schedule appointment this week",
+                            "Send vehicle pricing details"
+                          ].map((quickEdit, index) => (
+                            <Button
+                              key={index}
+                              variant="outline"
+                              size="sm"
+                              className="text-xs h-8"
+                              onClick={() => setResponseText(quickEdit)}
+                            >
+                              {quickEdit}
+                            </Button>
+                          ))}
+                        </div>
+
+                        <div className="flex gap-2">
+                          <Button 
+                            className="flex-1 gap-2 bg-gradient-primary hover:opacity-90"
+                            onClick={async () => {
+                              const messageToSend = responseText.trim() || currentAIResponse;
+                              if (messageToSend && selectedLead) {
+                                try {
+                                  await sendMessage(
+                                    selectedLead.id,
+                                    messageToSend,
+                                    contactMethod === 'phone' ? 'call' : contactMethod === 'email' ? 'email' : 'text',
+                                    selectedLead.journeyStage
+                                  );
+                                  
+                                  toast({
+                                    title: "Message Sent",
+                                    description: `Your ${contactMethod || 'text'} has been sent and customer will auto-respond in 15 seconds.`,
+                                  });
+                                  
+                                  setResponseText('');
+                                  onContact(selectedLead.id, contactMethod || 'text');
+                                } catch (error) {
+                                  toast({
+                                    title: "Error",
+                                    description: "Failed to send message. Please try again.",
+                                    variant: "destructive"
+                                  });
+                                }
+                              }
+                            }}
+                            disabled={isLoading}
+                          >
+                            <Send className="h-4 w-4" />
+                            {isLoading ? "Sending..." : `Send ${contactMethod === 'phone' ? 'Call' : contactMethod === 'email' ? 'Email' : 'Text'}`}
+                          </Button>
+                          <Button 
+                            variant="outline"
+                            onClick={() => setResponseText(currentAIResponse)}
+                          >
+                            <Edit3 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Overview Tab Content */}
+                  {activeSubTab === 'overview' && (
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-base">Lead Overview</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-muted-foreground">Priority</span>
+                              <Badge variant="outline" className={cn(
+                                "capitalize",
+                                selectedLead.priority === 'hot' && 'border-hot-lead text-hot-lead',
+                                selectedLead.priority === 'warm' && 'border-warm-lead text-warm-lead',
+                                selectedLead.priority === 'cold' && 'border-cold-lead text-cold-lead'
+                              )}>
+                                {selectedLead.priority}
+                              </Badge>
+                            </div>
+                            {selectedLead.timeOnLot && (
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm text-muted-foreground">Time on Lot</span>
+                                <span className="text-sm font-medium">{selectedLead.timeOnLot}</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-muted-foreground">Vehicle</span>
+                              <span className="text-sm font-medium">{selectedLead.vehicle}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-muted-foreground">Est. Value</span>
+                              <span className="text-sm font-medium">${selectedLead.value.toLocaleString()}</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <Separator />
+                        
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-medium">Notes</h4>
+                          <p className="text-sm text-muted-foreground">{selectedLead.notes}</p>
+                        </div>
+                        
+                        {selectedLead.keyInsight && (
+                          <>
+                            <Separator />
+                            <div className="space-y-2">
+                              <h4 className="text-sm font-medium">Key Insight</h4>
+                              <p className="text-sm text-muted-foreground">{selectedLead.keyInsight}</p>
+                            </div>
+                          </>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* History Tab Content */}
+                  {activeSubTab === 'history' && (
+                    <MessageHistory leadId={selectedLead.id} />
+                  )}
+
+                  {/* Notes Tab Content */}
+                  {activeSubTab === 'notes' && (
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-base">Lead Notes</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="space-y-2">
+                          <label className="text-xs font-medium text-muted-foreground">Add Note</label>
+                          <textarea
+                            placeholder="Add your notes about this lead..."
+                            className="w-full p-3 border border-input rounded-lg text-sm resize-none"
+                            rows={4}
+                          />
+                          <Button size="sm" className="w-full">Save Note</Button>
+                        </div>
+                        
+                        <Separator />
+                        
+                        <div className="space-y-3">
+                          <h4 className="text-sm font-medium">Previous Notes</h4>
+                          <div className="space-y-2">
+                            <div className="p-3 bg-muted/30 rounded-lg">
+                              <div className="flex justify-between items-start mb-1">
+                                <span className="text-xs font-medium">System Note</span>
+                                <span className="text-xs text-muted-foreground">Today 2:30 PM</span>
+                              </div>
+                              <p className="text-sm text-muted-foreground">{selectedLead.notes}</p>
+                            </div>
+                            {selectedLead.keyInsight && (
+                              <div className="p-3 bg-muted/30 rounded-lg">
+                                <div className="flex justify-between items-start mb-1">
+                                  <span className="text-xs font-medium">AI Insight</span>
+                                  <span className="text-xs text-muted-foreground">Today 1:15 PM</span>
+                                </div>
+                                <p className="text-sm text-muted-foreground">{selectedLead.keyInsight}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              )}
+
+              {/* Journey Content */}
+              {activeMainTab === 'journey' && (
                 <Card>
                   <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="text-xl">{selectedLead.name}</CardTitle>
-                        <p className="text-sm text-muted-foreground">{selectedLead.email}</p>
-                        <p className="text-sm text-muted-foreground">{selectedLead.phone}</p>
-                      </div>
-                      <Badge className={statusStyles[selectedLead.status]} variant="secondary">
-                        {selectedLead.status.charAt(0).toUpperCase() + selectedLead.status.slice(1)}
+                    <CardTitle className="text-base flex items-center gap-2">
+                      Customer Journey
+                      <Badge variant="secondary" className="text-xs">
+                        {selectedLead.journeyStage}
                       </Badge>
-                    </div>
+                    </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div className="flex items-center gap-2">
-                        <Car className="h-4 w-4 text-muted-foreground" />
-                        <span>{selectedLead.vehicle}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-success" />
-                        <span>${selectedLead.value.toLocaleString()}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                        <span>{selectedLead.lastActivity}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-muted-foreground" />
-                        <span>{selectedLead.source}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Quick Actions */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Quick Actions</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <Button 
-                      className="w-full justify-start gap-3 bg-gradient-primary hover:opacity-90"
-                      onClick={() => onContact(selectedLead.id, 'phone')}
-                    >
-                      <Phone className="h-4 w-4" />
-                      Call {selectedLead.name}
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-start gap-3"
-                      onClick={() => onContact(selectedLead.id, 'text')}
-                    >
-                      <MessageCircle className="h-4 w-4" />
-                      Send Text Message
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-start gap-3"
-                      onClick={() => onContact(selectedLead.id, 'email')}
-                    >
-                      <Mail className="h-4 w-4" />
-                      Send Email
-                    </Button>
-                  </CardContent>
-                </Card>
-              </>
-            )}
-
-            {/* Customer Info Sub-tabs */}
-            {activeMainTab === 'customer-info' && (
-              <div className="flex space-x-1 bg-muted/50 p-1 rounded-lg">
-                {['response', 'overview', 'history', 'notes'].map((tab) => (
-                  <button
-                    key={tab}
-                    className={cn(
-                      'flex-1 py-2 px-2 rounded-md text-xs font-medium transition-colors',
-                      activeSubTab === tab 
-                        ? 'bg-background text-foreground shadow-sm' 
-                        : 'text-muted-foreground hover:text-foreground'
-                    )}
-                    onClick={() => setActiveSubTab(tab as any)}
-                  >
-                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Tab Content */}
-            <Card>
-              <CardContent className="pt-6">
-                {activeMainTab === 'customer-info' && activeSubTab === 'response' && (
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2 mb-4">
-                      {contactMethod === 'phone' && <Phone className="h-5 w-5 text-primary" />}
-                      {contactMethod === 'email' && <Mail className="h-5 w-5 text-primary" />}
-                      {contactMethod === 'text' && <MessageCircle className="h-5 w-5 text-primary" />}
-                      {!contactMethod && <MessageCircle className="h-5 w-5 text-primary" />}
-                      <h4 className="font-medium">
-                        {contactMethod === 'phone' && 'Phone Call Script'}
-                        {contactMethod === 'email' && 'Email Response'}
-                        {contactMethod === 'text' && 'Text Message'}
-                        {!contactMethod && 'AI Suggested Response'}
-                      </h4>
-                    </div>
-                    
-                    {/* Show previous message as reference if available */}
-                    {selectedLead?.lastActivity.includes('contact made') && (
-                      <div className="bg-muted/10 border border-muted/20 rounded-md p-3 mb-4">
-                        <p className="text-xs font-medium text-muted-foreground mb-2">
-                          📄 Previous Message (Reference):
-                        </p>
-                        <p className="text-sm text-muted-foreground italic">
-                          "Hi {selectedLead.name}, I wanted to follow up on your interest in the {selectedLead.vehicle}..."
-                        </p>
-                      </div>
-                    )}
-                    
-                    <div className="bg-primary/5 border border-primary/20 rounded-md p-3 mb-4">
-                      <p className="text-xs font-medium text-primary mb-2">
-                        🤖 AI Suggested Response:
-                      </p>
-                      <p className="text-sm text-foreground whitespace-pre-line">{currentAIResponse}</p>
-                    </div>
-
+                  <CardContent className="space-y-6">
                     <div>
-                      <label className="text-sm font-medium mb-2 block">Your Response:</label>
-                      <textarea
-                        value={responseText || currentAIResponse}
-                        onChange={(e) => setResponseText(e.target.value)}
-                        className="w-full h-32 p-3 border border-input rounded-md text-sm resize-none"
-                        placeholder={`Type your ${contactMethod || 'message'} here...`}
-                      />
-                    </div>
-
-                     <div className="flex gap-2">
-                       <Button 
-                         className="flex-1 gap-2 bg-gradient-primary hover:opacity-90"
-                         onClick={async () => {
-                           const messageToSend = responseText.trim() || currentAIResponse;
-                           if (messageToSend && selectedLead) {
-                             try {
-                               await sendMessage(
-                                 selectedLead.id,
-                                 messageToSend,
-                                 contactMethod === 'phone' ? 'call' : contactMethod === 'email' ? 'email' : 'text',
-                                 selectedLead.journeyStage
-                               );
-                               
-                               toast({
-                                 title: "Message Sent",
-                                 description: `Your ${contactMethod || 'text'} has been sent and customer will auto-respond in 15 seconds.`,
-                               });
-                               
-                               setResponseText('');
-                               onContact(selectedLead.id, contactMethod || 'text');
-                             } catch (error) {
-                               toast({
-                                 title: "Error",
-                                 description: "Failed to send message. Please try again.",
-                                 variant: "destructive"
-                               });
-                             }
-                           }
-                         }}
-                         disabled={isLoading}
-                       >
-                         <Send className="h-4 w-4" />
-                         {isLoading ? "Sending..." : `Send ${contactMethod === 'phone' ? 'Call' : contactMethod === 'email' ? 'Email' : 'Text'}`}
-                       </Button>
-                       <Button 
-                         variant="outline"
-                         onClick={() => setResponseText(currentAIResponse)}
-                       >
-                         <Edit3 className="h-4 w-4" />
-                       </Button>
-                     </div>
-                  </div>
-                )}
-                
-                {activeMainTab === 'customer-info' && activeSubTab === 'overview' && (
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-medium mb-2">Lead Priority</h4>
-                      <Badge 
-                        className={cn(
-                          'text-white',
-                          selectedLead.priority === 'hot' && 'bg-hot-lead',
-                          selectedLead.priority === 'warm' && 'bg-warm-lead',
-                          selectedLead.priority === 'cold' && 'bg-cold-lead'
-                        )}
-                      >
-                        {selectedLead.priority.toUpperCase()} PRIORITY
-                      </Badge>
-                    </div>
-                    
-                    {selectedLead.timeOnLot && (
-                      <div className="bg-warning/10 border border-warning/20 rounded-md p-3">
-                        <h4 className="font-medium text-warning mb-1">Customer on Lot</h4>
-                        <p className="text-sm text-warning/80">{selectedLead.timeOnLot}</p>
-                      </div>
-                    )}
-
-                    <div>
-                      <h4 className="font-medium mb-2">Vehicle Interest</h4>
-                      <p className="text-sm text-muted-foreground">{selectedLead.vehicle}</p>
-                    </div>
-
-                    <div>
-                      <h4 className="font-medium mb-2">Estimated Value</h4>
-                      <p className="text-lg font-semibold text-success">
-                        ${selectedLead.value.toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                 {activeMainTab === 'customer-info' && activeSubTab === 'history' && (
-                   <MessageHistory leadId={selectedLead.id} />
-                 )}
-
-                {activeMainTab === 'customer-info' && activeSubTab === 'notes' && (
-                  <div className="space-y-3">
-                    <textarea 
-                      className="w-full h-32 p-3 border border-input rounded-md text-sm resize-none"
-                      placeholder="Add notes about this lead..."
-                      defaultValue={selectedLead.notes || ''}
-                    />
-                    <Button size="sm" className="w-full">
-                      Save Notes
-                    </Button>
-                  </div>
-                )}
-
-                {activeMainTab === 'journey' && (
-                  <div className="space-y-4">
-                    <div className="mb-6">
-                                  <h4 className="font-medium mb-3 flex items-center gap-2">
-                                    <Calendar className="h-4 w-4" />
-                                    Journey Progress
-                                  </h4>
-                                  
-                                  {/* Show journey advance button if customer has replied */}
-                                  <JourneyAdvanceButton
-                                    leadId={selectedLead.id}
-                                    leadName={selectedLead.name}
-                                    currentStage={selectedLead.journeyStage}
-                                    leadStatus={selectedLead.status}
-                                    hasCustomerReplied={selectedLead.status === 'qualified'}
-                                    onStageAdvanced={() => {
-                                      // Refresh could be handled here if needed
-                                    }}
-                                  />
-                      
                       {(() => {
-                        // Generate timeline events based on completed journey stages
                         const allStages = ['engaged', 'visit', 'proposal', 'sold', 'delivered'];
-                        const currentStageIndex = allStages.indexOf(selectedLead.journeyStage);
-                        // Only show stages BEFORE current as completed
-                        const completedStages = allStages.slice(0, currentStageIndex);
+                        const currentStageIndex = Math.max(0, allStages.indexOf(selectedLead.journeyStage));
                         
-                        const stageEvents = completedStages.map((stage, index) => {
+                        // Journey stage timeline events
+                        const stageEvents = allStages.slice(0, currentStageIndex + 1).map(stage => {
                           const stageInfo = {
-                            engaged: { action: 'Engaged Customer', type: 'contact' as const, date: '2 days ago', details: 'Active communication established' },
-                            visit: { action: 'Showroom Visit', type: 'visit' as const, date: '1 day ago', details: 'Customer visited showroom' },
+                            engaged: { action: 'Customer Engaged', type: 'milestone' as const, date: '2 days ago', details: 'Initial contact established' },
+                            visit: { action: 'Showroom Visit', type: 'milestone' as const, date: 'Yesterday', details: 'Test drive completed' },
                             proposal: { action: 'Proposal Sent', type: 'milestone' as const, date: '3 hours ago', details: 'Purchase proposal presented' },
                             sold: { action: 'Deal Closed', type: 'milestone' as const, date: '1 hour ago', details: 'Sale successfully completed' },
                             delivered: { action: 'Vehicle Delivered', type: 'milestone' as const, date: 'Just now', details: 'Vehicle delivered to customer' }
@@ -595,11 +669,13 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                         );
                       })}
                     </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </div>
+          {/* Bottom padding for send button */}
+          <div className="pb-6" />
         </ScrollArea>
       ) : (
         <div className="flex items-center justify-center h-full text-muted-foreground">
