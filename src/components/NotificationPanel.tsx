@@ -211,6 +211,27 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
         </Button>
       </div>
 
+      {/* Main Tabs - Moved to Top */}
+      <div className="flex space-x-1 bg-muted p-1 mx-4 mt-4 rounded-lg">
+              {[
+                { key: 'customer-info', label: 'Customer Info' },
+                { key: 'journey', label: 'Journey' }
+              ].map((tab) => (
+                <button
+                  key={tab.key}
+                  className={cn(
+                    'flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors',
+                    activeMainTab === tab.key 
+                      ? 'bg-background text-foreground shadow-sm' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                  onClick={() => setActiveMainTab(tab.key as any)}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
       {selectedLead ? (
         <ScrollArea className="h-full pb-20">
           <div className="p-4 space-y-4">
@@ -281,27 +302,6 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                 </Button>
               </CardContent>
             </Card>
-
-            {/* Main Tabs */}
-            <div className="flex space-x-1 bg-muted p-1 rounded-lg">
-              {[
-                { key: 'customer-info', label: 'Customer Info' },
-                { key: 'journey', label: 'Journey' }
-              ].map((tab) => (
-                <button
-                  key={tab.key}
-                  className={cn(
-                    'flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors',
-                    activeMainTab === tab.key 
-                      ? 'bg-background text-foreground shadow-sm' 
-                      : 'text-muted-foreground hover:text-foreground'
-                  )}
-                  onClick={() => setActiveMainTab(tab.key as any)}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
 
             {/* Customer Info Sub-tabs */}
             {activeMainTab === 'customer-info' && (

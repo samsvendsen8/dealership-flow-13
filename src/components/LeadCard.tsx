@@ -86,14 +86,11 @@ const priorityLabels = {
 };
 
 const journeyStages = {
-  inquiry: { label: 'Inquiry', icon: '💬', color: 'bg-blue-500' },
-  engaged: { label: 'Engaged', icon: '🎯', color: 'bg-teal-500' },
-  visit: { label: 'Visit', icon: '🏢', color: 'bg-purple-500' },
-  'test-drive': { label: 'Test Drive', icon: '🚗', color: 'bg-orange-500' },
+  engaged: { label: 'Engaged', icon: '💬', color: 'bg-teal-500' },
+  visit: { label: 'Visit', icon: '📍', color: 'bg-purple-500' },
   proposal: { label: 'Proposal', icon: '📄', color: 'bg-yellow-500' },
-  financing: { label: 'Financing', icon: '🏦', color: 'bg-indigo-500' },
-  sold: { label: 'Sold', icon: '✅', color: 'bg-green-500' },
-  delivered: { label: 'Delivered', icon: '🎉', color: 'bg-emerald-500' }
+  sold: { label: 'Sold', icon: '👍', color: 'bg-green-500' },
+  delivered: { label: 'Delivered', icon: '🚚', color: 'bg-emerald-500' }
 };
 
 export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, isFocused = false }: LeadCardProps) {
@@ -339,59 +336,68 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
         <div className="mt-3 p-3 bg-muted/30 rounded-md space-y-3">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-medium text-muted-foreground">Journey Progress</span>
-            <span className="text-xs text-muted-foreground">{lead.stageProgress}%</span>
+            <span className="text-xs font-medium text-primary">
+              Step {Object.keys(journeyStages).indexOf(lead.journeyStage) + 1} of {Object.keys(journeyStages).length}: {journeyStages[lead.journeyStage]?.label}
+            </span>
           </div>
           
           {/* Journey Timeline Progress Bar */}
           <TooltipProvider>
             <div className="relative">
-              <div className="w-full bg-muted rounded-full h-3 mb-2">
+              {/* Progress Bar */}
+              <div className="w-full bg-muted rounded-full h-2 relative">
                 <div 
-                  className="h-3 bg-gradient-to-r from-primary/60 to-primary rounded-full transition-all duration-500"
-                  style={{ width: `${lead.stageProgress}%` }}
+                  className="h-2 bg-gradient-to-r from-primary/60 to-primary rounded-full transition-all duration-500"
+                  style={{ width: `${(Object.keys(journeyStages).indexOf(lead.journeyStage) + 1) * 20}%` }}
                 />
-              </div>
-              
-              {/* Journey Stage Icons */}
-              <div className="relative h-8">
+                
+                {/* Journey Stage Icons - Overlapping the progress bar */}
                 {Object.entries(journeyStages).map(([stage, config], index, array) => {
-                  const position = array.length > 1 ? (index / (array.length - 1)) * 100 : 50;
+                  const position = (index / (array.length - 1)) * 100;
                   const isCompleted = Object.keys(journeyStages).indexOf(lead.journeyStage) >= index;
-                  const completedEvent = lead.timeline?.find(event => 
-                    event.action.toLowerCase().includes(stage) || 
-                    event.details.toLowerCase().includes(stage)
-                  );
+                  const isCurrentStep = lead.journeyStage === stage;
+                  
+                  // Mock completion dates for demonstration
+                  const mockDates = {
+                    engaged: '2024-01-15 10:30 AM',
+                    visit: '2024-01-16 2:15 PM',
+                    proposal: '2024-01-17 11:45 AM',
+                    sold: '2024-01-18 4:20 PM',
+                    delivered: null
+                  };
                   
                   return (
                     <Tooltip key={stage}>
                       <TooltipTrigger asChild>
                         <div 
                           className={cn(
-                            'absolute w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-110 cursor-pointer z-10',
+                            'absolute w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-125 cursor-pointer z-10',
                             isCompleted 
-                              ? 'bg-primary border-primary/20 text-white' 
+                              ? 'bg-primary border-white text-white shadow-md' 
+                              : isCurrentStep
+                              ? 'bg-primary/20 border-primary text-primary animate-pulse'
                               : 'bg-muted border-muted-foreground/30 text-muted-foreground'
                           )}
                           style={{ 
-                            left: `${Math.min(Math.max(position, 4), 96)}%`, 
+                            left: `${position}%`, 
                             top: '50%',
                             transform: 'translate(-50%, -50%)'
                           }}
                         >
-                          <span className="text-sm">{config.icon}</span>
+                          <span className="text-xs">{config.icon}</span>
                         </div>
                       </TooltipTrigger>
                       <TooltipContent side="top" className="max-w-xs">
                         <div className="text-xs">
                           <div className="font-medium">{config.label}</div>
-                          <div className="text-muted-foreground">
-                            {isCompleted ? 'Completed' : 'Pending'}
-                          </div>
-                          {completedEvent && (
-                            <div className="mt-1">
-                              <div className="text-success">✓ {completedEvent.date}</div>
-                              <div>{completedEvent.details}</div>
+                          {isCompleted && mockDates[stage as keyof typeof mockDates] ? (
+                            <div className="text-success">
+                              ✓ Completed: {mockDates[stage as keyof typeof mockDates]}
                             </div>
+                          ) : isCurrentStep ? (
+                            <div className="text-primary">📍 Current Step</div>
+                          ) : (
+                            <div className="text-muted-foreground">⏳ Pending</div>
                           )}
                         </div>
                       </TooltipContent>
