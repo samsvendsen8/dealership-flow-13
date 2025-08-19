@@ -120,56 +120,54 @@ export function ToastNotification({
                 <textarea
                   value={editedResponse}
                   onChange={(e) => setEditedResponse(e.target.value)}
-                  className="w-full h-20 p-2 text-sm border border-input rounded-md resize-none"
+                  className="w-full h-32 p-2 text-sm border border-input rounded-md resize-none"
                 />
               ) : (
                 <p className="text-sm text-foreground">{suggestedResponse}</p>
               )}
               
-              {/* AI Modification Options */}
-              {!isEditing && (
-                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
-                  <span className="text-xs text-muted-foreground">Quick AI edits:</span>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="h-6 px-2 text-xs"
-                    onClick={() => modifyResponse('shorter')}
-                  >
-                    Make Shorter
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="h-6 px-2 text-xs"
-                    onClick={() => modifyResponse('casual')}
-                  >
-                    Make Casual
-                  </Button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        className="h-6 w-6 p-0"
-                      >
-                        <ChevronDown className="h-3 w-3" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-40">
-                      <DropdownMenuItem onClick={() => modifyResponse('urgent')}>
-                        <span className="text-xs">🚨 Make Urgent</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => modifyResponse('friendly')}>
-                        <span className="text-xs">😊 Make Friendly</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => modifyResponse('professional')}>
-                        <span className="text-xs">👔 Make Professional</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              )}
+              {/* AI Modification Options - Available in both modes */}
+              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
+                <span className="text-xs text-muted-foreground">Quick AI edits:</span>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="h-6 px-2 text-xs"
+                  onClick={() => modifyResponse('shorter')}
+                >
+                  Make Shorter
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="h-6 px-2 text-xs"
+                  onClick={() => modifyResponse('casual')}
+                >
+                  Make Casual
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="h-6 w-6 p-0"
+                    >
+                      <ChevronDown className="h-3 w-3" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-40">
+                    <DropdownMenuItem onClick={() => modifyResponse('urgent')}>
+                      <span className="text-xs">🚨 Make Urgent</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => modifyResponse('friendly')}>
+                      <span className="text-xs">😊 Make Friendly</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => modifyResponse('professional')}>
+                      <span className="text-xs">👔 Make Professional</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
 
             <div className="flex gap-2">

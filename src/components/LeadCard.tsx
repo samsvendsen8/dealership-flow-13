@@ -347,6 +347,24 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
             )}
           </div>
           
+          {/* Current Stage Info - Moved above progress bar */}
+          {journeyStages[lead.journeyStage] && (
+            <div 
+              className="flex items-center gap-2 cursor-pointer hover:bg-muted/20 p-2 -m-2 rounded transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                onViewDetails(lead.id);
+              }}
+              title="Click to view detailed journey progress"
+            >
+              <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-xs text-white", journeyStages[lead.journeyStage].color)}>
+                {journeyStages[lead.journeyStage].icon}
+              </div>
+              <span className="text-sm font-medium">Current: {journeyStages[lead.journeyStage].label}</span>
+              <ArrowRight className="h-3 w-3 text-muted-foreground" />
+            </div>
+          )}
+          
           {/* Journey Timeline Progress Bar */}
           <TooltipProvider>
             <div className="relative">
@@ -413,24 +431,6 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
               </div>
             </div>
           </TooltipProvider>
-          
-          {/* Current Stage Info */}
-          {journeyStages[lead.journeyStage] && (
-            <div 
-              className="flex items-center gap-2 cursor-pointer hover:bg-muted/20 p-2 -m-2 rounded transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                onViewDetails(lead.id);
-              }}
-              title="Click to view detailed journey progress"
-            >
-              <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-xs text-white", journeyStages[lead.journeyStage].color)}>
-                {journeyStages[lead.journeyStage].icon}
-              </div>
-              <span className="text-sm font-medium">Current: {journeyStages[lead.journeyStage].label}</span>
-              <ArrowRight className="h-3 w-3 text-muted-foreground" />
-            </div>
-          )}
           
           {/* Work plan for current journey stage */}
           {lead.workPlan && lead.workPlan.length > 0 && journeyStages[lead.journeyStage] && (

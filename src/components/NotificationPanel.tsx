@@ -235,73 +235,78 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
       {selectedLead ? (
         <ScrollArea className="h-full pb-20">
           <div className="p-4 space-y-4">
-            {/* Lead Header */}
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-xl">{selectedLead.name}</CardTitle>
-                    <p className="text-sm text-muted-foreground">{selectedLead.email}</p>
-                    <p className="text-sm text-muted-foreground">{selectedLead.phone}</p>
-                  </div>
-                  <Badge className={statusStyles[selectedLead.status]} variant="secondary">
-                    {selectedLead.status.charAt(0).toUpperCase() + selectedLead.status.slice(1)}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Car className="h-4 w-4 text-muted-foreground" />
-                    <span>{selectedLead.vehicle}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <DollarSign className="h-4 w-4 text-success" />
-                    <span>${selectedLead.value.toLocaleString()}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span>{selectedLead.lastActivity}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                    <span>{selectedLead.source}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Show Lead Header and Quick Actions only for customer-info tab */}
+            {activeMainTab === 'customer-info' && (
+              <>
+                {/* Lead Header */}
+                <Card>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-xl">{selectedLead.name}</CardTitle>
+                        <p className="text-sm text-muted-foreground">{selectedLead.email}</p>
+                        <p className="text-sm text-muted-foreground">{selectedLead.phone}</p>
+                      </div>
+                      <Badge className={statusStyles[selectedLead.status]} variant="secondary">
+                        {selectedLead.status.charAt(0).toUpperCase() + selectedLead.status.slice(1)}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="flex items-center gap-2">
+                        <Car className="h-4 w-4 text-muted-foreground" />
+                        <span>{selectedLead.vehicle}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="h-4 w-4 text-success" />
+                        <span>${selectedLead.value.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <span>{selectedLead.lastActivity}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <span>{selectedLead.source}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
-            {/* Quick Actions */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button 
-                  className="w-full justify-start gap-3 bg-gradient-primary hover:opacity-90"
-                  onClick={() => onContact(selectedLead.id, 'phone')}
-                >
-                  <Phone className="h-4 w-4" />
-                  Call {selectedLead.name}
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start gap-3"
-                  onClick={() => onContact(selectedLead.id, 'text')}
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  Send Text Message
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start gap-3"
-                  onClick={() => onContact(selectedLead.id, 'email')}
-                >
-                  <Mail className="h-4 w-4" />
-                  Send Email
-                </Button>
-              </CardContent>
-            </Card>
+                {/* Quick Actions */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Quick Actions</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Button 
+                      className="w-full justify-start gap-3 bg-gradient-primary hover:opacity-90"
+                      onClick={() => onContact(selectedLead.id, 'phone')}
+                    >
+                      <Phone className="h-4 w-4" />
+                      Call {selectedLead.name}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start gap-3"
+                      onClick={() => onContact(selectedLead.id, 'text')}
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      Send Text Message
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start gap-3"
+                      onClick={() => onContact(selectedLead.id, 'email')}
+                    >
+                      <Mail className="h-4 w-4" />
+                      Send Email
+                    </Button>
+                  </CardContent>
+                </Card>
+              </>
+            )}
 
             {/* Customer Info Sub-tabs */}
             {activeMainTab === 'customer-info' && (
