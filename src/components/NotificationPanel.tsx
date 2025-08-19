@@ -202,71 +202,6 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
               </Button>
             </div>
 
-            {/* Lead Summary Card */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Lead Summary</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Contact</p>
-                    <div className="text-sm">
-                      <p className="font-medium">{selectedLead.email}</p>
-                      <p>{selectedLead.phone}</p>
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Vehicle Interest</p>
-                    <p className="text-sm font-medium">{selectedLead.vehicle}</p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Estimated Value</p>
-                    <p className="text-sm font-medium">${selectedLead.value.toLocaleString()}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Last Activity</p>
-                    <p className="text-sm">{selectedLead.lastActivity}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Quick Actions */}
-            <div className="space-y-3">
-              <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Quick Actions</h3>
-              <div className="flex gap-2">
-                <Button 
-                  size="sm" 
-                  className="flex-1 gap-2"
-                  onClick={() => handleContactMethodClick('phone')}
-                >
-                  <Phone className="h-4 w-4" />
-                  Call
-                </Button>
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  className="flex-1 gap-2"
-                  onClick={() => handleContactMethodClick('text')}
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  Text
-                </Button>
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  className="flex-1 gap-2"
-                  onClick={() => handleContactMethodClick('email')}
-                >
-                  <Mail className="h-4 w-4" />
-                  Email
-                </Button>
-              </div>
-            </div>
-
             {/* Tab Navigation - moved up below user info */}
             <div className="space-y-4">
               <div className="flex gap-1 p-1 bg-muted rounded-lg">
@@ -412,6 +347,71 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
               {/* Customer Info Content */}
               {activeMainTab === 'customer-info' && (
                 <div className="space-y-4">
+                  {/* Lead Summary Card */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-lg">Lead Summary</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <p className="text-sm text-muted-foreground">Contact</p>
+                          <div className="text-sm">
+                            <p className="font-medium">{selectedLead.email}</p>
+                            <p>{selectedLead.phone}</p>
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-sm text-muted-foreground">Vehicle Interest</p>
+                          <p className="text-sm font-medium">{selectedLead.vehicle}</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <p className="text-sm text-muted-foreground">Estimated Value</p>
+                          <p className="text-sm font-medium">${selectedLead.value.toLocaleString()}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-sm text-muted-foreground">Last Activity</p>
+                          <p className="text-sm">{selectedLead.lastActivity}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Quick Actions */}
+                  <div className="space-y-3">
+                    <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Quick Actions</h3>
+                    <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        className="flex-1 gap-2"
+                        onClick={() => handleContactMethodClick('phone')}
+                      >
+                        <Phone className="h-4 w-4" />
+                        Call
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="flex-1 gap-2"
+                        onClick={() => handleContactMethodClick('text')}
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                        Text
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="flex-1 gap-2"
+                        onClick={() => handleContactMethodClick('email')}
+                      >
+                        <Mail className="h-4 w-4" />
+                        Email
+                      </Button>
+                    </div>
+                  </div>
+
                   {/* Sub-tabs for customer info */}
                   <div className="flex gap-1 p-1 bg-secondary/50 rounded-lg">
                     <button
