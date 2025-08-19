@@ -128,7 +128,7 @@ const journeyStages = {
   delivered: { label: 'Delivered', icon: '🚚', color: 'bg-emerald-500' }
 };
 
-export default function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, isFocused = false }: LeadCardProps) {
+function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, isFocused = false }: LeadCardProps) {
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
   const [showQuickResponse, setShowQuickResponse] = useState(false);
   const [responseText, setResponseText] = useState('');
@@ -831,3 +831,5 @@ export default function LeadCard({ lead, onContact, onViewDetails, isCondensed =
     </Card>
   );
 }
+
+export default LeadCard;
