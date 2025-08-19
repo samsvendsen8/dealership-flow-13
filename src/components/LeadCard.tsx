@@ -411,7 +411,7 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
                           <span className="text-xs">{config.icon}</span>
                         </div>
                       </TooltipTrigger>
-                      <TooltipContent side="top" className="max-w-xs">
+                      <TooltipContent side="top" className="max-w-xs z-[9999] bg-popover border shadow-md">
                         <div className="text-xs">
                           <div className="font-medium">{config.label}</div>
                           {isCompleted && mockDates[stage as keyof typeof mockDates] ? (

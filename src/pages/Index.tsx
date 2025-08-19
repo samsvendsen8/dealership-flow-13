@@ -5,7 +5,7 @@ import { NotificationPanel } from '@/components/NotificationPanel';
 import { ToastNotification } from '@/components/ToastNotification';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Eye, List } from 'lucide-react';
+import { Eye, List, Target } from 'lucide-react';
 import type { Lead } from '@/components/LeadCard';
 
 // Mock data - in a real app this would come from your CRM API
@@ -515,15 +515,27 @@ const Index = () => {
               variant="outline"
               size="sm"
               onClick={() => {
-                setViewMode('focus');
-                if (leads.length > 0) {
-                  setFocusedLeadId(leads[0].id);
-                }
+                // Scroll to top and focus the main container to fit everything in view
+                window.scrollTo({ 
+                  top: 0, 
+                  behavior: 'smooth' 
+                });
+                
+                // Optional: zoom out slightly to fit more content if supported
+                setTimeout(() => {
+                  const container = document.querySelector('.container');
+                  if (container) {
+                    container.scrollIntoView({ 
+                      behavior: 'smooth', 
+                      block: 'start' 
+                    });
+                  }
+                }, 300);
               }}
               className="gap-2 bg-background/95 backdrop-blur-sm border shadow-lg"
             >
-              <Eye className="h-4 w-4" />
-              Focus View
+              <Target className="h-4 w-4" />
+              Fit View
             </Button>
           </div>
 
