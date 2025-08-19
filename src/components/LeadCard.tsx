@@ -426,7 +426,7 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
           {lead.workPlan && lead.workPlan.length > 0 && journeyStages[lead.journeyStage] && (
             <WorkPlanProgress 
               tasks={lead.workPlan} 
-              journeyStage={journeyStages[lead.journeyStage].label}
+              journeyStage={lead.journeyStage}
             />
           )}
         </div>

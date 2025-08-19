@@ -48,8 +48,8 @@ const contactIcons = {
 export function WorkPlanProgress({ tasks, journeyStage, className }: WorkPlanProgressProps) {
   if (!tasks || tasks.length === 0) return null;
 
-  // Filter tasks for current journey stage
-  const currentStageTasks = tasks.filter(t => t.journeyStage === journeyStage);
+  // Filter tasks for current journey stage (case insensitive)
+  const currentStageTasks = tasks.filter(t => t.journeyStage.toLowerCase() === journeyStage.toLowerCase());
   const completedCount = currentStageTasks.filter(t => t.status === 'completed' || t.status === 'customer_replied').length;
   const missedCount = currentStageTasks.filter(t => t.status === 'missed').length;
   const customerReplied = currentStageTasks.some(t => t.status === 'customer_replied');
