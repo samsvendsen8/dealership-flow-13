@@ -208,8 +208,11 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
   const handleContactMethodClick = (method: 'phone' | 'email' | 'text') => {
     if (method === 'phone') {
       setShowCallModal(true);
+    } else if (method === 'text') {
+      // Open sidebar with pre-filled AI text for manual sending
+      onContact(lead.id, method);
     } else {
-      // Directly trigger message sending for work plan items
+      // Directly trigger message sending for email
       handleQuickMessage(method);
     }
   };
