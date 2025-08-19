@@ -452,7 +452,8 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                         // Generate timeline events based on completed journey stages
                         const allStages = ['engaged', 'visit', 'proposal', 'sold', 'delivered'];
                         const currentStageIndex = allStages.indexOf(selectedLead.journeyStage);
-                        const completedStages = allStages.slice(0, currentStageIndex + 1);
+                        // Only show stages BEFORE current as completed
+                        const completedStages = allStages.slice(0, currentStageIndex);
                         
                         const stageEvents = completedStages.map((stage, index) => {
                           const stageInfo = {
@@ -466,8 +467,8 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                           return stageInfo[stage as keyof typeof stageInfo];
                         });
 
-                        // Calculate progress percentage
-                        const progressPercentage = ((currentStageIndex + 1) / allStages.length) * 100;
+                        // Calculate progress percentage (only completed stages)
+                        const progressPercentage = (currentStageIndex / allStages.length) * 100;
 
                         return (
                           <div className="space-y-4">
@@ -485,7 +486,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                               <span className="text-sm text-muted-foreground font-medium">{Math.round(progressPercentage)}%</span>
                             </div>
                             <p className="text-xs text-muted-foreground">
-                              Progress: {currentStageIndex + 1} of {allStages.length} stages completed
+                              Progress: {currentStageIndex} of {allStages.length} stages completed • Currently in {selectedLead.journeyStage} stage
                             </p>
                           </div>
                         );
