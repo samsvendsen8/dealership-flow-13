@@ -334,39 +334,67 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
           </div>
         </div>
         
-        {/* Journey Stage Progress with Timeline */}
+        {/* Journey Stage Progress with Detailed Timeline */}
         <div className="mt-3 p-3 bg-muted/30 rounded-md space-y-3">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-medium text-muted-foreground">Journey Stage</span>
             <span className="text-xs text-muted-foreground">{lead.stageProgress}%</span>
           </div>
-          <div 
-            className="flex items-center gap-2 cursor-pointer hover:bg-muted/20 p-2 -m-2 rounded transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              onViewDetails(lead.id);
-            }}
-            title="Click to view detailed journey progress"
-          >
-            <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-xs text-white", journeyStages[lead.journeyStage].color)}>
-              {journeyStages[lead.journeyStage].icon}
-            </div>
-            <span className="text-sm font-medium">{journeyStages[lead.journeyStage].label}</span>
-            <div className="flex-1 mx-2 relative">
-              <div className="w-full bg-muted rounded-full h-2">
-                <div 
-                  className={cn("h-2 rounded-full transition-all duration-500", journeyStages[lead.journeyStage].color)}
-                  style={{ width: `${lead.stageProgress}%` }}
-                />
-              </div>
-              {/* Timeline dots on the progress bar */}
-              {lead.timeline && lead.timeline.length > 0 && (
-                <div className="absolute inset-0 flex items-center">
-                  <Timeline events={lead.timeline} className="relative" />
-                </div>
-              )}
-            </div>
-            <ArrowRight className="h-3 w-3 text-muted-foreground" />
+          
+          {/* Detailed Interactive Progress Bar */}
+          <div className="relative">
+            <Timeline 
+              events={[
+                { 
+                  date: '3 days ago',
+                  action: 'Inquiry',
+                  details: 'Initial interest',
+                  type: 'contact' as const
+                },
+                {
+                  date: '2 days ago',
+                  action: 'Engaged',
+                  details: 'Customer responded',
+                  type: 'contact' as const
+                },
+                {
+                  date: lead.journeyStage === 'visit' ? '5 hours ago' : 'Scheduled',
+                  action: 'Visit', 
+                  details: 'Showroom visit',
+                  type: 'visit' as const
+                },
+                {
+                  date: lead.journeyStage === 'test-drive' ? '2 hours ago' : 'Pending',
+                  action: 'Test Drive',
+                  details: 'Vehicle test drive',
+                  type: 'milestone' as const
+                },
+                {
+                  date: 'Pending',
+                  action: 'Proposal',
+                  details: 'Purchase proposal',
+                  type: 'milestone' as const
+                },
+                {
+                  date: 'Pending',
+                  action: 'Financing',
+                  details: 'Financing approval',
+                  type: 'milestone' as const
+                },
+                {
+                  date: 'Pending',
+                  action: 'Sold',
+                  details: 'Sale completed',
+                  type: 'milestone' as const
+                },
+                {
+                  date: 'Pending',
+                  action: 'Delivered',
+                  details: 'Vehicle delivered',
+                  type: 'milestone' as const
+                }
+              ]}
+            />
           </div>
           
           {/* Work plan for current journey stage */}
