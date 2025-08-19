@@ -5,6 +5,25 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
+import { Timeline } from '@/components/ui/timeline';
+import { WorkPlanProgress } from '@/components/WorkPlanProgress';
+
+interface TimelineEvent {
+  date: string;
+  action: string;
+  details: string;
+  type: 'contact' | 'visit' | 'milestone' | 'missed';
+}
+
+interface WorkPlanTask {
+  id: string;
+  title: string;
+  description: string;
+  dueDate: string;
+  status: 'pending' | 'completed' | 'missed' | 'scheduled';
+  attemptNumber: number;
+  contactMethod: 'phone' | 'email' | 'text';
+}
 
 export interface Lead {
   id: string;
@@ -33,6 +52,9 @@ export interface Lead {
   preferredContact?: 'phone' | 'email' | 'text';
   budget?: { min: number; max: number };
   tradeInVehicle?: string;
+  // Timeline and work plan data
+  timeline?: TimelineEvent[];
+  workPlan?: WorkPlanTask[];
 }
 
 interface LeadCardProps {
@@ -312,8 +334,8 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
           </div>
         </div>
         
-        {/* Journey Stage Progress */}
-        <div className="mt-3 p-3 bg-muted/30 rounded-md">
+        {/* Journey Stage Progress with Timeline */}
+        <div className="mt-3 p-3 bg-muted/30 rounded-md space-y-3">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-medium text-muted-foreground">Journey Stage</span>
             <span className="text-xs text-muted-foreground">{lead.stageProgress}%</span>
@@ -333,6 +355,19 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
             </div>
             <ArrowRight className="h-3 w-3 text-muted-foreground" />
           </div>
+          
+          {/* Timeline dots */}
+          {lead.timeline && lead.timeline.length > 0 && (
+            <Timeline events={lead.timeline} />
+          )}
+          
+          {/* Work plan for current journey stage */}
+          {lead.workPlan && lead.workPlan.length > 0 && (
+            <WorkPlanProgress 
+              tasks={lead.workPlan} 
+              journeyStage={journeyStages[lead.journeyStage].label}
+            />
+          )}
         </div>
       </CardHeader>
 

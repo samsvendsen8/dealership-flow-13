@@ -34,7 +34,18 @@ const mockLeads: Lead[] = [
     lastAppointment: 'Today',
     keyInsight: 'Currently on lot - ready to make decision today with right financing',
     preferredContact: 'phone',
-    budget: { min: 26000, max: 30000 }
+    budget: { min: 26000, max: 30000 },
+    timeline: [
+      { date: '2 days ago', action: 'Initial Inquiry', details: 'Submitted online form for Toyota Camry', type: 'contact' },
+      { date: '1 day ago', action: 'Phone Call', details: 'Discussed financing options and scheduled visit', type: 'contact' },
+      { date: 'Today 9am', action: 'Arrived on Lot', details: 'Currently viewing vehicles on lot', type: 'visit' },
+      { date: 'Today 10am', action: 'Test Drive', details: 'Completed 15-minute test drive', type: 'milestone' }
+    ],
+    workPlan: [
+      { id: '1', title: 'Immediate Follow-up', description: 'Approach customer on lot and assist with viewing', dueDate: 'Now', status: 'pending', attemptNumber: 1, contactMethod: 'phone' },
+      { id: '2', title: 'Financing Discussion', description: 'Present financing options and run credit check', dueDate: 'Today 2pm', status: 'scheduled', attemptNumber: 1, contactMethod: 'phone' },
+      { id: '3', title: 'Trade-in Appraisal', description: 'Evaluate trade-in vehicle if applicable', dueDate: 'Today 3pm', status: 'pending', attemptNumber: 1, contactMethod: 'phone' }
+    ]
   },
   {
     id: '2',
@@ -60,7 +71,19 @@ const mockLeads: Lead[] = [
     keyInsight: 'Mentioned budget increase after seeing vehicle in person - ready to move forward',
     preferredContact: 'phone',
     budget: { min: 45000, max: 55000 },
-    tradeInVehicle: '2018 Honda Accord'
+    tradeInVehicle: '2018 Honda Accord',
+    timeline: [
+      { date: '5 days ago', action: 'Referral Contact', details: 'Initial contact through referral program', type: 'contact' },
+      { date: '3 days ago', action: 'First Call', details: 'Discussed vehicle requirements', type: 'contact' },
+      { date: '2 days ago', action: 'Showroom Visit', details: 'Viewed multiple Honda models', type: 'visit' },
+      { date: 'Yesterday', action: 'Test Drive', details: 'Test drove 2024 Honda Accord', type: 'milestone' },
+      { date: '1 hour ago', action: 'Price Negotiation', details: 'Discussed pricing and trade-in value', type: 'contact' }
+    ],
+    workPlan: [
+      { id: '1', title: 'Trade-in Appraisal', description: 'Complete appraisal of 2018 Honda Accord', dueDate: 'Today 4pm', status: 'pending', attemptNumber: 1, contactMethod: 'phone' },
+      { id: '2', title: 'Final Proposal', description: 'Present final offer including trade-in value', dueDate: 'Tomorrow 10am', status: 'scheduled', attemptNumber: 1, contactMethod: 'email' },
+      { id: '3', title: 'Contract Review', description: 'Review purchase agreement and terms', dueDate: 'Tomorrow 2pm', status: 'pending', attemptNumber: 1, contactMethod: 'phone' }
+    ]
   },
   {
     id: '3',
@@ -85,7 +108,18 @@ const mockLeads: Lead[] = [
     lastAppointment: '3 days ago',
     keyInsight: 'Spouse approval needed - scheduled joint call Friday morning',
     preferredContact: 'email',
-    budget: { min: 40000, max: 48000 }
+    budget: { min: 40000, max: 48000 },
+    timeline: [
+      { date: '1 week ago', action: 'Online Inquiry', details: 'Submitted interest form via Google Ads', type: 'contact' },
+      { date: '5 days ago', action: 'Initial Call', details: 'Discussed BMW X3 lease options', type: 'contact' },
+      { date: '3 days ago', action: 'Showroom Visit', details: 'Viewed X3, needs spouse approval', type: 'visit' },
+      { date: '2 hours ago', action: 'Follow-up Email', details: 'Sent lease comparison document', type: 'contact' }
+    ],
+    workPlan: [
+      { id: '1', title: 'Joint Call Setup', description: 'Schedule call with both spouses for Friday morning', dueDate: 'Friday 10am', status: 'scheduled', attemptNumber: 1, contactMethod: 'phone' },
+      { id: '2', title: 'Lease Documentation', description: 'Prepare detailed lease agreement and terms', dueDate: 'Thursday 3pm', status: 'pending', attemptNumber: 1, contactMethod: 'email' },
+      { id: '3', title: 'Credit Application', description: 'Process joint credit application if approved', dueDate: 'Friday 2pm', status: 'pending', attemptNumber: 1, contactMethod: 'phone' }
+    ]
   },
   {
     id: '4',
@@ -110,7 +144,17 @@ const mockLeads: Lead[] = [
     sentiment: 'neutral',
     keyInsight: 'Price sensitive - mentioned competitor pricing, needs value proposition',
     preferredContact: 'text',
-    budget: { min: 35000, max: 40000 }
+    budget: { min: 35000, max: 40000 },
+    timeline: [
+      { date: '4 hours ago', action: 'Facebook Inquiry', details: 'Messaged about Ford F-150 pricing', type: 'contact' },
+      { date: '3 hours ago', action: 'Phone Call', details: 'Discussed work truck needs and pricing', type: 'contact' },
+      { date: '30 min ago', action: 'Arrived for Test Drive', details: 'Currently test driving F-150', type: 'visit' }
+    ],
+    workPlan: [
+      { id: '1', title: 'Price Comparison', description: 'Prepare competitive pricing analysis vs competitors', dueDate: 'Today 5pm', status: 'pending', attemptNumber: 1, contactMethod: 'email' },
+      { id: '2', title: 'Business Use Benefits', description: 'Present tax advantages and commercial financing', dueDate: 'Monday 9am', status: 'scheduled', attemptNumber: 1, contactMethod: 'text' },
+      { id: '3', title: 'Follow-up Call', description: 'Check decision timeline and address concerns', dueDate: 'Monday 2pm', status: 'pending', attemptNumber: 1, contactMethod: 'phone' }
+    ]
   },
   {
     id: '5',
@@ -134,7 +178,17 @@ const mockLeads: Lead[] = [
     lastAppointment: 'Never',
     keyInsight: 'Early stage - needs education about vehicle benefits and financing options',
     preferredContact: 'email',
-    budget: { min: 25000, max: 32000 }
+    budget: { min: 25000, max: 32000 },
+    timeline: [
+      { date: '1 week ago', action: 'Email Campaign', details: 'Opened Subaru promotion email', type: 'contact' },
+      { date: '3 days ago', action: 'Form Submission', details: 'Requested Outback brochure and pricing', type: 'contact' },
+      { date: '1 day ago', action: 'Email Response', details: 'Replied asking about safety features', type: 'contact' }
+    ],
+    workPlan: [
+      { id: '1', title: 'Educational Follow-up', description: 'Send safety ratings and feature comparison', dueDate: 'Today 4pm', status: 'pending', attemptNumber: 1, contactMethod: 'email' },
+      { id: '2', title: 'Financing Information', description: 'Provide financing options and calculator', dueDate: 'Tomorrow 10am', status: 'pending', attemptNumber: 2, contactMethod: 'email' },
+      { id: '3', title: 'Showroom Invitation', description: 'Invite for test drive and vehicle viewing', dueDate: 'Friday 2pm', status: 'pending', attemptNumber: 3, contactMethod: 'phone' }
+    ]
   },
   {
     id: '6',
@@ -158,7 +212,15 @@ const mockLeads: Lead[] = [
     sentiment: 'positive',
     keyInsight: 'Cash buyer with urgent timeline - immediate follow-up critical',
     preferredContact: 'phone',
-    budget: { min: 40000, max: 50000 }
+    budget: { min: 40000, max: 50000 },
+    timeline: [
+      { date: '30 min ago', action: 'Website Inquiry', details: 'Submitted urgent purchase form for Tesla Model 3', type: 'contact' }
+    ],
+    workPlan: [
+      { id: '1', title: 'Immediate Contact', description: 'Call within 30 minutes of inquiry', dueDate: 'Now', status: 'pending', attemptNumber: 1, contactMethod: 'phone' },
+      { id: '2', title: 'Vehicle Availability', description: 'Confirm Tesla Model 3 availability and options', dueDate: 'Today 4pm', status: 'pending', attemptNumber: 1, contactMethod: 'phone' },
+      { id: '3', title: 'Purchase Documentation', description: 'Prepare cash purchase paperwork', dueDate: 'Today 6pm', status: 'pending', attemptNumber: 1, contactMethod: 'email' }
+    ]
   }
 ];
 
