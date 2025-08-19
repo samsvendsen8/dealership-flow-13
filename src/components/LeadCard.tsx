@@ -189,10 +189,14 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
                   <p className="text-xs text-muted-foreground truncate">{lead.email}</p>
                 </div>
                 <div className="flex items-center gap-2 text-xs">
-                  <div className={cn("w-4 h-4 rounded-full flex items-center justify-center text-xs text-white", journeyStages[lead.journeyStage].color)}>
-                    {journeyStages[lead.journeyStage].icon}
-                  </div>
-                  <span className="font-medium">{journeyStages[lead.journeyStage].label}</span>
+                  {journeyStages[lead.journeyStage] && (
+                    <>
+                      <div className={cn("w-4 h-4 rounded-full flex items-center justify-center text-xs text-white", journeyStages[lead.journeyStage].color)}>
+                        {journeyStages[lead.journeyStage].icon}
+                      </div>
+                      <span className="font-medium">{journeyStages[lead.journeyStage].label}</span>
+                    </>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
@@ -336,9 +340,11 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
         <div className="mt-3 p-3 bg-muted/30 rounded-md space-y-3">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-medium text-muted-foreground">Journey Progress</span>
-            <span className="text-xs font-medium text-primary">
-              Step {Object.keys(journeyStages).indexOf(lead.journeyStage) + 1} of {Object.keys(journeyStages).length}: {journeyStages[lead.journeyStage]?.label}
-            </span>
+            {journeyStages[lead.journeyStage] && (
+              <span className="text-xs font-medium text-primary">
+                Step {Object.keys(journeyStages).indexOf(lead.journeyStage) + 1} of {Object.keys(journeyStages).length}: {journeyStages[lead.journeyStage].label}
+              </span>
+            )}
           </div>
           
           {/* Journey Timeline Progress Bar */}
@@ -409,23 +415,25 @@ export function LeadCard({ lead, onContact, onViewDetails, isCondensed = false, 
           </TooltipProvider>
           
           {/* Current Stage Info */}
-          <div 
-            className="flex items-center gap-2 cursor-pointer hover:bg-muted/20 p-2 -m-2 rounded transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              onViewDetails(lead.id);
-            }}
-            title="Click to view detailed journey progress"
-          >
-            <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-xs text-white", journeyStages[lead.journeyStage].color)}>
-              {journeyStages[lead.journeyStage].icon}
+          {journeyStages[lead.journeyStage] && (
+            <div 
+              className="flex items-center gap-2 cursor-pointer hover:bg-muted/20 p-2 -m-2 rounded transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                onViewDetails(lead.id);
+              }}
+              title="Click to view detailed journey progress"
+            >
+              <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-xs text-white", journeyStages[lead.journeyStage].color)}>
+                {journeyStages[lead.journeyStage].icon}
+              </div>
+              <span className="text-sm font-medium">Current: {journeyStages[lead.journeyStage].label}</span>
+              <ArrowRight className="h-3 w-3 text-muted-foreground" />
             </div>
-            <span className="text-sm font-medium">Current: {journeyStages[lead.journeyStage].label}</span>
-            <ArrowRight className="h-3 w-3 text-muted-foreground" />
-          </div>
+          )}
           
           {/* Work plan for current journey stage */}
-          {lead.workPlan && lead.workPlan.length > 0 && (
+          {lead.workPlan && lead.workPlan.length > 0 && journeyStages[lead.journeyStage] && (
             <WorkPlanProgress 
               tasks={lead.workPlan} 
               journeyStage={journeyStages[lead.journeyStage].label}
