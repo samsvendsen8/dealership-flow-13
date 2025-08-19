@@ -12,6 +12,7 @@ interface WorkPlanTask {
   attemptNumber: number;
   contactMethod: 'phone' | 'email' | 'text';
   customerResponse?: boolean;
+  journeyStage: string;
 }
 
 interface WorkPlanProgressProps {
@@ -45,11 +46,17 @@ const contactIcons = {
 export function WorkPlanProgress({ tasks, journeyStage, className }: WorkPlanProgressProps) {
   if (!tasks || tasks.length === 0) return null;
 
-  const currentTasks = tasks.slice(0, 3); // Show next 3 tasks
-  const completedCount = tasks.filter(t => t.status === 'completed' || t.status === 'customer_replied').length;
-  const missedCount = tasks.filter(t => t.status === 'missed').length;
-  const customerReplied = tasks.some(t => t.status === 'customer_replied');
-  const currentTask = tasks.find(t => t.status === 'pending');
+  // Filter tasks for current journey stage
+  const currentStageTasks = tasks.filter(t => t.journeyStage === journeyStage);
+  const completedCount = currentStageTasks.filter(t => t.status === 'completed' || t.status === 'customer_replied').length;
+  const missedCount = currentStageTasks.filter(t => t.status === 'missed').length;
+  const customerReplied = currentStageTasks.some(t => t.status === 'customer_replied');
+  const currentTask = currentStageTasks.find(t => t.status === 'pending');
+  
+  // If customer replied, mark remaining tasks as completed (greyed out)
+  const displayTasks = customerReplied 
+    ? currentStageTasks.map(task => task.status === 'customer_replied' ? task : { ...task, status: 'completed' as const })
+    : currentStageTasks;
 
   return (
     <div className={cn('space-y-3', className)}>
@@ -58,15 +65,15 @@ export function WorkPlanProgress({ tasks, journeyStage, className }: WorkPlanPro
           <span className="text-xs font-medium text-muted-foreground">Work Plan ({journeyStage})</span>
           {customerReplied ? (
             <Badge className="text-xs bg-success text-white">
-              ✅ Customer Responded!
+              ✅ Customer Responded - Stage Complete!
             </Badge>
           ) : currentTask ? (
             <Badge variant="outline" className="text-xs text-primary border-primary">
-              → Attempt #{currentTask.attemptNumber} pending
+              → Attempt #{currentTask.attemptNumber}/3 pending
             </Badge>
           ) : (
             <Badge variant="outline" className="text-xs">
-              {completedCount}/{tasks.length} completed
+              {completedCount}/{currentStageTasks.length} completed
             </Badge>
           )}
         </div>
@@ -78,7 +85,7 @@ export function WorkPlanProgress({ tasks, journeyStage, className }: WorkPlanPro
       </div>
 
       <div className="space-y-2">
-        {currentTasks.map((task) => {
+        {displayTasks.map((task) => {
           const StatusIcon = statusIcons[task.status];
           const ContactIcon = contactIcons[task.contactMethod];
           
@@ -100,16 +107,18 @@ export function WorkPlanProgress({ tasks, journeyStage, className }: WorkPlanPro
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-medium truncate">
                     {task.status === 'customer_replied' ? '✅ Customer Replied!' : 
-                     task.status === 'pending' ? `🎯 Attempt #${task.attemptNumber}: ${task.title}` :
-                     `Attempt #${task.attemptNumber}: ${task.title}`}
+                     task.status === 'pending' ? `🎯 ${journeyStage.charAt(0).toUpperCase() + journeyStage.slice(1)} - Attempt ${task.attemptNumber}/3` :
+                     customerReplied && task.status === 'completed' ? `✅ Stage Complete (attempt ${task.attemptNumber} not needed)` :
+                     `Attempt ${task.attemptNumber}/3: ${task.contactMethod} contact`}
                   </span>
                   <span className="text-muted-foreground whitespace-nowrap">
                     {task.dueDate}
                   </span>
                 </div>
                 <p className="text-muted-foreground mt-0.5 text-xs">
-                  {task.status === 'customer_replied' ? 'Goal achieved! Customer responded to outreach.' :
-                   task.status === 'pending' ? `Next action: ${task.description} - Keep trying until customer responds` :
+                  {task.status === 'customer_replied' ? 'Goal achieved! Customer responded - stage complete, moving to next journey step.' :
+                   task.status === 'pending' ? `Next: ${task.description}` :
+                   customerReplied && task.status === 'completed' ? 'Customer responded earlier - this attempt was not needed.' :
                    task.description}
                 </p>
                 {task.status === 'customer_replied' && (
@@ -123,16 +132,16 @@ export function WorkPlanProgress({ tasks, journeyStage, className }: WorkPlanPro
         })}
       </div>
 
-      {tasks.length > 3 && !customerReplied && (
+      {currentStageTasks.length === 3 && !customerReplied && (
         <div className="text-xs text-muted-foreground text-center">
-          +{tasks.length - 3} more attempts planned until customer responds
+          3 attempts planned for {journeyStage} stage - goal is customer response
         </div>
       )}
       
       {customerReplied && (
         <div className="text-xs text-center p-2 bg-success/5 border border-success/20 rounded-md">
-          <span className="text-success font-medium">🎉 Stage Complete!</span>
-          <span className="text-muted-foreground ml-1">Customer responded - ready for next journey stage</span>
+          <span className="text-success font-medium">🎉 {journeyStage.charAt(0).toUpperCase() + journeyStage.slice(1)} Stage Complete!</span>
+          <span className="text-muted-foreground ml-1">Customer responded - moving to next stage</span>
         </div>
       )}
     </div>

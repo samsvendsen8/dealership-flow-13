@@ -25,6 +25,7 @@ interface WorkPlanTask {
   attemptNumber: number;
   contactMethod: 'phone' | 'email' | 'text';
   customerResponse?: boolean;
+  journeyStage: string;
 }
 
 export interface Lead {
