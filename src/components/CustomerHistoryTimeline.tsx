@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -173,6 +173,7 @@ export function CustomerHistoryTimeline({
   filter, 
   onFilterChange 
 }: CustomerHistoryTimelineProps) {
+  const [expandedMessageId, setExpandedMessageId] = useState<string | null>(null);
   
   const filteredItems = mockHistoryItems.filter(item => {
     if (filter === 'text') {
@@ -208,6 +209,67 @@ export function CustomerHistoryTimeline({
         hour: 'numeric',
         minute: '2-digit'
       });
+    }
+  };
+
+  // Group messages by conversation thread (based on similar IDs like "2", "2a", "2b")
+  const getConversationThread = (messageId: string) => {
+    const baseId = messageId.split(/[a-z]$/)[0]; // Gets "2" from "2a" or "2b"
+    return mockHistoryItems.filter(item => 
+      (item.type === 'text' || item.type === 'email') && 
+      (item.id === baseId || item.id.startsWith(baseId))
+    ).sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  };
+
+  // Inline message thread view 
+  const renderInlineMessageThread = (messageId: string) => {
+    const threadMessages = getConversationThread(messageId);
+    
+    return (
+      <div className="mt-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border-l-4 border-primary/30">
+        <div className="text-xs text-muted-foreground mb-3 text-center">
+          <span className="bg-background px-2 py-1 rounded border">
+            Conversation Thread
+          </span>
+        </div>
+        <div className="space-y-3 max-h-64 overflow-y-auto">
+          {threadMessages.map((msg) => {
+            const isIncoming = msg.isIncoming ?? (msg.type === 'text' || msg.type === 'email');
+            
+            return (
+              <div key={msg.id} className={cn(
+                "flex flex-col",
+                isIncoming ? "items-start" : "items-end"
+              )}>
+                <div className={cn(
+                  "max-w-[85%] p-3 rounded-lg shadow-sm text-sm",
+                  isIncoming 
+                    ? "bg-background border text-foreground rounded-bl-sm" 
+                    : "bg-primary text-primary-foreground rounded-br-sm"
+                )}>
+                  <p className="leading-relaxed">{msg.content}</p>
+                </div>
+                <div className={cn(
+                  "flex items-center gap-1 mt-1 text-xs text-muted-foreground",
+                  isIncoming ? "ml-2" : "mr-2"
+                )}>
+                  {msg.type === 'email' && <Mail className="h-3 w-3" />}
+                  <span>{formatTimestamp(msg.timestamp)}</span>
+                  {msg.status === 'completed' && !isIncoming && (
+                    <CheckCircle className="h-3 w-3" />
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  const handleMessageClick = (item: HistoryItem) => {
+    if (['text', 'email'].includes(item.type)) {
+      setExpandedMessageId(expandedMessageId === item.id ? null : item.id);
     }
   };
 
@@ -308,7 +370,13 @@ export function CustomerHistoryTimeline({
                   )}></div>
                   
                   {/* Content Card */}
-                  <div className="ml-8 bg-card border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                  <div 
+                    className={cn(
+                      "ml-8 bg-card border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow",
+                      ['text', 'email'].includes(item.type) && "cursor-pointer hover:bg-card/80"
+                    )}
+                    onClick={() => handleMessageClick(item)}
+                  >
                     {/* Header with icon, title, and timestamp */}
                     <div className="flex items-center gap-2 text-sm mb-2">
                       <div className={cn(
@@ -320,6 +388,11 @@ export function CustomerHistoryTimeline({
                       <span className="font-medium text-card-foreground">{item.title}</span>
                       {item.status && StatusIcon && (
                         <StatusIcon className="h-3 w-3 text-muted-foreground" />
+                      )}
+                      {['text', 'email'].includes(item.type) && (
+                        <span className="text-xs text-muted-foreground ml-1">
+                          Click to view thread
+                        </span>
                       )}
                       <span className="text-xs text-muted-foreground ml-auto">
                         {formatTimestamp(item.timestamp)}
@@ -357,6 +430,11 @@ export function CustomerHistoryTimeline({
                         </span>
                       )}
                     </div>
+                    
+                    {/* Inline Message Thread */}
+                    {expandedMessageId === item.id && ['text', 'email'].includes(item.type) && 
+                      renderInlineMessageThread(item.id)
+                    }
                   </div>
                 </div>
               );
