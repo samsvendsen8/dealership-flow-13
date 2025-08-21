@@ -111,13 +111,13 @@ const typeIcons = {
 };
 
 const typeColors = {
-  call: 'text-blue-600 bg-blue-50 border-blue-200',
-  text: 'text-green-600 bg-green-50 border-green-200',
-  email: 'text-purple-600 bg-purple-50 border-purple-200',
-  appointment: 'text-orange-600 bg-orange-50 border-orange-200',
-  note: 'text-gray-600 bg-gray-50 border-gray-200',
+  call: 'text-primary bg-primary/10 border-primary/20',
+  text: 'text-emerald-600 bg-emerald-50 border-emerald-200',
+  email: 'text-violet-600 bg-violet-50 border-violet-200',
+  appointment: 'text-amber-600 bg-amber-50 border-amber-200',
+  note: 'text-muted-foreground bg-muted/50 border-border',
   tag: 'text-pink-600 bg-pink-50 border-pink-200',
-  milestone: 'text-yellow-600 bg-yellow-50 border-yellow-200'
+  milestone: 'text-orange-600 bg-orange-50 border-orange-200'
 };
 
 const statusIcons = {
@@ -128,10 +128,10 @@ const statusIcons = {
 };
 
 const priorityColors = {
-  low: 'border-l-gray-300',
-  medium: 'border-l-blue-400',
-  high: 'border-l-orange-400',
-  urgent: 'border-l-red-500'
+  low: 'border-muted',
+  medium: 'border-primary/60',
+  high: 'border-amber-400',
+  urgent: 'border-destructive'
 };
 
 export function CustomerHistoryTimeline({ 
@@ -260,19 +260,19 @@ export function CustomerHistoryTimeline({
                         </span>
                       )}
                       {item.outcome && (
-                        <span className="text-xs text-green-700 bg-green-50 px-2 py-0.5 rounded">
+                        <span className="text-xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
                           {item.outcome}
                         </span>
                       )}
                       {item.tags && item.tags.map((tag) => (
-                        <span key={tag} className="text-xs text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
+                        <span key={tag} className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded">
                           #{tag}
                         </span>
                       ))}
                       {item.priority && ['high', 'urgent'].includes(item.priority) && (
                         <span className={cn(
                           "text-xs px-2 py-0.5 rounded font-medium",
-                          item.priority === 'urgent' ? 'text-red-700 bg-red-50' : 'text-orange-700 bg-orange-50'
+                          item.priority === 'urgent' ? 'text-destructive bg-destructive/10' : 'text-amber-700 bg-amber-50'
                         )}>
                           {item.priority}
                         </span>
