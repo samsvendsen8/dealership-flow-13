@@ -478,20 +478,29 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
   return (
     <Card 
       className={cn(
-        'relative border-l-4 transition-all duration-300 cursor-pointer shadow-soft hover:shadow-medium',
+        'relative border-l-4 transition-all duration-300',
         priorityStyles[lead.priority],
         isFocused && 'ring-2 ring-primary shadow-lg scale-[1.02]'
       )}
-      onClick={() => onViewDetails(lead.id)}
     >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div 
+            className="flex items-center gap-3 cursor-pointer hover:bg-muted/20 -m-2 p-2 rounded transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              onViewDetails(lead.id);
+            }}
+            title="View lead details"
+          >
             <div>
               <div className="flex items-center gap-2">
                 <h3 className={cn("font-semibold text-foreground", isFocused ? "text-xl" : "text-lg")}>{lead.name}</h3>
                 {lead.sentiment && (
-                  <span className={cn("px-2 py-1 rounded-full text-xs font-medium", sentimentConfig[lead.sentiment].bg, sentimentConfig[lead.sentiment].color)}>
+                  <span 
+                    className={cn("px-2 py-1 rounded-full text-xs font-medium", sentimentConfig[lead.sentiment].bg, sentimentConfig[lead.sentiment].color)}
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     {sentimentConfig[lead.sentiment].icon} {lead.sentiment}
                   </span>
                 )}
@@ -500,7 +509,7 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
               <p className="text-sm text-muted-foreground">{lead.phone}</p>
             </div>
           </div>
-          <div className="flex flex-col items-end gap-2">
+          <div className="flex flex-col items-end gap-2" onClick={(e) => e.stopPropagation()}>
             <Badge className={statusStyles[lead.status]} variant="secondary">
               {lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}
             </Badge>
@@ -608,7 +617,14 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
         </Collapsible>
 
         {/* Vehicle of Interest - Less Prominent */}
-        <div className="bg-muted/10 border rounded-lg p-3 mt-4">
+        <div 
+          className="bg-muted/10 border rounded-lg p-3 mt-4 cursor-pointer hover:bg-muted/20 transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            onViewDetails(lead.id);
+          }}
+          title="View vehicle details"
+        >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Car className="h-4 w-4 text-muted-foreground" />
@@ -634,7 +650,14 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
         </div>
         
         {/* Enhanced Metrics Row */}
-        <div className="grid grid-cols-3 gap-4 mt-4 p-3 bg-muted/20 rounded-lg">
+        <div 
+          className="grid grid-cols-3 gap-4 mt-4 p-3 bg-muted/20 rounded-lg cursor-pointer hover:bg-muted/30 transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            onViewDetails(lead.id);
+          }}
+          title="View detailed metrics"
+        >
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 text-lg font-bold text-success">
               <DollarSign className="h-4 w-4" />
@@ -666,8 +689,8 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
         </div>
         
         {/* Journey Stage Progress with Timeline */}
-        <div className="mt-3 p-3 bg-muted/30 rounded-md space-y-3 relative z-50">
-          <div className="flex items-center justify-between mb-2">
+        <div className="mt-3 p-3 bg-muted/30 rounded-md space-y-3 relative z-50" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-2" onClick={(e) => e.stopPropagation()}>
             <span className="text-xs font-medium text-muted-foreground">Journey Progress</span>
             {journeyStages[lead.journeyStage] && (
               <span className="text-xs font-medium text-primary">
@@ -786,30 +809,39 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                 
                 {/* Quick Action Buttons */}
                 <div className="flex gap-1">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleContactMethodClick('phone')}
-                    className="h-6 text-xs flex-1"
-                  >
-                    <Phone className="h-2 w-2 mr-1" />
-                    Call
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleContactMethodClick('text')}
-                    className="h-6 text-xs flex-1"
-                  >
-                    <MessageCircle className="h-2 w-2 mr-1" />
-                    Text
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleContactMethodClick('email')}
-                    className="h-6 text-xs flex-1"
-                  >
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleContactMethodClick('phone');
+                  }}
+                  className="h-6 text-xs flex-1"
+                >
+                  <Phone className="h-2 w-2 mr-1" />
+                  Call
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleContactMethodClick('text');
+                  }}
+                  className="h-6 text-xs flex-1"
+                >
+                  <MessageCircle className="h-2 w-2 mr-1" />
+                  Text
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleContactMethodClick('email');
+                  }}
+                  className="h-6 text-xs flex-1"
+                >
                     <Mail className="h-2 w-2 mr-1" />
                     Email
                   </Button>
@@ -869,7 +901,7 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
 
         {/* Current Work Plan Step - Condensed */}
         {currentWorkPlanTask && !showInlineAction && (
-          <div className="bg-muted/20 border rounded-lg p-4">
+          <div className="bg-muted/20 border rounded-lg p-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-3">
               <h4 className="font-medium text-sm flex items-center gap-2">
                 <Clock className="h-4 w-4 text-primary" />
@@ -899,7 +931,10 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => handleContactMethodClick('phone')}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleContactMethodClick('phone');
+                  }}
                   className="flex-1"
                 >
                   <Phone className="h-3 w-3 mr-1" />
@@ -908,7 +943,10 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => handleContactMethodClick('text')}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleContactMethodClick('text');
+                  }}
                   className="flex-1"
                 >
                   <MessageCircle className="h-3 w-3 mr-1" />
@@ -917,7 +955,10 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => handleContactMethodClick('email')}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleContactMethodClick('email');
+                  }}
                   className="flex-1"
                 >
                   <Mail className="h-3 w-3 mr-1" />
@@ -950,7 +991,14 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
 
 
         {/* Contact Preferences & History */}
-        <div className="bg-muted/10 rounded-lg p-3">
+        <div 
+          className="bg-muted/10 rounded-lg p-3 cursor-pointer hover:bg-muted/20 transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            onViewDetails(lead.id);
+          }}
+          title="View contact history"
+        >
           <div className="flex items-center justify-between mb-2">
             <h4 className="font-medium text-sm">Contact Information</h4>
             {lead.preferredContact && (
