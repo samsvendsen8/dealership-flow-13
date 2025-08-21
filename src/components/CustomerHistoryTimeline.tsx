@@ -353,19 +353,25 @@ export function CustomerHistoryTimeline({
         ) : (
           <>
             {/* Timeline line */}
-            <div className="absolute left-20 top-0 bottom-0 w-px bg-border/60"></div>
+            <div className="absolute left-16 top-0 bottom-0 w-px bg-border/60"></div>
             
             {filteredItems.map((item, index) => {
               const Icon = typeIcons[item.type];
               const StatusIcon = item.status ? statusIcons[item.status] : null;
+              const date = new Date(item.timestamp);
               
               return (
                 <div key={item.id} className="relative pb-4 last:pb-0">
-                  {/* Timeline dot with timestamp */}
-                  <div className="absolute left-0 flex items-center gap-2">
-                    {/* Timestamp */}
-                    <div className="text-xs text-muted-foreground font-mono w-16 text-right -rotate-90 origin-center whitespace-nowrap -translate-y-2">
-                      {formatTimestamp(item.timestamp)}
+                  {/* Timeline timestamp and dot */}
+                  <div className="absolute left-0 flex items-center gap-3">
+                    {/* Stacked timestamp */}
+                    <div className="text-xs text-muted-foreground text-right leading-tight">
+                      <div className="font-medium">
+                        {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </div>
+                      <div className="text-muted-foreground/70">
+                        {date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+                      </div>
                     </div>
                     {/* Timeline dot */}
                     <div className={cn(
