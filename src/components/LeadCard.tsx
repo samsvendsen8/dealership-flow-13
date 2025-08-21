@@ -32,7 +32,9 @@ import {
   FileText,
   RefreshCw,
   Heart,
-  AlertCircle
+  AlertCircle,
+  Expand,
+  Shrink
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { WorkPlanProgress } from './WorkPlanProgress';
@@ -40,6 +42,8 @@ import JourneyAdvanceButton from './JourneyAdvanceButton';
 import { CallSimulationModal } from './CallSimulationModal';
 import { CelebrationAnimation } from './CelebrationAnimation';
 import { WorkItemSlideOut } from './WorkItemSlideOut';
+import { InlineActionForm } from './InlineActionForm';
+import { CustomerResponsePreview } from './CustomerResponsePreview';
 import { useMessaging } from '@/hooks/useMessaging';
 import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -142,6 +146,9 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
   const [showCallModal, setShowCallModal] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [completingWorkItem, setCompletingWorkItem] = useState(false);
+  const [showInlineAction, setShowInlineAction] = useState(false);
+  const [inlineActionType, setInlineActionType] = useState<'call' | 'text' | 'email'>('text');
+  const [workPlanExpanded, setWorkPlanExpanded] = useState(false);
   const { sendMessage, advanceJourneyStage, isLoading } = useMessaging();
   const { toast } = useToast();
   
@@ -206,14 +213,35 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
   };
 
   const handleContactMethodClick = (method: 'phone' | 'email' | 'text') => {
-    if (method === 'phone') {
-      setShowCallModal(true);
-    } else if (method === 'text') {
-      // Open sidebar with pre-filled AI text for manual sending
-      onContact(lead.id, method);
-    } else {
-      // Directly trigger message sending for email
-      handleQuickMessage(method);
+    const actionType = method === 'phone' ? 'call' : method;
+    setInlineActionType(actionType as 'call' | 'text' | 'email');
+    setShowInlineAction(true);
+    // No longer auto-send, just open inline form
+  };
+
+  const handleInlineActionComplete = async (notes: string, moveToNext: boolean) => {
+    try {
+      // Here you would typically save the notes and complete the work plan item
+      // For now, we'll simulate this
+      
+      if (moveToNext) {
+        await handleAdvanceJourney();
+      }
+      
+      setShowInlineAction(false);
+      toast({
+        title: "Work Item Completed",
+        description: `${inlineActionType} interaction logged for ${lead.name}`,
+      });
+      
+      // Trigger any necessary updates
+      onTaskCompleted?.(lead.id);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to complete work item",
+        variant: "destructive"
+      });
     }
   };
 
@@ -235,7 +263,25 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
     }
   };
 
-  // Get recommended quick actions based on journey stage and contact history
+  // Mock customer response (in a real app, this would come from API)
+  const mockCustomerResponse = lead.status === 'qualified' ? {
+    id: 'resp-1',
+    content: `Hi! Thanks for following up on the ${lead.vehicle}. I'm really interested but had a few questions about the financing options. Could we schedule a time to discuss? Also, what's your best price on this model?`,
+    type: 'text' as const,
+    timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(), // 15 minutes ago
+    status: 'new' as const
+  } : null;
+
+  // Get current work plan task
+  const getCurrentWorkPlanTask = () => {
+    if (!lead.workPlan) return null;
+    return lead.workPlan.find(task => 
+      task.journeyStage === lead.journeyStage && 
+      task.status === 'pending'
+    ) || lead.workPlan.filter(task => task.journeyStage === lead.journeyStage)[0];
+  };
+
+  const currentWorkPlanTask = getCurrentWorkPlanTask();
   const getQuickActions = () => {
     const isRecentlyContacted = lead.lastActivity.includes('contact sent') || 
                                lead.lastActivity.includes('contact made') || 
@@ -470,6 +516,34 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           </div>
         </div>
         
+        {/* Vehicle of Interest - Top & Prominent */}
+        <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-l-4 border-primary rounded-lg p-6 mt-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center space-x-3">
+              <div className="bg-primary/20 p-3 rounded-xl">
+                <Car className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-foreground">{lead.vehicle}</h2>
+                <p className="text-sm text-muted-foreground">Vehicle of Interest</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-primary">${lead.value.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground">Target Value</p>
+            </div>
+          </div>
+          {lead.tradeInVehicle && (
+            <div className="mt-3 pt-3 border-t border-primary/20">
+              <div className="flex items-center gap-2">
+                <RefreshCw className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-muted-foreground">Trade-in: </span>
+                <span className="text-sm font-semibold text-foreground">{lead.tradeInVehicle}</span>
+              </div>
+            </div>
+          )}
+        </div>
+        
         {/* Enhanced Metrics Row */}
         <div className="grid grid-cols-3 gap-4 mt-4 p-3 bg-muted/20 rounded-lg">
           <div className="text-center">
@@ -638,6 +712,114 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
       </CardHeader>
 
       <CardContent className="space-y-4">
+        {/* Customer Response Preview - Top Priority */}
+        {mockCustomerResponse && (
+          <CustomerResponsePreview
+            response={mockCustomerResponse}
+            leadName={lead.name}
+            onViewFull={() => onViewDetails(lead.id)}
+            onRespond={(method) => handleContactMethodClick(method)}
+          />
+        )}
+
+        {/* Inline Action Form */}
+        {showInlineAction && (
+          <InlineActionForm
+            actionType={inlineActionType}
+            leadName={lead.name}
+            leadId={lead.id}
+            workPlanItem={currentWorkPlanTask ? {
+              id: currentWorkPlanTask.id,
+              title: currentWorkPlanTask.title,
+              description: currentWorkPlanTask.description,
+              dueDate: currentWorkPlanTask.dueDate
+            } : undefined}
+            onComplete={handleInlineActionComplete}
+            onCancel={() => setShowInlineAction(false)}
+          />
+        )}
+
+        {/* Current Work Plan Step - Condensed */}
+        {currentWorkPlanTask && !showInlineAction && (
+          <div className="bg-muted/20 border rounded-lg p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="font-medium text-sm flex items-center gap-2">
+                <Clock className="h-4 w-4 text-primary" />
+                Current Work Plan Step
+              </h4>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-xs">
+                  {currentWorkPlanTask.dueDate}
+                </Badge>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setWorkPlanExpanded(!workPlanExpanded)}
+                  className="h-6 w-6 p-0"
+                >
+                  {workPlanExpanded ? <Shrink className="h-3 w-3" /> : <Expand className="h-3 w-3" />}
+                </Button>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <p className="text-sm font-medium">{currentWorkPlanTask.title}</p>
+              <p className="text-xs text-muted-foreground">{currentWorkPlanTask.description}</p>
+              
+              {/* Action Buttons */}
+              <div className="flex gap-2 pt-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleContactMethodClick('phone')}
+                  className="flex-1"
+                >
+                  <Phone className="h-3 w-3 mr-1" />
+                  Call
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleContactMethodClick('text')}
+                  className="flex-1"
+                >
+                  <MessageCircle className="h-3 w-3 mr-1" />
+                  Text
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleContactMethodClick('email')}
+                  className="flex-1"
+                >
+                  <Mail className="h-3 w-3 mr-1" />
+                  Email
+                </Button>
+              </div>
+              
+              {/* Context */}
+              {lead.workPlan && lead.workPlan.filter(t => t.journeyStage === lead.journeyStage).length > 1 && (
+                <p className="text-xs text-muted-foreground pt-1">
+                  {lead.workPlan.filter(t => t.journeyStage === lead.journeyStage).length} attempts planned for {lead.journeyStage} stage
+                </p>
+              )}
+            </div>
+
+            {/* Expanded Work Plan */}
+            {workPlanExpanded && (
+              <div className="mt-4 pt-4 border-t border-border">
+                <WorkPlanProgress 
+                  tasks={lead.workPlan || []} 
+                  journeyStage={lead.journeyStage}
+                  currentLeadStage={lead.journeyStage}
+                  showCurrentOnly={false}
+                  onContactMethodClick={(method, task) => handleContactMethodClick(method)}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Key Insight Section */}
         {lead.keyInsight && (
           <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
@@ -648,26 +830,6 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
             <p className="text-sm text-foreground">{lead.keyInsight}</p>
           </div>
         )}
-
-        {/* Vehicle & Trade-in Info */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-muted/20 rounded-lg p-3">
-            <div className="flex items-center gap-2 mb-1">
-              <Car className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Interested Vehicle</span>
-            </div>
-            <p className="text-sm font-semibold text-foreground">{lead.vehicle}</p>
-          </div>
-          {lead.tradeInVehicle && (
-            <div className="bg-muted/20 rounded-lg p-3">
-              <div className="flex items-center gap-2 mb-1">
-                <RefreshCw className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Trade-in Vehicle</span>
-              </div>
-              <p className="text-sm font-semibold text-foreground">{lead.tradeInVehicle}</p>
-            </div>
-          )}
-        </div>
 
         {/* Contact Preferences & History */}
         <div className="bg-muted/10 rounded-lg p-3">

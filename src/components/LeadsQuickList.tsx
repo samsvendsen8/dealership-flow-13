@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Clock, DollarSign, Car } from 'lucide-react';
+import { Clock, DollarSign, Car, Brain, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { type Lead } from './LeadCard';
 
@@ -28,6 +28,37 @@ const priorityIcons = {
   hot: '🔥',
   warm: '⚡',
   cold: '❄️'
+};
+
+// AI Priority Scoring
+const getAIPriorityScore = (lead: Lead) => {
+  let score = 0;
+  
+  // Deal probability weight
+  if (lead.dealProbability >= 80) score += 30;
+  else if (lead.dealProbability >= 60) score += 20;
+  else if (lead.dealProbability >= 40) score += 10;
+  
+  // Priority weight
+  if (lead.priority === 'hot') score += 25;
+  else if (lead.priority === 'warm') score += 15;
+  else score += 5;
+  
+  // Timeline urgency
+  if (lead.timeOnLot) score += 20;
+  if (lead.lastActivity?.includes('min ago')) score += 15;
+  
+  // Value weight
+  if (lead.value > 40000) score += 10;
+  else if (lead.value > 30000) score += 5;
+  
+  return Math.min(100, score);
+};
+
+const getScoreColor = (score: number) => {
+  if (score >= 80) return 'text-hot-lead bg-hot-lead/10 border-hot-lead/30';
+  if (score >= 60) return 'text-warm-lead bg-warm-lead/10 border-warm-lead/30';
+  return 'text-cold-lead bg-cold-lead/10 border-cold-lead/30';
 };
 
 export function LeadsQuickList({ leads, onLeadClick, selectedLeadId }: LeadsQuickListProps) {
@@ -66,7 +97,17 @@ export function LeadsQuickList({ leads, onLeadClick, selectedLeadId }: LeadsQuic
                       <h4 className="font-medium text-sm text-foreground truncate">{lead.name}</h4>
                       <p className="text-xs text-muted-foreground truncate">{lead.email}</p>
                     </div>
-                    <div className="flex items-center gap-1 ml-2">
+                    <div className="flex items-center gap-2 ml-2">
+                      <Badge 
+                        variant="outline" 
+                        className={cn(
+                          'text-xs px-2 py-1 flex items-center gap-1',
+                          getScoreColor(getAIPriorityScore(lead))
+                        )}
+                      >
+                        <Brain className="h-3 w-3" />
+                        {getAIPriorityScore(lead)}
+                      </Badge>
                       <span className="text-xs">{priorityIcons[lead.priority]}</span>
                       <div className={cn('w-2 h-2 rounded-full', statusColors[lead.status])} />
                     </div>

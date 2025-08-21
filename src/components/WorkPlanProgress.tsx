@@ -21,7 +21,10 @@ interface WorkPlanProgressProps {
   journeyStage: string;
   currentLeadStage?: string;
   className?: string;
+  showCurrentOnly?: boolean;
   onContactMethodClick?: (method: 'phone' | 'email' | 'text', task: WorkPlanTask) => void;
+  onExpandToggle?: () => void;
+  isExpanded?: boolean;
 }
 
 const statusIcons = {
@@ -50,7 +53,16 @@ const contactIcons = {
   text: MessageCircle,
 };
 
-export function WorkPlanProgress({ tasks, journeyStage, currentLeadStage, className, onContactMethodClick }: WorkPlanProgressProps) {
+export function WorkPlanProgress({ 
+  tasks, 
+  journeyStage, 
+  currentLeadStage, 
+  className, 
+  showCurrentOnly = false,
+  onContactMethodClick,
+  onExpandToggle,
+  isExpanded = false 
+}: WorkPlanProgressProps) {
   const isViewingCurrentStage = !currentLeadStage || journeyStage.toLowerCase() === currentLeadStage.toLowerCase();
   const stageOrder = ['engaged', 'visit', 'proposal', 'sold', 'delivered'];
   const currentStageIndex = stageOrder.indexOf(currentLeadStage?.toLowerCase() || '');
