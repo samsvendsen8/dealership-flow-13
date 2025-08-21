@@ -111,13 +111,13 @@ const typeIcons = {
 };
 
 const typeColors = {
-  call: 'text-primary bg-primary/10 border-primary/20',
-  text: 'text-emerald-600 bg-emerald-50 border-emerald-200',
-  email: 'text-violet-600 bg-violet-50 border-violet-200',
-  appointment: 'text-amber-600 bg-amber-50 border-amber-200',
-  note: 'text-muted-foreground bg-muted/50 border-border',
-  tag: 'text-pink-600 bg-pink-50 border-pink-200',
-  milestone: 'text-orange-600 bg-orange-50 border-orange-200'
+  call: 'text-primary bg-primary/20 border-primary/30 shadow-sm',
+  text: 'text-emerald-700 bg-emerald-100 border-emerald-300 shadow-sm',
+  email: 'text-violet-700 bg-violet-100 border-violet-300 shadow-sm',
+  appointment: 'text-amber-700 bg-amber-100 border-amber-300 shadow-sm',
+  note: 'text-foreground bg-card border-border shadow-sm',
+  tag: 'text-pink-700 bg-pink-100 border-pink-300 shadow-sm',
+  milestone: 'text-orange-700 bg-orange-100 border-orange-300 shadow-sm'
 };
 
 const statusIcons = {
@@ -212,7 +212,7 @@ export function CustomerHistoryTimeline({
         ) : (
           <>
             {/* Timeline line */}
-            <div className="absolute left-4 top-0 bottom-0 w-px bg-border"></div>
+            <div className="absolute left-4 top-0 bottom-0 w-px bg-border/60"></div>
             
             {filteredItems.map((item, index) => {
               const Icon = typeIcons[item.type];
@@ -222,10 +222,10 @@ export function CustomerHistoryTimeline({
                 <div key={item.id} className="relative pb-4 last:pb-0">
                   {/* Timeline dot */}
                   <div className={cn(
-                    "absolute left-3 w-2 h-2 rounded-full border-2 bg-background",
-                    item.priority === 'urgent' ? 'border-destructive' :
-                    item.priority === 'high' ? 'border-orange-400' :
-                    item.priority === 'medium' ? 'border-blue-400' : 'border-muted'
+                    "absolute left-2.5 w-3 h-3 rounded-full border-2 bg-background shadow-sm",
+                    item.priority === 'urgent' ? 'border-destructive shadow-destructive/30' :
+                    item.priority === 'high' ? 'border-orange-500 shadow-orange-500/30' :
+                    item.priority === 'medium' ? 'border-primary shadow-primary/30' : 'border-muted-foreground/60'
                   )}></div>
                   
                   {/* Content */}
@@ -248,24 +248,24 @@ export function CustomerHistoryTimeline({
                     </div>
                     
                     {/* Content */}
-                    <p className="text-sm text-muted-foreground leading-relaxed pl-6">
+                    <p className="text-sm text-foreground/80 leading-relaxed pl-6">
                       {item.content}
                     </p>
                     
                     {/* Metadata inline */}
                     <div className="flex items-center gap-2 pl-6">
                       {item.duration && (
-                        <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded">
+                        <span className="text-xs text-foreground bg-muted px-2 py-0.5 rounded border">
                           {item.duration}
                         </span>
                       )}
                       {item.outcome && (
-                        <span className="text-xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                        <span className="text-xs text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300">
                           {item.outcome}
                         </span>
                       )}
                       {item.tags && item.tags.map((tag) => (
-                        <span key={tag} className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded">
+                        <span key={tag} className="text-xs text-primary bg-primary/20 px-2 py-0.5 rounded border border-primary/30">
                           #{tag}
                         </span>
                       ))}
