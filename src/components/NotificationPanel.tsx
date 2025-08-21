@@ -13,7 +13,8 @@ import JourneyAdvanceButton from './JourneyAdvanceButton';
 import { WorkPlanProgress } from './WorkPlanProgress';
 import { CallSimulationModal } from './CallSimulationModal';
 import { useMessaging } from '@/hooks/useMessaging';
-import { useToast } from '@/components/ui/use-toast';
+import { CustomerHistoryTimeline } from './CustomerHistoryTimeline';
+import { useToast } from '@/hooks/use-toast';
 
 interface NotificationPanelProps {
   isOpen: boolean;
@@ -32,12 +33,13 @@ const statusStyles = {
 };
 
 export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, contactMethod, aiSuggestedResponse }: NotificationPanelProps) {
-  const [activeMainTab, setActiveMainTab] = useState<'contact' | 'customer-info' | 'journey'>('contact');
+  const [activeMainTab, setActiveMainTab] = useState<'contact' | 'customer-info' | 'customer-history'>('contact');
   const [activeSubTab, setActiveSubTab] = useState<'overview' | 'notes'>('overview');
   const [responseText, setResponseText] = useState('');
   const [expandedHistoryItems, setExpandedHistoryItems] = useState<Set<string>>(new Set());
   const [selectedJourneyStage, setSelectedJourneyStage] = useState<string | null>(null);
   const [showCallModal, setShowCallModal] = useState(false);
+  const [historyFilter, setHistoryFilter] = useState<'all' | 'text' | 'priority'>('all');
   const { sendMessage, isLoading } = useMessaging();
   const { toast } = useToast();
 
@@ -235,15 +237,15 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                   Customer Info
                 </button>
                 <button
-                  onClick={() => setActiveMainTab('journey')}
+                  onClick={() => setActiveMainTab('customer-history')}
                   className={cn(
                     "flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors",
-                    activeMainTab === 'journey' 
+                    activeMainTab === 'customer-history' 
                       ? "bg-background text-foreground shadow-sm" 
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  Journey
+                  Customer History
                 </button>
               </div>
 
@@ -550,128 +552,14 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                 </div>
               )}
 
-              {/* Journey Content */}
-              {activeMainTab === 'journey' && (
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base flex items-center gap-2">
-                      Customer Journey
-                      <Badge variant="secondary" className="text-xs">
-                        {selectedLead.journeyStage}
-                      </Badge>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div>
-                      {(() => {
-                        const allStages = ['engaged', 'visit', 'proposal', 'sold', 'delivered'];
-                        const currentStageIndex = Math.max(0, allStages.indexOf(selectedLead.journeyStage));
-                        
-                        // Journey stage timeline events
-                        const stageEvents = allStages.slice(0, currentStageIndex + 1).map(stage => {
-                          const stageInfo = {
-                            engaged: { action: 'Customer Engaged', type: 'milestone' as const, date: '2 days ago', details: 'Initial contact established' },
-                            visit: { action: 'Showroom Visit', type: 'milestone' as const, date: 'Yesterday', details: 'Test drive completed' },
-                            proposal: { action: 'Proposal Sent', type: 'milestone' as const, date: '3 hours ago', details: 'Purchase proposal presented' },
-                            sold: { action: 'Deal Closed', type: 'milestone' as const, date: '1 hour ago', details: 'Sale successfully completed' },
-                            delivered: { action: 'Vehicle Delivered', type: 'milestone' as const, date: 'Just now', details: 'Vehicle delivered to customer' }
-                          };
-                          
-                          return stageInfo[stage as keyof typeof stageInfo];
-                        });
-
-                        // Calculate progress percentage (only completed stages)
-                        const progressPercentage = (currentStageIndex / allStages.length) * 100;
-
-                        return (
-                          <div className="space-y-4">
-                            <div className="flex items-center gap-2">
-                              <div className="flex-1 bg-muted rounded-full h-3 relative">
-                                <div 
-                                  className="bg-primary h-3 rounded-full transition-all duration-500"
-                                  style={{ width: `${progressPercentage}%` }}
-                                />
-                                <Timeline 
-                                  events={stageEvents}
-                                  className="absolute inset-0 h-3"
-                                />
-                              </div>
-                              <span className="text-sm text-muted-foreground font-medium">{Math.round(progressPercentage)}%</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                              Progress: {currentStageIndex} of {allStages.length} stages completed • Currently in {selectedLead.journeyStage} stage
-                            </p>
-                          </div>
-                        );
-                      })()}
-                    </div>
-
-                    <div className="space-y-3">
-                      {['engaged', 'visit', 'proposal', 'sold', 'delivered'].map((stageKey, index) => {
-                        const journeyStages = {
-                          engaged: { label: 'Engaged', icon: '💬', color: 'bg-teal-500', description: 'Active communication established' },
-                          visit: { label: 'Visit', icon: '📍', color: 'bg-purple-500', description: 'Customer visit arranged' },
-                          proposal: { label: 'Proposal', icon: '📄', color: 'bg-yellow-500', description: 'Formal offer presented' },
-                          sold: { label: 'Sold', icon: '👍', color: 'bg-green-500', description: 'Deal closed successfully' },
-                          delivered: { label: 'Delivered', icon: '🚚', color: 'bg-emerald-500', description: 'Vehicle delivered to customer' }
-                        };
-                        
-                        const stage = journeyStages[stageKey as keyof typeof journeyStages];
-                        const allStages = Object.keys(journeyStages);
-                        const currentStageIndex = allStages.indexOf(selectedLead.journeyStage);
-                        const isCompleted = index < currentStageIndex;
-                        const isCurrent = index === currentStageIndex;
-                        const isFuture = index > currentStageIndex;
-                        
-                        // Use the same mock workPlan data as LeadCard
-                        const mockWorkPlanData = selectedLead.workPlan || [];
-
-                        return (
-                          <div key={stageKey} className="space-y-2">
-                            <div 
-                              className={cn(
-                                "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all",
-                                isCompleted && "bg-success/10 border-success/20",
-                                isCurrent && "bg-primary/10 border-primary/20 ring-1 ring-primary/30",
-                                isFuture && "bg-muted/30 border-muted opacity-60"
-                              )}
-                              onClick={() => setSelectedJourneyStage(selectedJourneyStage === stageKey ? null : stageKey)}
-                            >
-                              <div className={cn(
-                                "w-6 h-6 rounded-full flex items-center justify-center text-xs text-white font-medium",
-                                isCompleted && "bg-success",
-                                isCurrent && stage.color,
-                                isFuture && "bg-muted-foreground"
-                              )}>
-                                {isCompleted ? <CheckCircle className="h-3 w-3" /> : stage.icon}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <h4 className="font-medium text-sm">{stage.label}</h4>
-                                  {isCurrent && (
-                                    <Badge variant="secondary" className="text-xs">Current</Badge>
-                                  )}
-                                </div>
-                                <p className="text-xs text-muted-foreground">{stage.description}</p>
-                              </div>
-                            </div>
-
-                            {selectedJourneyStage === stageKey && mockWorkPlanData.length > 0 && (
-                              <div className="ml-9">
-                                 <WorkPlanProgress 
-                                   tasks={mockWorkPlanData} 
-                                   journeyStage={stageKey}
-                                   currentLeadStage={selectedLead.journeyStage}
-                                   onContactMethodClick={(method) => handleContactMethodClick(method)}
-                                 />
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </CardContent>
-                </Card>
+              {/* Customer History Content */}
+              {activeMainTab === 'customer-history' && selectedLead && (
+                <CustomerHistoryTimeline
+                  leadId={selectedLead.id}
+                  leadName={selectedLead.name}
+                  filter={historyFilter}
+                  onFilterChange={setHistoryFilter}
+                />
               )}
             </div>
           </div>
