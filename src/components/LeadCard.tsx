@@ -272,13 +272,20 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
     status: 'new' as const
   } : null;
 
-  // Get current work plan task
+  // Get current work plan task - only return incomplete/actionable tasks
   const getCurrentWorkPlanTask = () => {
     if (!lead.workPlan) return null;
-    return lead.workPlan.find(task => 
+    
+    // Filter to only incomplete tasks in current journey stage
+    const incompleteTasks = lead.workPlan.filter(task => 
       task.journeyStage === lead.journeyStage && 
-      task.status === 'pending'
-    ) || lead.workPlan.filter(task => task.journeyStage === lead.journeyStage)[0];
+      !['completed', 'not_needed'].includes(task.status)
+    );
+    
+    // Return the first pending task, or null if all tasks are complete
+    return incompleteTasks.find(task => task.status === 'pending') || 
+           incompleteTasks.find(task => task.status === 'scheduled') ||
+           null;
   };
 
   const currentWorkPlanTask = getCurrentWorkPlanTask();
