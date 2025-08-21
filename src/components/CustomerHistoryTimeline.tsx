@@ -28,6 +28,7 @@ interface HistoryItem {
   duration?: string;
   outcome?: string;
   tags?: string[];
+  isIncoming?: boolean; // For message direction
 }
 
 interface CustomerHistoryTimelineProps {
@@ -55,10 +56,31 @@ const mockHistoryItems: HistoryItem[] = [
     id: '2',
     type: 'text',
     timestamp: '2024-01-15T10:15:00Z',
-    title: 'Initial contact response',
+    title: 'Customer response',
     content: 'Hi! Thanks for following up on the BMW X3. I\'m really interested but had a few questions about the financing options.',
     status: 'completed',
-    priority: 'medium'
+    priority: 'medium',
+    isIncoming: true
+  },
+  {
+    id: '2a',
+    type: 'text',
+    timestamp: '2024-01-15T10:18:00Z',
+    title: 'Sales rep response',
+    content: 'Great to hear! I\'d be happy to go over all our financing options with you. We have some great rates right now.',
+    status: 'completed',
+    priority: 'medium',
+    isIncoming: false
+  },
+  {
+    id: '2b',
+    type: 'text',
+    timestamp: '2024-01-15T10:20:00Z',
+    title: 'Customer response',
+    content: 'Perfect! What\'s the lowest rate you can offer?',
+    status: 'completed',
+    priority: 'medium',
+    isIncoming: true
   },
   {
     id: '3',
@@ -78,7 +100,18 @@ const mockHistoryItems: HistoryItem[] = [
     content: 'Sent detailed specifications and pricing information for BMW X3 with requested options package.',
     status: 'completed',
     priority: 'medium',
-    tags: ['specifications', 'pricing']
+    tags: ['specifications', 'pricing'],
+    isIncoming: false
+  },
+  {
+    id: '4a',
+    type: 'email',
+    timestamp: '2024-01-14T11:30:00Z',
+    title: 'Customer inquiry',
+    content: 'Thank you for the specs! The X3 looks perfect. Do you have any available in Alpine White?',
+    status: 'completed',
+    priority: 'medium',
+    isIncoming: true
   },
   {
     id: '5',
@@ -178,6 +211,50 @@ export function CustomerHistoryTimeline({
     }
   };
 
+  // iPhone-style message view for text/email filter
+  const renderMessageView = () => {
+    return (
+      <div className="space-y-3 bg-gray-100 dark:bg-gray-900 p-4 rounded-lg max-h-96 overflow-y-auto">
+        <div className="text-center mb-4">
+          <span className="text-xs text-muted-foreground bg-background px-3 py-1 rounded-full border">
+            {leadName}
+          </span>
+        </div>
+        {filteredItems.map((item) => {
+          const isIncoming = item.isIncoming ?? (item.type === 'text' || item.type === 'email');
+          
+          return (
+            <div key={item.id} className={cn(
+              "flex flex-col",
+              isIncoming ? "items-start" : "items-end"
+            )}>
+              <div className={cn(
+                "max-w-[75%] p-3 rounded-2xl shadow-sm",
+                isIncoming 
+                  ? "bg-card border text-card-foreground rounded-bl-md" 
+                  : "bg-primary text-primary-foreground rounded-br-md"
+              )}>
+                <p className="text-sm leading-relaxed">{item.content}</p>
+              </div>
+              <div className={cn(
+                "flex items-center gap-1 mt-1 text-xs text-muted-foreground",
+                isIncoming ? "ml-2" : "mr-2"
+              )}>
+                {item.type === 'email' && (
+                  <Mail className="h-3 w-3" />
+                )}
+                <span>{formatTimestamp(item.timestamp)}</span>
+                {item.status === 'completed' && !isIncoming && (
+                  <CheckCircle className="h-3 w-3" />
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-4">
       {/* Filters */}
@@ -202,13 +279,15 @@ export function CustomerHistoryTimeline({
         </div>
       </div>
 
-      {/* Timeline Feed */}
+      {/* Timeline Feed or Message View */}
       <div className="relative">
         {filteredItems.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
             <p className="text-sm">No interactions found for this filter</p>
           </div>
+        ) : filter === 'text' ? (
+          renderMessageView()
         ) : (
           <>
             {/* Timeline line */}
