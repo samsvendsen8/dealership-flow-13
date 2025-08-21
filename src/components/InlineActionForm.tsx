@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Phone, Mail, MessageSquare, CheckCircle, Clock } from 'lucide-react';
+import { Phone, Mail, MessageSquare, CheckCircle, Clock, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface InlineActionFormProps {
-  actionType: 'call' | 'text' | 'email';
+  actionType: 'call' | 'text' | 'email' | 'appointment';
   leadName: string;
   leadId: string;
   workPlanItem?: {
@@ -24,13 +24,15 @@ interface InlineActionFormProps {
 const actionIcons = {
   call: Phone,
   text: MessageSquare,
-  email: Mail
+  email: Mail,
+  appointment: Calendar
 };
 
 const actionLabels = {
   call: 'Phone Call',
   text: 'Text Message',
-  email: 'Email'
+  email: 'Email',
+  appointment: 'Schedule Appointment'
 };
 
 export function InlineActionForm({ 

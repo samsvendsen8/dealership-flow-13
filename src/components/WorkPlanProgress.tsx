@@ -11,7 +11,7 @@ interface WorkPlanTask {
   dueDate: string;
   status: 'pending' | 'completed' | 'missed' | 'scheduled' | 'customer_replied' | 'not_needed' | 'reached_out';
   attemptNumber: number;
-  contactMethod: 'phone' | 'email' | 'text';
+  contactMethod: 'phone' | 'email' | 'text' | 'appointment';
   customerResponse?: boolean;
   journeyStage: string;
 }
@@ -22,7 +22,7 @@ interface WorkPlanProgressProps {
   currentLeadStage?: string;
   className?: string;
   showCurrentOnly?: boolean;
-  onContactMethodClick?: (method: 'phone' | 'email' | 'text', task: WorkPlanTask) => void;
+  onContactMethodClick?: (method: 'phone' | 'email' | 'text' | 'appointment', task: WorkPlanTask) => void;
   onExpandToggle?: () => void;
   isExpanded?: boolean;
 }
@@ -51,6 +51,7 @@ const contactIcons = {
   phone: Phone,
   email: Mail,
   text: MessageCircle,
+  appointment: Calendar,
 };
 
 export function WorkPlanProgress({ 

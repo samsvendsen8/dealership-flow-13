@@ -63,7 +63,7 @@ interface WorkPlanTask {
   dueDate: string;
   status: 'pending' | 'completed' | 'missed' | 'scheduled' | 'customer_replied' | 'not_needed' | 'reached_out';
   attemptNumber: number;
-  contactMethod: 'phone' | 'email' | 'text';
+  contactMethod: 'phone' | 'email' | 'text' | 'appointment';
   customerResponse?: boolean;
   journeyStage: string;
 }
@@ -92,7 +92,7 @@ export interface Lead {
   sentiment?: 'positive' | 'neutral' | 'negative';
   lastAppointment?: string;
   keyInsight?: string;
-  preferredContact?: 'phone' | 'email' | 'text';
+  preferredContact?: 'phone' | 'email' | 'text' | 'appointment';
   budget?: { min: number; max: number };
   tradeInVehicle?: string;
   // Timeline and work plan data
@@ -102,11 +102,11 @@ export interface Lead {
 
 interface LeadCardProps {
   lead: Lead;
-  onContact: (leadId: string, method: 'phone' | 'email' | 'text') => void;
+  onContact: (leadId: string, method: 'phone' | 'email' | 'text' | 'appointment') => void;
   onViewDetails: (leadId: string) => void;
-  onOpenNotificationPanel?: (leadId: string, method: 'phone' | 'email' | 'text') => void;
+  onOpenNotificationPanel?: (leadId: string, method: 'phone' | 'email' | 'text' | 'appointment') => void;
   onTaskCompleted?: (leadId: string) => void;
-  onCommunicationSent?: (leadId: string, method: 'phone' | 'email' | 'text') => void;
+  onCommunicationSent?: (leadId: string, method: 'phone' | 'email' | 'text' | 'appointment') => void;
   isCondensed?: boolean;
   isFocused?: boolean;
 }
@@ -147,7 +147,7 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
   const [showCelebration, setShowCelebration] = useState(false);
   const [completingWorkItem, setCompletingWorkItem] = useState(false);
   const [showInlineAction, setShowInlineAction] = useState(false);
-  const [inlineActionType, setInlineActionType] = useState<'call' | 'text' | 'email'>('text');
+  const [inlineActionType, setInlineActionType] = useState<'call' | 'text' | 'email' | 'appointment'>('text');
   const [workPlanExpanded, setWorkPlanExpanded] = useState(false);
   const { sendMessage, advanceJourneyStage, isLoading } = useMessaging();
   const { toast } = useToast();
@@ -157,13 +157,14 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
     setSelectedJourneyStage(lead.journeyStage);
   }, [lead.id, lead.journeyStage]);
 
-  const handleQuickMessage = async (method: 'phone' | 'email' | 'text') => {
+  const handleQuickMessage = async (method: 'phone' | 'email' | 'text' | 'appointment') => {
     if (!responseText.trim()) {
       // Generate default message if empty
       const defaultMessages = {
         phone: `Hi ${lead.name}, this is [Your Name] from [Dealership]. I wanted to follow up on your interest in the ${lead.vehicle}. When would be a good time to chat?`,
         email: `Hi ${lead.name}, I wanted to follow up on your interest in the ${lead.vehicle}. I'd be happy to answer any questions and schedule a convenient time to connect.`,
-        text: `Hi ${lead.name}! Following up on your interest in the ${lead.vehicle}. I'm here to help with any questions. What's the best time to call?`
+        text: `Hi ${lead.name}! Following up on your interest in the ${lead.vehicle}. I'm here to help with any questions. What's the best time to call?`,
+        appointment: `Hi ${lead.name}, I'd like to schedule an appointment to show you the ${lead.vehicle}. What time works best for you this week?`
       };
       setResponseText(defaultMessages[method]);
       return;
@@ -212,10 +213,16 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
     }
   };
 
-  const handleContactMethodClick = (method: 'phone' | 'email' | 'text') => {
-    const actionType = method === 'phone' ? 'call' : method;
-    setInlineActionType(actionType as 'call' | 'text' | 'email');
-    setShowInlineAction(true);
+  const handleContactMethodClick = (method: 'phone' | 'email' | 'text' | 'appointment') => {
+    if (method === 'appointment') {
+      // Handle appointment scheduling
+      setInlineActionType('appointment');
+      setShowInlineAction(true);
+    } else {
+      const actionType = method === 'phone' ? 'call' : method;
+      setInlineActionType(actionType as 'call' | 'text' | 'email');
+      setShowInlineAction(true);
+    }
     // No longer auto-send, just open inline form
   };
 
@@ -903,12 +910,12 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                           variant="outline"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleContactMethodClick('email');
+                            handleContactMethodClick('appointment');
                           }}
                           className="h-6 text-xs flex-1"
                         >
-                          <Mail className="h-2 w-2 mr-1" />
-                          Email
+                          <Calendar className="h-2 w-2 mr-1" />
+                          Schedule
                         </Button>
                       </div>
                       
@@ -1068,11 +1075,11 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => handleQuickMessage('email')}
+                  onClick={() => handleQuickMessage('appointment')}
                   disabled={isLoading}
                 >
-                  <Mail className="h-4 w-4 mr-1" />
-                  Email
+                  <Calendar className="h-4 w-4 mr-1" />
+                  Schedule
                 </Button>
               </div>
             </div>

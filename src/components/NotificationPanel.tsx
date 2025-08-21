@@ -19,8 +19,8 @@ interface NotificationPanelProps {
   isOpen: boolean;
   onClose: () => void;
   selectedLead?: Lead;
-  onContact: (leadId: string, method: 'phone' | 'email' | 'text') => void;
-  contactMethod?: 'phone' | 'email' | 'text';
+  onContact: (leadId: string, method: 'phone' | 'email' | 'text' | 'appointment') => void;
+  contactMethod?: 'phone' | 'email' | 'text' | 'appointment';
   aiSuggestedResponse?: string;
 }
 
@@ -61,11 +61,12 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
   };
 
   // Generate AI responses for different contact methods
-  const generateAIResponse = (method: 'phone' | 'email' | 'text', lead: Lead) => {
+  const generateAIResponse = (method: 'phone' | 'email' | 'text' | 'appointment', lead: Lead) => {
     const responses = {
       phone: `Hi ${lead.name}! This is [Your Name] from [Dealership Name]. I noticed you've been interested in our ${lead.vehicle}. I wanted to personally reach out to see if you have any questions and help you schedule a test drive. What would be the best time for you to visit our showroom?`,
       email: `Subject: Your ${lead.vehicle} - Next Steps & Special Pricing\n\nHi ${lead.name},\n\nThank you for your interest in the ${lead.vehicle}! I'm excited to help you through this process.\n\nBased on your inquiry, I've prepared:\n• Detailed vehicle specifications\n• Current financing options\n• Available appointment times for test drives\n\nI'm here to answer any questions and make this as easy as possible for you. When would be a good time to connect?\n\nBest regards,\n[Your Name]`,
-      text: `Hi ${lead.name}! This is [Your Name] from [Dealership]. Hope you're well! Still interested in the ${lead.vehicle}? I'd love to help schedule a test drive or answer any questions. When works best for you? 🚗`
+      text: `Hi ${lead.name}! This is [Your Name] from [Dealership]. Hope you're well! Still interested in the ${lead.vehicle}? I'd love to help schedule a test drive or answer any questions. When works best for you? 🚗`,
+      appointment: `Hi ${lead.name}, I'd like to schedule an appointment for you to see the ${lead.vehicle} in person. We have availability this week for test drives and I can show you all the features. What day and time works best for your schedule?`
     };
     
     return responses[method];
@@ -75,9 +76,15 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
     aiSuggestedResponse || generateAIResponse(contactMethod, selectedLead) :
     selectedLead ? generateAIResponse('text', selectedLead) : '';
 
-  const handleContactMethodClick = (method: 'phone' | 'email' | 'text') => {
+  const handleContactMethodClick = (method: 'phone' | 'email' | 'text' | 'appointment') => {
     if (method === 'phone') {
       setShowCallModal(true);
+    } else if (method === 'appointment') {
+      // For appointments, switch to contact tab and prepare scheduling message
+      setActiveMainTab('contact');
+      if (selectedLead) {
+        setResponseText(generateAIResponse('appointment', selectedLead));
+      }
     } else {
       // Auto-switch to contact tab for messaging
       setActiveMainTab('contact');

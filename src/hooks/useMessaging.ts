@@ -6,7 +6,7 @@ export interface Message {
   lead_id: string;
   direction: 'outbound' | 'inbound';
   content: string;
-  message_type: 'text' | 'email' | 'call';
+  message_type: 'text' | 'email' | 'call' | 'appointment';
   status: 'sent' | 'delivered' | 'read' | 'replied';
   created_at: string;
 }
@@ -36,7 +36,7 @@ export const useMessaging = () => {
   const sendMessage = useCallback(async (
     leadId: string, 
     content: string, 
-    messageType: 'text' | 'email' | 'call' = 'text',
+    messageType: 'text' | 'email' | 'call' | 'appointment' = 'text',
     currentJourneyStage: string
   ) => {
     setIsLoading(true);
@@ -146,7 +146,7 @@ export const useMessaging = () => {
       lead_id: row.lead_id,
       direction: row.direction as 'outbound' | 'inbound',
       content: row.content,
-      message_type: row.message_type as 'text' | 'email' | 'call',
+      message_type: row.message_type as 'text' | 'email' | 'call' | 'appointment',
       status: row.status as 'sent' | 'delivered' | 'read' | 'replied',
       created_at: row.created_at
     }));
