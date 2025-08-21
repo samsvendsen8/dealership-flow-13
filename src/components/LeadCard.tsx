@@ -516,29 +516,118 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           </div>
         </div>
         
-        {/* Vehicle of Interest - Top & Prominent */}
-        <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-l-4 border-primary rounded-lg p-6 mt-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center space-x-3">
-              <div className="bg-primary/20 p-3 rounded-xl">
-                <Car className="h-6 w-6 text-primary" />
-              </div>
+        {/* AI Analysis & Insights - Moved to top */}
+        <Collapsible open={isAnalysisOpen} onOpenChange={setIsAnalysisOpen} className="mt-4">
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="sm" className="w-full justify-between">
+              <span className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                AI Analysis & Insights
+              </span>
+              <ChevronDown className={cn("h-4 w-4 transition-transform", isAnalysisOpen && "rotate-180")} />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-2">
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 space-y-3">
+              {/* Recommended Actions */}
               <div>
-                <h2 className="text-2xl font-bold text-foreground">{lead.vehicle}</h2>
-                <p className="text-sm text-muted-foreground">Vehicle of Interest</p>
+                <h5 className="font-medium text-sm flex items-center gap-2 mb-2">
+                  <Target className="h-4 w-4 text-primary" />
+                  Recommended Actions
+                </h5>
+                <div className="space-y-2">
+                  {quickActions.map((action, idx) => (
+                    <div key={idx} className="flex items-start gap-3 text-sm">
+                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium">{action.label}</p>
+                        <p className="text-muted-foreground text-xs">{action.context}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Risk Indicators */}
+              <div className="border-t border-primary/20 pt-3">
+                <h5 className="font-medium text-sm flex items-center gap-2 mb-2">
+                  <AlertCircle className="h-4 w-4 text-warning" />
+                  Risk Assessment
+                </h5>
+                <div className="space-y-2 text-sm">
+                  {lead.daysSinceLastContact && lead.daysSinceLastContact > 3 && (
+                    <div className="flex items-center gap-2 text-warning">
+                      <Clock className="h-3 w-3" />
+                      <span>Extended silence - follow up urgently</span>
+                    </div>
+                  )}
+                  {lead.sentiment === 'negative' && (
+                    <div className="flex items-center gap-2 text-destructive">
+                      <AlertCircle className="h-3 w-3" />
+                      <span>Negative sentiment detected - address concerns</span>
+                    </div>
+                  )}
+                  {lead.contactAttempts && lead.contactAttempts > 2 && !lead.responseRate && (
+                    <div className="flex items-center gap-2 text-warning">
+                      <MessageCircle className="h-3 w-3" />
+                      <span>Multiple attempts, no response - try different approach</span>
+                    </div>
+                  )}
+                  {(!lead.daysSinceLastContact || lead.daysSinceLastContact <= 1) && lead.sentiment !== 'negative' && (
+                    <div className="flex items-center gap-2 text-success">
+                      <CheckCircle className="h-3 w-3" />
+                      <span>Lead is actively engaged</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Opportunity Score */}
+              {lead.dealProbability && (
+                <div className="border-t border-primary/20 pt-3">
+                  <h5 className="font-medium text-sm flex items-center gap-2 mb-2">
+                    <Heart className="h-4 w-4 text-success" />
+                    Opportunity Score
+                  </h5>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 bg-muted rounded-full h-2">
+                      <div 
+                        className="bg-gradient-to-r from-destructive via-warning to-success h-2 rounded-full transition-all"
+                        style={{ width: `${lead.dealProbability}%` }}
+                      />
+                    </div>
+                    <span className="font-bold text-sm">{lead.dealProbability}%</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Based on engagement level, response rate, and journey progress
+                  </p>
+                </div>
+              )}
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+
+        {/* Vehicle of Interest - Less Prominent */}
+        <div className="bg-muted/10 border rounded-lg p-3 mt-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Car className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="font-medium text-sm">{lead.vehicle}</p>
+                <p className="text-xs text-muted-foreground">Vehicle of Interest</p>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-primary">${lead.value.toLocaleString()}</div>
+              <p className="font-medium text-sm">${lead.value.toLocaleString()}</p>
               <p className="text-xs text-muted-foreground">Target Value</p>
             </div>
           </div>
           {lead.tradeInVehicle && (
-            <div className="mt-3 pt-3 border-t border-primary/20">
+            <div className="mt-2 pt-2 border-t border-border">
               <div className="flex items-center gap-2">
-                <RefreshCw className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium text-muted-foreground">Trade-in: </span>
-                <span className="text-sm font-semibold text-foreground">{lead.tradeInVehicle}</span>
+                <RefreshCw className="h-3 w-3 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground">Trade-in: </span>
+                <span className="text-xs font-medium">{lead.tradeInVehicle}</span>
               </div>
             </div>
           )}
@@ -678,23 +767,62 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
             </div>
           </TooltipProvider>
           
-          {/* Work plan for selected journey stage */}
-          {lead.workPlan && lead.workPlan.length > 0 && journeyStages[selectedJourneyStage] && (
-            <WorkItemSlideOut
-              isTriggered={completingWorkItem}
-              onComplete={() => setCompletingWorkItem(false)}
-            >
-              <WorkPlanProgress 
-                tasks={lead.workPlan} 
-                journeyStage={selectedJourneyStage}
-                currentLeadStage={lead.journeyStage}
-                onContactMethodClick={(method, task) => {
-                  // Set response text based on task
-                  setResponseText(`Quick follow-up for: ${task.title}`);
-                  handleContactMethodClick(method);
-                }}
-              />
-            </WorkItemSlideOut>
+          {/* Current Work Plan Step in Journey Progress */}
+          {currentWorkPlanTask && journeyStages[selectedJourneyStage] && (
+            <div className="mt-3 p-3 bg-muted/10 border rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <h5 className="font-medium text-xs flex items-center gap-2">
+                  <Clock className="h-3 w-3 text-primary" />
+                  Current Step
+                </h5>
+                <Badge variant="outline" className="text-xs">
+                  {currentWorkPlanTask.dueDate}
+                </Badge>
+              </div>
+              
+              <div className="space-y-2">
+                <p className="text-xs font-medium">{currentWorkPlanTask.title}</p>
+                <p className="text-xs text-muted-foreground">{currentWorkPlanTask.description}</p>
+                
+                {/* Quick Action Buttons */}
+                <div className="flex gap-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleContactMethodClick('phone')}
+                    className="h-6 text-xs flex-1"
+                  >
+                    <Phone className="h-2 w-2 mr-1" />
+                    Call
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleContactMethodClick('text')}
+                    className="h-6 text-xs flex-1"
+                  >
+                    <MessageCircle className="h-2 w-2 mr-1" />
+                    Text
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleContactMethodClick('email')}
+                    className="h-6 text-xs flex-1"
+                  >
+                    <Mail className="h-2 w-2 mr-1" />
+                    Email
+                  </Button>
+                </div>
+                
+                {/* Context */}
+                {lead.workPlan && lead.workPlan.filter(t => t.journeyStage === lead.journeyStage).length > 1 && (
+                  <p className="text-xs text-muted-foreground">
+                    {lead.workPlan.filter(t => t.journeyStage === lead.journeyStage).length} attempts planned today
+                  </p>
+                )}
+              </div>
+            </div>
           )}
           
           {/* Journey Advance Button for customer replies */}
@@ -820,16 +948,6 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           </div>
         )}
 
-        {/* Key Insight Section */}
-        {lead.keyInsight && (
-          <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
-            <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="h-4 w-4 text-primary" />
-              <h4 className="font-medium text-primary text-sm">Key Insight</h4>
-            </div>
-            <p className="text-sm text-foreground">{lead.keyInsight}</p>
-          </div>
-        )}
 
         {/* Contact Preferences & History */}
         <div className="bg-muted/10 rounded-lg p-3">
@@ -944,96 +1062,6 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           </div>
         </div>
 
-        {/* Analysis Section - Collapsible */}
-        <Collapsible open={isAnalysisOpen} onOpenChange={setIsAnalysisOpen}>
-          <CollapsibleTrigger asChild>
-            <Button variant="ghost" size="sm" className="w-full justify-between">
-              <span className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4" />
-                AI Analysis & Insights
-              </span>
-              <ChevronDown className={cn("h-4 w-4 transition-transform", isAnalysisOpen && "rotate-180")} />
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="mt-2">
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 space-y-3">
-              {/* Recommended Actions */}
-              <div>
-                <h5 className="font-medium text-sm flex items-center gap-2 mb-2">
-                  <Target className="h-4 w-4 text-primary" />
-                  Recommended Actions
-                </h5>
-                <div className="space-y-2">
-                  {quickActions.map((action, idx) => (
-                    <div key={idx} className="flex items-start gap-3 text-sm">
-                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                      <div>
-                        <p className="font-medium">{action.label}</p>
-                        <p className="text-muted-foreground text-xs">{action.context}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Risk Indicators */}
-              <div className="border-t border-primary/20 pt-3">
-                <h5 className="font-medium text-sm flex items-center gap-2 mb-2">
-                  <AlertCircle className="h-4 w-4 text-warning" />
-                  Risk Assessment
-                </h5>
-                <div className="space-y-2 text-sm">
-                  {lead.daysSinceLastContact && lead.daysSinceLastContact > 3 && (
-                    <div className="flex items-center gap-2 text-warning">
-                      <Clock className="h-3 w-3" />
-                      <span>Extended silence - follow up urgently</span>
-                    </div>
-                  )}
-                  {lead.sentiment === 'negative' && (
-                    <div className="flex items-center gap-2 text-destructive">
-                      <AlertCircle className="h-3 w-3" />
-                      <span>Negative sentiment detected - address concerns</span>
-                    </div>
-                  )}
-                  {lead.contactAttempts && lead.contactAttempts > 2 && !lead.responseRate && (
-                    <div className="flex items-center gap-2 text-warning">
-                      <MessageCircle className="h-3 w-3" />
-                      <span>Multiple attempts, no response - try different approach</span>
-                    </div>
-                  )}
-                  {(!lead.daysSinceLastContact || lead.daysSinceLastContact <= 1) && lead.sentiment !== 'negative' && (
-                    <div className="flex items-center gap-2 text-success">
-                      <CheckCircle className="h-3 w-3" />
-                      <span>Lead is actively engaged</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Opportunity Score */}
-              {lead.dealProbability && (
-                <div className="border-t border-primary/20 pt-3">
-                  <h5 className="font-medium text-sm flex items-center gap-2 mb-2">
-                    <Heart className="h-4 w-4 text-success" />
-                    Opportunity Score
-                  </h5>
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 bg-muted rounded-full h-2">
-                      <div 
-                        className="bg-gradient-to-r from-destructive via-warning to-success h-2 rounded-full transition-all"
-                        style={{ width: `${lead.dealProbability}%` }}
-                      />
-                    </div>
-                    <span className="font-bold text-sm">{lead.dealProbability}%</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Based on engagement level, response rate, and journey progress
-                  </p>
-                </div>
-              )}
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
 
         {/* Customer on Lot Alert */}
         {lead.timeOnLot && (
