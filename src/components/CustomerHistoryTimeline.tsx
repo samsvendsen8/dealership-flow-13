@@ -214,8 +214,8 @@ export function CustomerHistoryTimeline({
   // iPhone-style message view for text/email filter
   const renderMessageView = () => {
     return (
-      <div className="space-y-3 bg-gray-100 dark:bg-gray-900 p-4 rounded-lg max-h-96 overflow-y-auto">
-        <div className="text-center mb-4">
+      <div className="space-y-3 bg-gray-100 dark:bg-gray-900 p-6 rounded-lg min-h-[500px] max-h-[700px] overflow-y-auto">
+        <div className="text-center mb-6">
           <span className="text-xs text-muted-foreground bg-background px-3 py-1 rounded-full border">
             {leadName}
           </span>
@@ -225,11 +225,11 @@ export function CustomerHistoryTimeline({
           
           return (
             <div key={item.id} className={cn(
-              "flex flex-col",
+              "flex flex-col mb-4",
               isIncoming ? "items-start" : "items-end"
             )}>
               <div className={cn(
-                "max-w-[75%] p-3 rounded-2xl shadow-sm",
+                "max-w-[80%] p-4 rounded-2xl shadow-sm",
                 isIncoming 
                   ? "bg-card border text-card-foreground rounded-bl-md" 
                   : "bg-primary text-primary-foreground rounded-br-md"
@@ -237,8 +237,8 @@ export function CustomerHistoryTimeline({
                 <p className="text-sm leading-relaxed">{item.content}</p>
               </div>
               <div className={cn(
-                "flex items-center gap-1 mt-1 text-xs text-muted-foreground",
-                isIncoming ? "ml-2" : "mr-2"
+                "flex items-center gap-1 mt-2 text-xs text-muted-foreground",
+                isIncoming ? "ml-3" : "mr-3"
               )}>
                 {item.type === 'email' && (
                   <Mail className="h-3 w-3" />
