@@ -918,19 +918,40 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
             </div>
           )}
           
-          {/* Journey Advance Button for customer replies */}
-          <JourneyAdvanceButton
-            leadId={lead.id}
-            leadName={lead.name}
-            currentStage={lead.journeyStage}
-            leadStatus={lead.status}
-            hasCustomerReplied={lead.status === 'qualified'}
-            onStageAdvanced={() => {
-              // Could trigger a refresh here if needed
-            }}
-          />
-        </div>
-      </CardHeader>
+           {/* Journey Advance Button for customer replies */}
+           <JourneyAdvanceButton
+             leadId={lead.id}
+             leadName={lead.name}
+             currentStage={lead.journeyStage}
+             leadStatus={lead.status}
+             hasCustomerReplied={lead.status === 'qualified'}
+             onStageAdvanced={() => {
+               // Could trigger a refresh here if needed
+             }}
+           />
+         </div>
+         
+         {/* Historical Work Plan Progress - Show when viewing previous stages */}
+         {selectedJourneyStage !== lead.journeyStage && (
+           <div className="mt-4 border-t pt-4">
+             <div className="flex items-center gap-2 mb-3">
+               <div className="h-2 w-2 rounded-full bg-muted-foreground/50"></div>
+               <h4 className="text-sm font-medium text-muted-foreground">
+                 {journeyStages[selectedJourneyStage as keyof typeof journeyStages]?.label} Stage Work Plan
+               </h4>
+             </div>
+             <WorkPlanProgress
+               tasks={lead.workPlan || []}
+               journeyStage={selectedJourneyStage}
+               currentLeadStage={lead.journeyStage}
+               onContactMethodClick={(method, task) => {
+                 // Handle contact method clicks for historical tasks
+                 handleContactMethodClick(method);
+               }}
+             />
+           </div>
+         )}
+       </CardHeader>
 
       <CardContent className="space-y-4">
         {/* Customer Response Preview - Top Priority */}
