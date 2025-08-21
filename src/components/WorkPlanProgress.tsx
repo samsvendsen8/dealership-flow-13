@@ -157,7 +157,8 @@ export function WorkPlanProgress({
             Work Plan ({journeyStage}) 
             {!isViewingCurrentStage && (
               <span className="ml-1 text-xs">
-                {isViewingCompletedStage ? '✅ Completed' : '⏳ Future'}
+                {isViewingCompletedStage && customerReplied ? '✅ Stage Completed' : 
+                 isViewingCompletedStage ? '📊 Historical View' : '⏳ Future'}
               </span>
             )}
           </span>
@@ -173,13 +174,15 @@ export function WorkPlanProgress({
             <Badge variant="outline" className="text-xs text-primary border-primary">
               → Attempt #{currentTask.attemptNumber}/3 pending
             </Badge>
-          ) : isViewingCompletedStage ? (
+          ) : completedCount > 0 && isViewingCompletedStage ? (
             <Badge className="text-xs bg-success text-white">
-              ✅ Completed Successfully
+              ✅ Stage Completed Successfully
             </Badge>
           ) : (
             <Badge variant="outline" className="text-xs">
-              {completedCount}/{displayTasks.length} completed
+              {reachedOutCount > 0 ? `${reachedOutCount} waiting response` : 
+               completedCount > 0 ? `${completedCount}/${displayTasks.length} tasks done` :
+               'No progress yet'}
             </Badge>
           )}
         </div>
@@ -240,7 +243,10 @@ export function WorkPlanProgress({
                       e.stopPropagation();
                       onContactMethodClick?.('phone', task);
                     }}
-                    title="Make phone call"
+                    title={task.status === 'pending' ? 'Make phone call' : 
+                           task.status === 'completed' || task.status === 'customer_replied' ? 'Call completed' :
+                           task.status === 'reached_out' ? 'Call attempted - awaiting response' : 
+                           'Make phone call'}
                   >
                     <Phone className="h-3 w-3" />
                   </Button>
@@ -252,7 +258,10 @@ export function WorkPlanProgress({
                       e.stopPropagation();
                       onContactMethodClick?.('email', task);
                     }}
-                    title="Send email"
+                    title={task.status === 'pending' ? 'Send email' :
+                           task.status === 'completed' || task.status === 'customer_replied' ? 'Email completed' :
+                           task.status === 'reached_out' ? 'Email sent - awaiting response' :
+                           'Send email'}
                   >
                     <Mail className="h-3 w-3" />
                   </Button>
@@ -264,7 +273,10 @@ export function WorkPlanProgress({
                       e.stopPropagation();
                       onContactMethodClick?.('text', task);
                     }}
-                    title="Send text message"
+                    title={task.status === 'pending' ? 'Send text message' :
+                           task.status === 'completed' || task.status === 'customer_replied' ? 'Text completed' :
+                           task.status === 'reached_out' ? 'Text sent - awaiting response' :
+                           'Send text message'}
                   >
                     <MessageCircle className="h-3 w-3" />
                   </Button>
