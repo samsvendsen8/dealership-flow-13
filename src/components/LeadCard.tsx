@@ -745,7 +745,7 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                 {/* Journey Stage Icons - Overlapping the progress bar */}
                 {Object.entries(journeyStages).map(([stage, config], index, array) => {
                   const position = (index / (array.length - 1)) * 100;
-                  const isCompleted = Object.keys(journeyStages).indexOf(lead.journeyStage) >= index;
+                  const isCompleted = Object.keys(journeyStages).indexOf(lead.journeyStage) > index;
                   const isCurrentStep = lead.journeyStage === stage;
                   
                   // Mock completion dates for demonstration
