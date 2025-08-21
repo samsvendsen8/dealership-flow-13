@@ -178,7 +178,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
   return (
     <div className={cn(
       "fixed right-0 top-0 h-full bg-background border-l border-border z-50 transition-all duration-300 ease-in-out",
-      isOpen ? "w-[500px] translate-x-0" : "w-0 translate-x-full"
+      isOpen ? "w-[420px] translate-x-0" : "w-0 translate-x-full"
     )}>
       {selectedLead ? (
         <ScrollArea className="h-full">

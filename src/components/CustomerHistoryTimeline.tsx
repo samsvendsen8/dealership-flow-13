@@ -385,7 +385,7 @@ export function CustomerHistoryTimeline({
                   {/* Content Card */}
                   <div 
                     className={cn(
-                      "ml-24 bg-card border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow",
+                      "ml-20 bg-card border rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow",
                       ['text', 'email'].includes(item.type) && "cursor-pointer hover:bg-card/80"
                     )}
                     onClick={() => handleMessageClick(item)}
@@ -393,12 +393,12 @@ export function CustomerHistoryTimeline({
                     {/* Header with icon, title */}
                     <div className="flex items-center gap-2 text-sm mb-2">
                       <div className={cn(
-                        "p-1.5 rounded border",
+                        "p-1 rounded border",
                         typeColors[item.type]
                       )}>
                         <Icon className="h-3 w-3" />
                       </div>
-                      <span className="font-medium text-card-foreground">{item.title}</span>
+                      <span className="font-medium text-card-foreground text-xs">{item.title}</span>
                       {item.status && StatusIcon && (
                         <StatusIcon className="h-3 w-3 text-muted-foreground" />
                       )}
@@ -410,30 +410,30 @@ export function CustomerHistoryTimeline({
                     </div>
                     
                     {/* Content */}
-                    <p className="text-sm text-card-foreground/80 leading-relaxed mb-3">
+                    <p className="text-xs text-card-foreground/80 leading-relaxed mb-2">
                       {item.content}
                     </p>
                     
                     {/* Metadata inline */}
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-1 flex-wrap">
                       {item.duration && (
-                        <span className="text-xs text-foreground bg-muted px-2 py-1 rounded border">
+                        <span className="text-xs text-foreground bg-muted px-1.5 py-0.5 rounded border">
                           {item.duration}
                         </span>
                       )}
                       {item.outcome && (
-                        <span className="text-xs text-emerald-800 bg-emerald-100 px-2 py-1 rounded border border-emerald-300">
+                        <span className="text-xs text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-300">
                           {item.outcome}
                         </span>
                       )}
                       {item.tags && item.tags.map((tag) => (
-                        <span key={tag} className="text-xs text-primary bg-primary/20 px-2 py-1 rounded border border-primary/30">
+                        <span key={tag} className="text-xs text-primary bg-primary/20 px-1.5 py-0.5 rounded border border-primary/30">
                           #{tag}
                         </span>
                       ))}
                       {item.priority && ['high', 'urgent'].includes(item.priority) && (
                         <span className={cn(
-                          "text-xs px-2 py-1 rounded font-medium border",
+                          "text-xs px-1.5 py-0.5 rounded font-medium border",
                           item.priority === 'urgent' ? 'text-destructive bg-destructive/10 border-destructive/30' : 'text-amber-700 bg-amber-100 border-amber-300'
                         )}>
                           {item.priority}
