@@ -222,23 +222,23 @@ export function CustomerHistoryTimeline({
                 <div key={item.id} className="relative pb-4 last:pb-0">
                   {/* Timeline dot */}
                   <div className={cn(
-                    "absolute left-2.5 w-3 h-3 rounded-full border-2 bg-background shadow-sm",
+                    "absolute left-2.5 w-3 h-3 rounded-full border-2 bg-background shadow-sm z-10",
                     item.priority === 'urgent' ? 'border-destructive shadow-destructive/30' :
                     item.priority === 'high' ? 'border-orange-500 shadow-orange-500/30' :
                     item.priority === 'medium' ? 'border-primary shadow-primary/30' : 'border-muted-foreground/60'
                   )}></div>
                   
-                  {/* Content */}
-                  <div className="ml-8 space-y-1">
+                  {/* Content Card */}
+                  <div className="ml-8 bg-card border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
                     {/* Header with icon, title, and timestamp */}
-                    <div className="flex items-center gap-2 text-sm">
+                    <div className="flex items-center gap-2 text-sm mb-2">
                       <div className={cn(
-                        "p-1 rounded border",
+                        "p-1.5 rounded border",
                         typeColors[item.type]
                       )}>
                         <Icon className="h-3 w-3" />
                       </div>
-                      <span className="font-medium">{item.title}</span>
+                      <span className="font-medium text-card-foreground">{item.title}</span>
                       {item.status && StatusIcon && (
                         <StatusIcon className="h-3 w-3 text-muted-foreground" />
                       )}
@@ -248,31 +248,31 @@ export function CustomerHistoryTimeline({
                     </div>
                     
                     {/* Content */}
-                    <p className="text-sm text-foreground/80 leading-relaxed pl-6">
+                    <p className="text-sm text-card-foreground/80 leading-relaxed mb-3">
                       {item.content}
                     </p>
                     
                     {/* Metadata inline */}
-                    <div className="flex items-center gap-2 pl-6">
+                    <div className="flex items-center gap-2 flex-wrap">
                       {item.duration && (
-                        <span className="text-xs text-foreground bg-muted px-2 py-0.5 rounded border">
+                        <span className="text-xs text-foreground bg-muted px-2 py-1 rounded border">
                           {item.duration}
                         </span>
                       )}
                       {item.outcome && (
-                        <span className="text-xs text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300">
+                        <span className="text-xs text-emerald-800 bg-emerald-100 px-2 py-1 rounded border border-emerald-300">
                           {item.outcome}
                         </span>
                       )}
                       {item.tags && item.tags.map((tag) => (
-                        <span key={tag} className="text-xs text-primary bg-primary/20 px-2 py-0.5 rounded border border-primary/30">
+                        <span key={tag} className="text-xs text-primary bg-primary/20 px-2 py-1 rounded border border-primary/30">
                           #{tag}
                         </span>
                       ))}
                       {item.priority && ['high', 'urgent'].includes(item.priority) && (
                         <span className={cn(
-                          "text-xs px-2 py-0.5 rounded font-medium",
-                          item.priority === 'urgent' ? 'text-destructive bg-destructive/10' : 'text-amber-700 bg-amber-50'
+                          "text-xs px-2 py-1 rounded font-medium border",
+                          item.priority === 'urgent' ? 'text-destructive bg-destructive/10 border-destructive/30' : 'text-amber-700 bg-amber-100 border-amber-300'
                         )}>
                           {item.priority}
                         </span>
