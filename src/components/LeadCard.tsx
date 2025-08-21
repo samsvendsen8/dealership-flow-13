@@ -790,70 +790,131 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
             </div>
           </TooltipProvider>
           
-          {/* Current Work Plan Step in Journey Progress */}
-          {currentWorkPlanTask && journeyStages[selectedJourneyStage] && (
+          {/* Current Step in Journey Progress - Customer Response Takes Priority */}
+          {journeyStages[selectedJourneyStage] && (
             <div className="mt-3 p-3 bg-muted/10 border rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <h5 className="font-medium text-xs flex items-center gap-2">
-                  <Clock className="h-3 w-3 text-primary" />
-                  Current Step
-                </h5>
-                <Badge variant="outline" className="text-xs">
-                  {currentWorkPlanTask.dueDate}
-                </Badge>
-              </div>
-              
-              <div className="space-y-2">
-                <p className="text-xs font-medium">{currentWorkPlanTask.title}</p>
-                <p className="text-xs text-muted-foreground">{currentWorkPlanTask.description}</p>
-                
-                {/* Quick Action Buttons */}
-                <div className="flex gap-1">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleContactMethodClick('phone');
-                  }}
-                  className="h-6 text-xs flex-1"
-                >
-                  <Phone className="h-2 w-2 mr-1" />
-                  Call
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleContactMethodClick('text');
-                  }}
-                  className="h-6 text-xs flex-1"
-                >
-                  <MessageCircle className="h-2 w-2 mr-1" />
-                  Text
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleContactMethodClick('email');
-                  }}
-                  className="h-6 text-xs flex-1"
-                >
-                    <Mail className="h-2 w-2 mr-1" />
-                    Email
-                  </Button>
-                </div>
-                
-                {/* Context */}
-                {lead.workPlan && lead.workPlan.filter(t => t.journeyStage === lead.journeyStage).length > 1 && (
-                  <p className="text-xs text-muted-foreground">
-                    {lead.workPlan.filter(t => t.journeyStage === lead.journeyStage).length} attempts planned today
-                  </p>
-                )}
-              </div>
+              {/* Customer Response Section (Higher Priority) */}
+              {mockCustomerResponse ? (
+                <>
+                  <div className="flex items-center justify-between mb-2">
+                    <h5 className="font-medium text-xs flex items-center gap-2">
+                      <Activity className="h-3 w-3 text-success" />
+                      Customer Reached Out
+                    </h5>
+                    <Badge variant="outline" className="text-xs bg-success/10 text-success border-success/20">
+                      15 min ago
+                    </Badge>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium">Customer replied with questions</p>
+                    <p className="text-xs text-muted-foreground line-clamp-2">
+                      {mockCustomerResponse.content.substring(0, 100)}...
+                    </p>
+                    
+                    {/* Customer Response Action Buttons - Separate from workplan */}
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        variant="default"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Direct customer response handling - not workplan related
+                          onContact(lead.id, 'phone');
+                        }}
+                        className="h-6 text-xs flex-1"
+                      >
+                        <Phone className="h-2 w-2 mr-1" />
+                        Call Back
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="default"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Direct customer response handling - not workplan related
+                          onContact(lead.id, 'text');
+                        }}
+                        className="h-6 text-xs flex-1"
+                      >
+                        <MessageCircle className="h-2 w-2 mr-1" />
+                        Reply
+                      </Button>
+                    </div>
+                    
+                    <p className="text-xs text-success">
+                      Priority: Respond to customer inquiry
+                    </p>
+                  </div>
+                </>
+              ) : (
+                /* Workplan Item Section (When no customer response) */
+                currentWorkPlanTask && (
+                  <>
+                    <div className="flex items-center justify-between mb-2">
+                      <h5 className="font-medium text-xs flex items-center gap-2">
+                        <Clock className="h-3 w-3 text-primary" />
+                        Current Step
+                      </h5>
+                      <Badge variant="outline" className="text-xs">
+                        {currentWorkPlanTask.dueDate}
+                      </Badge>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium">{currentWorkPlanTask.title}</p>
+                      <p className="text-xs text-muted-foreground">{currentWorkPlanTask.description}</p>
+                      
+                      {/* Workplan Action Buttons */}
+                      <div className="flex gap-1">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleContactMethodClick('phone');
+                          }}
+                          className="h-6 text-xs flex-1"
+                        >
+                          <Phone className="h-2 w-2 mr-1" />
+                          Call
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleContactMethodClick('text');
+                          }}
+                          className="h-6 text-xs flex-1"
+                        >
+                          <MessageCircle className="h-2 w-2 mr-1" />
+                          Text
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleContactMethodClick('email');
+                          }}
+                          className="h-6 text-xs flex-1"
+                        >
+                          <Mail className="h-2 w-2 mr-1" />
+                          Email
+                        </Button>
+                      </div>
+                      
+                      {/* Context */}
+                      {lead.workPlan && lead.workPlan.filter(t => t.journeyStage === lead.journeyStage).length > 1 && (
+                        <p className="text-xs text-muted-foreground">
+                          {lead.workPlan.filter(t => t.journeyStage === lead.journeyStage).length} attempts planned today
+                        </p>
+                      )}
+                    </div>
+                  </>
+                )
+              )}
             </div>
           )}
           
