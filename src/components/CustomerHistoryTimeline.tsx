@@ -202,99 +202,87 @@ export function CustomerHistoryTimeline({
         </div>
       </div>
 
-      {/* Timeline */}
-      <div className="space-y-3">
+      {/* Timeline Feed */}
+      <div className="relative">
         {filteredItems.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
             <p className="text-sm">No interactions found for this filter</p>
           </div>
         ) : (
-          filteredItems.map((item, index) => {
-            const Icon = typeIcons[item.type];
-            const StatusIcon = item.status ? statusIcons[item.status] : null;
+          <>
+            {/* Timeline line */}
+            <div className="absolute left-4 top-0 bottom-0 w-px bg-border"></div>
             
-            return (
-              <Card 
-                key={item.id} 
-                className={cn(
-                  "border-l-4 transition-all hover:shadow-sm",
-                  priorityColors[item.priority || 'medium']
-                )}
-              >
-                <CardContent className="p-3">
-                  <div className="flex items-start gap-3">
-                    {/* Icon */}
-                    <div className={cn(
-                      "p-2 rounded-lg border flex-shrink-0",
-                      typeColors[item.type]
-                    )}>
-                      <Icon className="h-3 w-3" />
+            {filteredItems.map((item, index) => {
+              const Icon = typeIcons[item.type];
+              const StatusIcon = item.status ? statusIcons[item.status] : null;
+              
+              return (
+                <div key={item.id} className="relative pb-4 last:pb-0">
+                  {/* Timeline dot */}
+                  <div className={cn(
+                    "absolute left-3 w-2 h-2 rounded-full border-2 bg-background",
+                    item.priority === 'urgent' ? 'border-destructive' :
+                    item.priority === 'high' ? 'border-orange-400' :
+                    item.priority === 'medium' ? 'border-blue-400' : 'border-muted'
+                  )}></div>
+                  
+                  {/* Content */}
+                  <div className="ml-8 space-y-1">
+                    {/* Header with icon, title, and timestamp */}
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className={cn(
+                        "p-1 rounded border",
+                        typeColors[item.type]
+                      )}>
+                        <Icon className="h-3 w-3" />
+                      </div>
+                      <span className="font-medium">{item.title}</span>
+                      {item.status && StatusIcon && (
+                        <StatusIcon className="h-3 w-3 text-muted-foreground" />
+                      )}
+                      <span className="text-xs text-muted-foreground ml-auto">
+                        {formatTimestamp(item.timestamp)}
+                      </span>
                     </div>
                     
                     {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-medium text-sm">{item.title}</h4>
-                          {item.status && StatusIcon && (
-                            <StatusIcon className="h-3 w-3 text-muted-foreground" />
-                          )}
-                        </div>
-                        <span className="text-xs text-muted-foreground">
-                          {formatTimestamp(item.timestamp)}
+                    <p className="text-sm text-muted-foreground leading-relaxed pl-6">
+                      {item.content}
+                    </p>
+                    
+                    {/* Metadata inline */}
+                    <div className="flex items-center gap-2 pl-6">
+                      {item.duration && (
+                        <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded">
+                          {item.duration}
                         </span>
-                      </div>
-                      
-                      <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
-                        {item.content}
-                      </p>
-                      
-                      {/* Metadata */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          {item.duration && (
-                            <Badge variant="outline" className="text-xs px-1.5 py-0.5">
-                              {item.duration}
-                            </Badge>
-                          )}
-                          {item.priority && ['high', 'urgent'].includes(item.priority) && (
-                            <Badge 
-                              variant={item.priority === 'urgent' ? 'destructive' : 'secondary'} 
-                              className="text-xs px-1.5 py-0.5"
-                            >
-                              {item.priority}
-                            </Badge>
-                          )}
-                        </div>
-                        
-                        {item.tags && (
-                          <div className="flex gap-1 flex-wrap">
-                            {item.tags.slice(0, 2).map((tag) => (
-                              <Badge key={tag} variant="outline" className="text-xs px-1.5 py-0.5">
-                                {tag}
-                              </Badge>
-                            ))}
-                            {item.tags.length > 2 && (
-                              <Badge variant="outline" className="text-xs px-1.5 py-0.5">
-                                +{item.tags.length - 2}
-                              </Badge>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                      
+                      )}
                       {item.outcome && (
-                        <div className="mt-2 p-2 bg-muted/30 rounded text-xs">
-                          <strong>Outcome:</strong> {item.outcome}
-                        </div>
+                        <span className="text-xs text-green-700 bg-green-50 px-2 py-0.5 rounded">
+                          {item.outcome}
+                        </span>
+                      )}
+                      {item.tags && item.tags.map((tag) => (
+                        <span key={tag} className="text-xs text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
+                          #{tag}
+                        </span>
+                      ))}
+                      {item.priority && ['high', 'urgent'].includes(item.priority) && (
+                        <span className={cn(
+                          "text-xs px-2 py-0.5 rounded font-medium",
+                          item.priority === 'urgent' ? 'text-red-700 bg-red-50' : 'text-orange-700 bg-orange-50'
+                        )}>
+                          {item.priority}
+                        </span>
                       )}
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            );
-          })
+                </div>
+              );
+            })}
+          </>
         )}
       </div>
 
