@@ -34,7 +34,7 @@ import {
   Heart,
   AlertCircle,
   Expand,
-  Shrink
+  Minimize
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { WorkPlanProgress } from './WorkPlanProgress';
@@ -757,7 +757,7 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                   onClick={() => setWorkPlanExpanded(!workPlanExpanded)}
                   className="h-6 w-6 p-0"
                 >
-                  {workPlanExpanded ? <Shrink className="h-3 w-3" /> : <Expand className="h-3 w-3" />}
+                  {workPlanExpanded ? <Minimize className="h-3 w-3" /> : <Expand className="h-3 w-3" />}
                 </Button>
               </div>
             </div>
