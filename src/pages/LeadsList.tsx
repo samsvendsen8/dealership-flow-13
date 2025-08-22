@@ -38,8 +38,7 @@ const mockLeads: Lead[] = [
     lastAppointment: 'Today',
     keyInsight: 'Currently on lot - ready to make decision today with right financing',
     preferredContact: 'phone',
-    budget: { min: 26000, max: 30000 },
-    
+    budget: { min: 26000, max: 30000 }
   },
   {
     id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22',
@@ -61,8 +60,7 @@ const mockLeads: Lead[] = [
     nextFollowUp: 'Tomorrow 2pm',
     dealProbability: 85,
     sentiment: 'positive',
-    tradeInVehicle: '2018 Honda Accord',
-    
+    tradeInVehicle: '2018 Honda Accord'
   },
   {
     id: 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33',
@@ -84,8 +82,7 @@ const mockLeads: Lead[] = [
     nextFollowUp: 'Friday 10am',
     dealProbability: 70,
     sentiment: 'neutral',
-    budget: { min: 40000, max: 48000 },
-    
+    budget: { min: 40000, max: 48000 }
   },
   {
     id: 'd3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44',
@@ -106,8 +103,7 @@ const mockLeads: Lead[] = [
     daysSinceLastContact: 0,
     dealProbability: 60,
     sentiment: 'neutral',
-    budget: { min: 35000, max: 40000 },
-    
+    budget: { min: 35000, max: 40000 }
   },
   {
     id: 'e4eebc99-9c0b-4ef8-bb6d-6bb9bd380a55',
@@ -128,8 +124,7 @@ const mockLeads: Lead[] = [
     daysSinceLastContact: 1,
     dealProbability: 30,
     sentiment: 'neutral',
-    budget: { min: 25000, max: 32000 },
-    
+    budget: { min: 25000, max: 32000 }
   },
   {
     id: 'f5eebc99-9c0b-4ef8-bb6d-6bb9bd380a66',
@@ -151,8 +146,7 @@ const mockLeads: Lead[] = [
     nextFollowUp: 'Today 4pm',
     dealProbability: 95,
     sentiment: 'positive',
-    budget: { min: 40000, max: 50000 },
-    
+    budget: { min: 40000, max: 50000 }
   }
 ];
 
@@ -242,10 +236,10 @@ const LeadsList = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4">
+    <div className="h-screen bg-background flex flex-col">
+      {/* Header - Fixed */}
+      <div className="border-b bg-card flex-shrink-0">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link to="/">
@@ -266,233 +260,236 @@ const LeadsList = () => {
         </div>
       </div>
 
-      {/* Filters and Search */}
-      <div className="container mx-auto px-4 py-6">
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Filter className="h-5 w-5" />
-              Filters & Search
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-              <div className="lg:col-span-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search leads..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
+      {/* Main Content - Flex Fill */}
+      <div className="flex-1 overflow-hidden">
+        <div className="container mx-auto px-4 py-4 h-full flex flex-col">
+          {/* Filters - Compact */}
+          <Card className="mb-4 flex-shrink-0">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Filter className="h-5 w-5" />
+                Filters & Search
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
+                <div className="lg:col-span-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search leads..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="new">New</SelectItem>
+                    <SelectItem value="contacted">Contacted</SelectItem>
+                    <SelectItem value="qualified">Qualified</SelectItem>
+                    <SelectItem value="proposal">Proposal</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Priority" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Priorities</SelectItem>
+                    <SelectItem value="hot">Hot</SelectItem>
+                    <SelectItem value="warm">Warm</SelectItem>
+                    <SelectItem value="cold">Cold</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={journeyStageFilter} onValueChange={setJourneyStageFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Journey Stage" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Stages</SelectItem>
+                    <SelectItem value="initial_inquiry">Initial Inquiry</SelectItem>
+                    <SelectItem value="engaged">Engaged</SelectItem>
+                    <SelectItem value="visit">Visit</SelectItem>
+                    <SelectItem value="proposal">Proposal</SelectItem>
+                    <SelectItem value="negotiation">Negotiation</SelectItem>
+                    <SelectItem value="closing">Closing</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="lastContact">Last Contact</SelectItem>
+                    <SelectItem value="value">Deal Value</SelectItem>
+                    <SelectItem value="priority">Priority</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="new">New</SelectItem>
-                  <SelectItem value="contacted">Contacted</SelectItem>
-                  <SelectItem value="qualified">Qualified</SelectItem>
-                  <SelectItem value="proposal">Proposal</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Priority" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Priorities</SelectItem>
-                  <SelectItem value="hot">Hot</SelectItem>
-                  <SelectItem value="warm">Warm</SelectItem>
-                  <SelectItem value="cold">Cold</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={journeyStageFilter} onValueChange={setJourneyStageFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Journey Stage" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Stages</SelectItem>
-                  <SelectItem value="initial_inquiry">Initial Inquiry</SelectItem>
-                  <SelectItem value="engaged">Engaged</SelectItem>
-                  <SelectItem value="visit">Visit</SelectItem>
-                  <SelectItem value="proposal">Proposal</SelectItem>
-                  <SelectItem value="negotiation">Negotiation</SelectItem>
-                  <SelectItem value="closing">Closing</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="lastContact">Last Contact</SelectItem>
-                  <SelectItem value="value">Deal Value</SelectItem>
-                  <SelectItem value="priority">Priority</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Leads Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <SortDesc className="h-5 w-5" />
-              Leads List
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            <ScrollArea className="h-[600px]">
-                <div className="space-y-2 p-4">
-                {filteredAndSortedLeads.map((lead) => (
-                  <div
-                    key={lead.id}
-                    className="border rounded-lg p-4 hover:bg-muted/50 transition-colors animate-fade-in"
-                  >
-                    <div className="grid grid-cols-1 lg:grid-cols-11 gap-4 items-center">{/*lead info*/}
-                      {/* Lead Info */}
-                      <div className="lg:col-span-2">{/*lead info */}
-                        <h3 className="font-semibold text-foreground">{lead.name}</h3>
-                        <p className="text-sm text-muted-foreground">{lead.email}</p>
-                        <p className="text-sm text-muted-foreground">{lead.phone}</p>
-                      </div>
-
-                      {/* Vehicle & Value */}
-                      <div className="lg:col-span-2">
-                        <p className="font-medium text-foreground">{lead.vehicle}</p>
-                        <p className="text-sm text-muted-foreground">
-                          ${(lead.value || 0).toLocaleString()}
-                        </p>
-                      </div>
-
-                      {/* Status & Priority */}
-                      <div className="lg:col-span-2">
-                        <div className="flex flex-wrap gap-1">
-                          <Badge className={statusColors[lead.status] || 'bg-gray-100 text-gray-800'}>
-                            {lead.status}
-                          </Badge>
-                          <Badge className={priorityColors[lead.priority]}>
-                            {lead.priority}
-                          </Badge>
+          {/* Leads Table - Flex Fill */}
+          <Card className="flex-1 overflow-hidden">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <SortDesc className="h-5 w-5" />
+                Leads List
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0 flex-1 overflow-hidden">
+              <ScrollArea className="h-full">
+                <div className="space-y-1 p-3">
+                  {filteredAndSortedLeads.map((lead) => (
+                    <div
+                      key={lead.id}
+                      className="border rounded-lg p-3 hover:bg-muted/50 transition-colors animate-fade-in"
+                    >
+                      <div className="grid grid-cols-1 lg:grid-cols-11 gap-3 items-center">
+                        {/* Lead Info */}
+                        <div className="lg:col-span-2">
+                          <h3 className="font-semibold text-sm text-foreground">{lead.name}</h3>
+                          <p className="text-xs text-muted-foreground truncate">{lead.email}</p>
+                          <p className="text-xs text-muted-foreground">{lead.phone}</p>
                         </div>
-                      </div>
 
-                      {/* Journey Stage with Visual Progress */}
-                      <div className="lg:col-span-3">
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <Badge className={journeyStageColors[lead.journeyStage] || 'bg-gray-100 text-gray-800'}>
-                              {lead.journeyStage?.replace('_', ' ')}
+                        {/* Vehicle & Value */}
+                        <div className="lg:col-span-2">
+                          <p className="font-medium text-sm text-foreground truncate">{lead.vehicle}</p>
+                          <p className="text-xs text-muted-foreground">
+                            ${(lead.value || 0).toLocaleString()}
+                          </p>
+                        </div>
+
+                        {/* Status & Priority */}
+                        <div className="lg:col-span-1">
+                          <div className="flex flex-col gap-1">
+                            <Badge className={`${statusColors[lead.status] || 'bg-gray-100 text-gray-800'} text-xs px-2 py-0.5`}>
+                              {lead.status}
                             </Badge>
-                            <span className="text-xs text-muted-foreground">
-                              {lead.stageProgress}%
-                            </span>
+                            <Badge className={`${priorityColors[lead.priority]} text-xs px-2 py-0.5`}>
+                              {lead.priority}
+                            </Badge>
                           </div>
-                          
-                          {/* Journey Progress Bar */}
+                        </div>
+
+                        {/* Journey Stage with Visual Progress */}
+                        <div className="lg:col-span-3">
                           <div className="space-y-1">
-                            <Progress 
-                              value={getJourneyProgress(lead.journeyStage)} 
-                              className="h-2"
-                            />
-                            <div className="flex justify-between text-xs text-muted-foreground">
-                              <span>Inquiry</span>
-                              <span>Closing</span>
+                            <div className="flex items-center justify-between">
+                              <Badge className={`${journeyStageColors[lead.journeyStage] || 'bg-gray-100 text-gray-800'} text-xs px-2 py-0.5`}>
+                                {lead.journeyStage?.replace('_', ' ')}
+                              </Badge>
+                              <span className="text-xs text-muted-foreground">
+                                {lead.stageProgress}%
+                              </span>
+                            </div>
+                            
+                            {/* Journey Progress Bar */}
+                            <div className="space-y-1">
+                              <Progress 
+                                value={getJourneyProgress(lead.journeyStage)} 
+                                className="h-1.5"
+                              />
+                              <div className="flex justify-between text-xs text-muted-foreground">
+                                <span>Inquiry</span>
+                                <span>Closing</span>
+                              </div>
+                            </div>
+                            
+                            {/* Journey Stage Dots */}
+                            <div className="flex items-center justify-between mt-1">
+                              {journeyStages.map((stage, index) => {
+                                const currentStageIndex = journeyStages.findIndex(s => s.key === lead.journeyStage);
+                                const isCompleted = index <= currentStageIndex;
+                                const isCurrent = index === currentStageIndex;
+                                
+                                return (
+                                  <div
+                                    key={stage.key}
+                                    className={cn(
+                                      "w-1.5 h-1.5 rounded-full transition-all duration-300",
+                                      isCompleted 
+                                        ? stage.color 
+                                        : "bg-muted",
+                                      isCurrent && "ring-2 ring-offset-1 ring-primary/50 scale-125"
+                                    )}
+                                    title={stage.label}
+                                  />
+                                );
+                              })}
                             </div>
                           </div>
-                          
-                          {/* Journey Stage Dots */}
-                          <div className="flex items-center justify-between mt-2">
-                            {journeyStages.map((stage, index) => {
-                              const currentStageIndex = journeyStages.findIndex(s => s.key === lead.journeyStage);
-                              const isCompleted = index <= currentStageIndex;
-                              const isCurrent = index === currentStageIndex;
-                              
-                              return (
-                                <div
-                                  key={stage.key}
-                                  className={cn(
-                                    "w-2 h-2 rounded-full transition-all duration-300",
-                                    isCompleted 
-                                      ? stage.color 
-                                      : "bg-muted",
-                                    isCurrent && "ring-2 ring-offset-1 ring-primary/50 scale-125"
-                                  )}
-                                  title={stage.label}
-                                />
-                              );
-                            })}
+                        </div>
+
+                        {/* Last Contact */}
+                        <div className="lg:col-span-1">
+                          <p className="text-xs font-medium text-foreground">
+                            {formatLastContact(lead.lastActivity)}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {lead.daysSinceLastContact === 0 ? 'Today' : `${lead.daysSinceLastContact}d ago`}
+                          </p>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="lg:col-span-1">
+                          <div className="flex gap-1">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleContact(lead.id, 'phone')}
+                              className="h-7 w-7 p-0"
+                            >
+                              <Phone className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleContact(lead.id, 'email')}
+                              className="h-7 w-7 p-0"
+                            >
+                              <Mail className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleContact(lead.id, 'text')}
+                              className="h-7 w-7 p-0"
+                            >
+                              <MessageSquare className="h-3 w-3" />
+                            </Button>
                           </div>
                         </div>
                       </div>
 
-                      {/* Last Contact */}
-                      <div className="lg:col-span-2">
-                        <p className="text-sm font-medium text-foreground">
-                          {formatLastContact(lead.lastActivity)}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {lead.daysSinceLastContact === 0 ? 'Today' : `${lead.daysSinceLastContact}d ago`}
-                        </p>
-                      </div>
-
-                      {/* Actions */}
-                      <div className="lg:col-span-1">{/*actions */}
-                        <div className="flex gap-1">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleContact(lead.id, 'phone')}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Phone className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleContact(lead.id, 'email')}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Mail className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleContact(lead.id, 'text')}
-                            className="h-8 w-8 p-0"
-                          >
-                            <MessageSquare className="h-4 w-4" />
-                          </Button>
+                      {/* Notes - Compact */}
+                      {lead.notes && (
+                        <div className="mt-2 pt-2 border-t">
+                          <p className="text-xs text-muted-foreground">
+                            <strong>Notes:</strong> {lead.notes}
+                          </p>
                         </div>
-                      </div>
+                      )}
                     </div>
+                  ))}
 
-                    {/* Notes */}
-                    {lead.notes && (
-                      <div className="mt-3 pt-3 border-t">
-                        <p className="text-sm text-muted-foreground">
-                          <strong>Notes:</strong> {lead.notes}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                ))}
-
-                {filteredAndSortedLeads.length === 0 && (
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground">No leads found matching your filters.</p>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
-          </CardContent>
-        </Card>
+                  {filteredAndSortedLeads.length === 0 && (
+                    <div className="text-center py-6">
+                      <p className="text-muted-foreground">No leads found matching your filters.</p>
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
