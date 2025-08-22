@@ -8,7 +8,8 @@ import { GoalsDashboard } from '@/components/GoalsDashboard';
 import { useToast } from '@/hooks/use-toast';
 import { useRealTimeUpdates } from '@/hooks/useRealTimeUpdates';
 import { Button } from '@/components/ui/button';
-import { Eye, List, Target } from 'lucide-react';
+import { Eye, List, Target, Users } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type { Lead } from '@/components/LeadCard';
 
 // Mock data - in a real app this would come from your CRM API
@@ -634,6 +635,20 @@ const Index = () => {
         />
       ) : (
         <div className="container mx-auto px-6 py-8">
+          {/* Navigation Header */}
+          <div className="mb-8 flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Sales Dashboard</h1>
+              <p className="text-muted-foreground">Manage your priority leads and track progress</p>
+            </div>
+            <Link to="/leads">
+              <Button variant="outline" className="gap-2">
+                <Users className="h-4 w-4" />
+                All Leads
+              </Button>
+            </Link>
+          </div>
+
           {/* Goals Dashboard */}
           <GoalsDashboard />
           
