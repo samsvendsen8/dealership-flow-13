@@ -4,11 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ArrowLeft, Search, Phone, Mail, MessageSquare, Calendar, Filter, SortDesc } from 'lucide-react';
 import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 import type { Lead } from '@/components/LeadCard';
 
 // Mock data for now - in a real app this would come from Supabase
@@ -178,6 +180,20 @@ const journeyStageColors = {
   closing: 'bg-emerald-100 text-emerald-800'
 };
 
+const journeyStages = [
+  { key: 'initial_inquiry', label: 'Initial Inquiry', color: 'bg-gray-500' },
+  { key: 'engaged', label: 'Engaged', color: 'bg-blue-500' },
+  { key: 'visit', label: 'Visit', color: 'bg-orange-500' },
+  { key: 'proposal', label: 'Proposal', color: 'bg-purple-500' },
+  { key: 'negotiation', label: 'Negotiation', color: 'bg-yellow-500' },
+  { key: 'closing', label: 'Closing', color: 'bg-emerald-500' }
+];
+
+const getJourneyProgress = (stage: string) => {
+  const stageIndex = journeyStages.findIndex(s => s.key === stage);
+  return stageIndex >= 0 ? ((stageIndex + 1) / journeyStages.length) * 100 : 0;
+};
+
 const formatLastContact = (lastActivity: string) => {
   return lastActivity || 'Never';
 };
@@ -333,15 +349,15 @@ const LeadsList = () => {
           </CardHeader>
           <CardContent className="p-0">
             <ScrollArea className="h-[600px]">
-              <div className="space-y-2 p-4">
+                <div className="space-y-2 p-4">
                 {filteredAndSortedLeads.map((lead) => (
                   <div
                     key={lead.id}
-                    className="border rounded-lg p-4 hover:bg-muted/50 transition-colors"
+                    className="border rounded-lg p-4 hover:bg-muted/50 transition-colors animate-fade-in"
                   >
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                    <div className="grid grid-cols-1 lg:grid-cols-11 gap-4 items-center">{/*lead info*/}
                       {/* Lead Info */}
-                      <div className="lg:col-span-3">
+                      <div className="lg:col-span-2">{/*lead info */}
                         <h3 className="font-semibold text-foreground">{lead.name}</h3>
                         <p className="text-sm text-muted-foreground">{lead.email}</p>
                         <p className="text-sm text-muted-foreground">{lead.phone}</p>
@@ -367,14 +383,53 @@ const LeadsList = () => {
                         </div>
                       </div>
 
-                      {/* Journey Stage */}
-                      <div className="lg:col-span-2">
-                        <Badge className={journeyStageColors[lead.journeyStage] || 'bg-gray-100 text-gray-800'}>
-                          {lead.journeyStage?.replace('_', ' ')}
-                        </Badge>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {lead.stageProgress}% complete
-                        </p>
+                      {/* Journey Stage with Visual Progress */}
+                      <div className="lg:col-span-3">
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <Badge className={journeyStageColors[lead.journeyStage] || 'bg-gray-100 text-gray-800'}>
+                              {lead.journeyStage?.replace('_', ' ')}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              {lead.stageProgress}%
+                            </span>
+                          </div>
+                          
+                          {/* Journey Progress Bar */}
+                          <div className="space-y-1">
+                            <Progress 
+                              value={getJourneyProgress(lead.journeyStage)} 
+                              className="h-2"
+                            />
+                            <div className="flex justify-between text-xs text-muted-foreground">
+                              <span>Inquiry</span>
+                              <span>Closing</span>
+                            </div>
+                          </div>
+                          
+                          {/* Journey Stage Dots */}
+                          <div className="flex items-center justify-between mt-2">
+                            {journeyStages.map((stage, index) => {
+                              const currentStageIndex = journeyStages.findIndex(s => s.key === lead.journeyStage);
+                              const isCompleted = index <= currentStageIndex;
+                              const isCurrent = index === currentStageIndex;
+                              
+                              return (
+                                <div
+                                  key={stage.key}
+                                  className={cn(
+                                    "w-2 h-2 rounded-full transition-all duration-300",
+                                    isCompleted 
+                                      ? stage.color 
+                                      : "bg-muted",
+                                    isCurrent && "ring-2 ring-offset-1 ring-primary/50 scale-125"
+                                  )}
+                                  title={stage.label}
+                                />
+                              );
+                            })}
+                          </div>
+                        </div>
                       </div>
 
                       {/* Last Contact */}
@@ -388,7 +443,7 @@ const LeadsList = () => {
                       </div>
 
                       {/* Actions */}
-                      <div className="lg:col-span-1">
+                      <div className="lg:col-span-1">{/*actions */}
                         <div className="flex gap-1">
                           <Button
                             size="sm"
