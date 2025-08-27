@@ -119,19 +119,29 @@ export function LeadsPriorityList({
                             lead.lastActivity.includes('contact sent') || 
                             lead.lastActivity.includes('contact made');
     
-    const hasRecentCustomerActivity = lead.lastActivity.includes('Just now') && 
-                                     !hasRecentContact;
+    // Check for recent customer activity (replies, questions, etc.)
+    const hasRecentCustomerActivity = lead.lastActivity.includes('Just now') ||
+                                     lead.lastActivity.includes('min ago') ||
+                                     lead.lastActivity.includes('Customer Reply') ||
+                                     lead.lastActivity.includes('replied') ||
+                                     (lead.timeline && lead.timeline.some(item => 
+                                       item.date.includes('min ago') && 
+                                       (item.action.includes('Reply') || item.action.includes('Customer'))
+                                     ));
     
     // Check if lead has gone cold (no activity for extended period)
     const isOldActivity = lead.lastActivity.includes('week ago') || 
                          lead.lastActivity.includes('month ago') ||
                          lead.priority === 'cold';
     
-    if (isOldActivity && !hasRecentCustomerActivity) {
+    // Priority order: Customer activity > Cold > Recent contact > Default action required
+    if (hasRecentCustomerActivity && !hasRecentContact) {
+      return 'action-required'; // Customer replied - needs immediate action
+    } else if (isOldActivity && !hasRecentCustomerActivity) {
       return 'cold';
-    } else if (hasRecentCustomerActivity) {
-      return 're-engaged';
-    } else if (hasRecentContact || lead.status === 'contacted') {
+    } else if (hasRecentContact && !hasRecentCustomerActivity) {
+      return 'awaiting-response';
+    } else if (lead.status === 'contacted' && !hasRecentCustomerActivity) {
       return 'awaiting-response';
     } else {
       return 'action-required';
