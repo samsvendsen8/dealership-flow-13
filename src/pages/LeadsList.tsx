@@ -239,7 +239,7 @@ const LeadsList = () => {
     <div className="h-screen bg-background flex flex-col">
       {/* Header - Compact */}
       <div className="border-b bg-card flex-shrink-0">
-        <div className="container mx-auto px-4 py-2">
+        <div className="container mx-auto px-4 py-1">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Link to="/">
@@ -259,9 +259,9 @@ const LeadsList = () => {
 
       {/* Main Content - Flex Fill */}
       <div className="flex-1 overflow-hidden">
-        <div className="container mx-auto px-4 py-1 h-full flex flex-col">
+        <div className="container mx-auto px-4 h-full flex flex-col">
           {/* Filters - Compact Horizontal Bar */}
-          <div className="border rounded-lg p-2 mb-1 flex-shrink-0 bg-card">
+          <div className="border rounded-lg p-2 flex-shrink-0 bg-card">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-2">
               <div className="lg:col-span-2">
                 <div className="relative">
