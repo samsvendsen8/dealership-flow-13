@@ -167,31 +167,33 @@ const mockLeads: Lead[] = [
     phone: '(555) 567-8901',
     vehicle: '2024 Subaru Outback',
     status: 'contacted',
-    priority: 'cold',
-    lastActivity: '1 day ago',
+    priority: 'warm',
+    lastActivity: '30 min ago',
     value: 29000,
     source: 'Email Campaign',
-    notes: 'Initial inquiry, needs more information',
+    notes: 'Customer replied with questions + missed previous call - needs follow-up',
     journeyStage: 'engaged',
-    stageProgress: 30,
-    contactAttempts: 2,
-    responseRate: 50,
-    daysSinceLastContact: 1,
-    dealProbability: 30,
-    sentiment: 'neutral',
+    stageProgress: 40,
+    contactAttempts: 3,
+    responseRate: 67,
+    daysSinceLastContact: 0,
+    dealProbability: 55,
+    sentiment: 'positive',
     lastAppointment: 'Never',
-    keyInsight: 'Early stage - needs education about vehicle benefits and financing options',
+    keyInsight: 'Customer responded positively but missed scheduled call - still has pending tasks',
     preferredContact: 'email',
     budget: { min: 25000, max: 32000 },
     timeline: [
       { date: '1 week ago', action: 'Email Campaign', details: 'Opened Subaru promotion email', type: 'contact' },
       { date: '3 days ago', action: 'Form Submission', details: 'Requested Outback brochure and pricing', type: 'contact' },
-      { date: '1 day ago', action: 'Email Response', details: 'Replied asking about safety features', type: 'contact' }
+      { date: '1 day ago', action: 'Email Response', details: 'Replied asking about safety features and availability', type: 'contact' },
+      { date: '30 min ago', action: 'Customer Reply', details: 'Sent detailed questions about financing options', type: 'contact' }
     ],
     workPlan: [
-      { id: 'engaged-1', title: 'Engaged Stage - Attempt 1', description: 'Send safety ratings and feature comparison', dueDate: 'Today', status: 'customer_replied', attemptNumber: 1, contactMethod: 'email', customerResponse: true, journeyStage: 'engaged' },
-      { id: 'engaged-2', title: 'Engaged Stage - Attempt 2', description: 'Call to answer questions and schedule visit', dueDate: 'Tomorrow', status: 'not_needed', attemptNumber: 2, contactMethod: 'phone', journeyStage: 'engaged' },
-      { id: 'engaged-3', title: 'Engaged Stage - Attempt 3', description: 'Text to confirm showroom appointment', dueDate: 'Day 3', status: 'not_needed', attemptNumber: 3, contactMethod: 'text', journeyStage: 'engaged' }
+      { id: 'engaged-1', title: 'Engaged Stage - Attempt 1', description: 'Send safety ratings and feature comparison', dueDate: 'Yesterday', status: 'customer_replied', attemptNumber: 1, contactMethod: 'email', customerResponse: true, journeyStage: 'engaged' },
+      { id: 'engaged-2', title: 'Engaged Stage - Attempt 2', description: 'Call to answer questions and schedule visit', dueDate: 'Today 2pm', status: 'missed', attemptNumber: 2, contactMethod: 'phone', journeyStage: 'engaged' },
+      { id: 'engaged-3', title: 'Engaged Stage - Attempt 3', description: 'Follow-up email to address customer questions', dueDate: 'Today 4pm', status: 'pending', attemptNumber: 3, contactMethod: 'email', journeyStage: 'engaged' },
+      { id: 'engaged-4', title: 'Engaged Stage - Attempt 4', description: 'Text to confirm best time for call', dueDate: 'Tomorrow 10am', status: 'scheduled', attemptNumber: 4, contactMethod: 'text', journeyStage: 'engaged' }
     ]
   },
   {
