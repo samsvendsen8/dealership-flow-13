@@ -237,24 +237,21 @@ const LeadsList = () => {
 
   return (
     <div className="h-screen bg-background flex flex-col">
-      {/* Header - Fixed */}
+      {/* Header - Compact */}
       <div className="border-b bg-card flex-shrink-0">
-        <div className="container mx-auto px-4 py-3">
+        <div className="container mx-auto px-4 py-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <Link to="/">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Dashboard
+                <Button variant="ghost" size="sm" className="h-8">
+                  <ArrowLeft className="h-3 w-3 mr-1" />
+                  Back
                 </Button>
               </Link>
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">All Leads</h1>
-                <p className="text-muted-foreground">Manage and track all your assigned leads</p>
-              </div>
+              <h1 className="text-lg font-semibold text-foreground">All Leads</h1>
             </div>
-            <div className="text-sm text-muted-foreground">
-              {filteredAndSortedLeads.length} of {leads.length} leads
+            <div className="text-xs text-muted-foreground">
+              {filteredAndSortedLeads.length} of {leads.length}
             </div>
           </div>
         </div>
@@ -263,105 +260,91 @@ const LeadsList = () => {
       {/* Main Content - Flex Fill */}
       <div className="flex-1 overflow-hidden">
         <div className="container mx-auto px-4 py-4 h-full flex flex-col">
-          {/* Filters - Compact */}
-          <Card className="mb-4 flex-shrink-0">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Filter className="h-5 w-5" />
-                Filters & Search
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
-                <div className="lg:col-span-2">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search leads..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
+          {/* Filters - Compact Horizontal Bar */}
+          <div className="border rounded-lg p-2 mb-3 flex-shrink-0 bg-card">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-2">
+              <div className="lg:col-span-2">
+                <div className="relative">
+                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+                  <Input
+                    placeholder="Search leads..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-7 h-8 text-xs"
+                  />
                 </div>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="new">New</SelectItem>
-                    <SelectItem value="contacted">Contacted</SelectItem>
-                    <SelectItem value="qualified">Qualified</SelectItem>
-                    <SelectItem value="proposal">Proposal</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Priority" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Priorities</SelectItem>
-                    <SelectItem value="hot">Hot</SelectItem>
-                    <SelectItem value="warm">Warm</SelectItem>
-                    <SelectItem value="cold">Cold</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={journeyStageFilter} onValueChange={setJourneyStageFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Journey Stage" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Stages</SelectItem>
-                    <SelectItem value="initial_inquiry">Initial Inquiry</SelectItem>
-                    <SelectItem value="engaged">Engaged</SelectItem>
-                    <SelectItem value="visit">Visit</SelectItem>
-                    <SelectItem value="proposal">Proposal</SelectItem>
-                    <SelectItem value="negotiation">Negotiation</SelectItem>
-                    <SelectItem value="closing">Closing</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sort by" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="lastContact">Last Contact</SelectItem>
-                    <SelectItem value="value">Deal Value</SelectItem>
-                    <SelectItem value="priority">Priority</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
-            </CardContent>
-          </Card>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="new">New</SelectItem>
+                  <SelectItem value="contacted">Contacted</SelectItem>
+                  <SelectItem value="qualified">Qualified</SelectItem>
+                  <SelectItem value="proposal">Proposal</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue placeholder="Priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Priorities</SelectItem>
+                  <SelectItem value="hot">Hot</SelectItem>
+                  <SelectItem value="warm">Warm</SelectItem>
+                  <SelectItem value="cold">Cold</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={journeyStageFilter} onValueChange={setJourneyStageFilter}>
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue placeholder="Journey Stage" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Stages</SelectItem>
+                  <SelectItem value="initial_inquiry">Initial Inquiry</SelectItem>
+                  <SelectItem value="engaged">Engaged</SelectItem>
+                  <SelectItem value="visit">Visit</SelectItem>
+                  <SelectItem value="proposal">Proposal</SelectItem>
+                  <SelectItem value="negotiation">Negotiation</SelectItem>
+                  <SelectItem value="closing">Closing</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="lastContact">Last Contact</SelectItem>
+                  <SelectItem value="value">Deal Value</SelectItem>
+                  <SelectItem value="priority">Priority</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
           {/* Leads Table - Flex Fill */}
           <Card className="flex-1 overflow-hidden">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <SortDesc className="h-5 w-5" />
-                Leads List
-              </CardTitle>
-            </CardHeader>
             <CardContent className="p-0 flex-1 overflow-hidden">
               <ScrollArea className="h-full">
-                <div className="space-y-1 p-3">
+                <div className="space-y-0.5 p-2">
                   {filteredAndSortedLeads.map((lead) => (
                     <div
                       key={lead.id}
-                      className="border rounded-lg p-3 hover:bg-muted/50 transition-colors animate-fade-in"
+                      className="border rounded-lg p-2 hover:bg-muted/50 transition-colors animate-fade-in"
                     >
-                      <div className="grid grid-cols-1 lg:grid-cols-11 gap-3 items-center">
+                      <div className="grid grid-cols-1 lg:grid-cols-11 gap-2 items-center">
                         {/* Lead Info */}
                         <div className="lg:col-span-2">
-                          <h3 className="font-semibold text-sm text-foreground">{lead.name}</h3>
+                          <h3 className="font-semibold text-xs text-foreground">{lead.name}</h3>
                           <p className="text-xs text-muted-foreground truncate">{lead.email}</p>
                           <p className="text-xs text-muted-foreground">{lead.phone}</p>
                         </div>
 
                         {/* Vehicle & Value */}
                         <div className="lg:col-span-2">
-                          <p className="font-medium text-sm text-foreground truncate">{lead.vehicle}</p>
+                          <p className="font-medium text-xs text-foreground truncate">{lead.vehicle}</p>
                           <p className="text-xs text-muted-foreground">
                             ${(lead.value || 0).toLocaleString()}
                           </p>
@@ -369,11 +352,11 @@ const LeadsList = () => {
 
                         {/* Status & Priority */}
                         <div className="lg:col-span-1">
-                          <div className="flex flex-col gap-1">
-                            <Badge className={`${statusColors[lead.status] || 'bg-gray-100 text-gray-800'} text-xs px-2 py-0.5`}>
+                          <div className="flex flex-col gap-0.5">
+                            <Badge className={`${statusColors[lead.status] || 'bg-gray-100 text-gray-800'} text-xs px-1.5 py-0.5 h-5`}>
                               {lead.status}
                             </Badge>
-                            <Badge className={`${priorityColors[lead.priority]} text-xs px-2 py-0.5`}>
+                            <Badge className={`${priorityColors[lead.priority]} text-xs px-1.5 py-0.5 h-5`}>
                               {lead.priority}
                             </Badge>
                           </div>
@@ -381,9 +364,9 @@ const LeadsList = () => {
 
                         {/* Journey Stage with Visual Progress */}
                         <div className="lg:col-span-3">
-                          <div className="space-y-1">
+                          <div className="space-y-0.5">
                             <div className="flex items-center justify-between">
-                              <Badge className={`${journeyStageColors[lead.journeyStage] || 'bg-gray-100 text-gray-800'} text-xs px-2 py-0.5`}>
+                              <Badge className={`${journeyStageColors[lead.journeyStage] || 'bg-gray-100 text-gray-800'} text-xs px-1.5 py-0.5 h-5`}>
                                 {lead.journeyStage?.replace('_', ' ')}
                               </Badge>
                               <span className="text-xs text-muted-foreground">
@@ -392,10 +375,10 @@ const LeadsList = () => {
                             </div>
                             
                             {/* Journey Progress Bar */}
-                            <div className="space-y-1">
+                            <div className="space-y-0.5">
                               <Progress 
                                 value={getJourneyProgress(lead.journeyStage)} 
-                                className="h-1.5"
+                                className="h-1"
                               />
                               <div className="flex justify-between text-xs text-muted-foreground">
                                 <span>Inquiry</span>
@@ -404,7 +387,7 @@ const LeadsList = () => {
                             </div>
                             
                             {/* Journey Stage Dots */}
-                            <div className="flex items-center justify-between mt-1">
+                            <div className="flex items-center justify-between">
                               {journeyStages.map((stage, index) => {
                                 const currentStageIndex = journeyStages.findIndex(s => s.key === lead.journeyStage);
                                 const isCompleted = index <= currentStageIndex;
@@ -414,11 +397,11 @@ const LeadsList = () => {
                                   <div
                                     key={stage.key}
                                     className={cn(
-                                      "w-1.5 h-1.5 rounded-full transition-all duration-300",
+                                      "w-1 h-1 rounded-full transition-all duration-300",
                                       isCompleted 
                                         ? stage.color 
                                         : "bg-muted",
-                                      isCurrent && "ring-2 ring-offset-1 ring-primary/50 scale-125"
+                                      isCurrent && "ring-1 ring-offset-1 ring-primary/50 scale-125"
                                     )}
                                     title={stage.label}
                                   />
@@ -440,12 +423,12 @@ const LeadsList = () => {
 
                         {/* Actions */}
                         <div className="lg:col-span-1">
-                          <div className="flex gap-1">
+                          <div className="flex gap-0.5">
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={() => handleContact(lead.id, 'phone')}
-                              className="h-7 w-7 p-0"
+                              className="h-6 w-6 p-0"
                             >
                               <Phone className="h-3 w-3" />
                             </Button>
@@ -453,7 +436,7 @@ const LeadsList = () => {
                               size="sm"
                               variant="ghost"
                               onClick={() => handleContact(lead.id, 'email')}
-                              className="h-7 w-7 p-0"
+                              className="h-6 w-6 p-0"
                             >
                               <Mail className="h-3 w-3" />
                             </Button>
@@ -461,7 +444,7 @@ const LeadsList = () => {
                               size="sm"
                               variant="ghost"
                               onClick={() => handleContact(lead.id, 'text')}
-                              className="h-7 w-7 p-0"
+                              className="h-6 w-6 p-0"
                             >
                               <MessageSquare className="h-3 w-3" />
                             </Button>
@@ -471,7 +454,7 @@ const LeadsList = () => {
 
                       {/* Notes - Compact */}
                       {lead.notes && (
-                        <div className="mt-2 pt-2 border-t">
+                        <div className="mt-1 pt-1 border-t">
                           <p className="text-xs text-muted-foreground">
                             <strong>Notes:</strong> {lead.notes}
                           </p>
