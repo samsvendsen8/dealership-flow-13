@@ -286,26 +286,7 @@ export function LeadsPriorityList({
           </Select>
         </div>
 
-        {/* Priority Algorithm Info - Tooltip Icon */}
-        <div className="flex items-center gap-2">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Info className="h-4 w-4 text-primary" />
-                  <span>AI Priority Scoring</span>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-sm">
-                <p className="text-sm">
-                  🤖 Leads are automatically ranked using: Priority level + Deal value + Time on lot + Recent activity. 
-                  <strong>Recently contacted leads move down</strong> since you're waiting for their response, 
-                  while new customer activity gets top priority.
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+        {/* Removed AI Priority Scoring - moved to Quick Lead List */}
       </div>
 
       {/* Tabs Section */}
