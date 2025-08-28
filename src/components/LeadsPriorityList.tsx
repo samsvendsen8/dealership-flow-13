@@ -245,7 +245,6 @@ export function LeadsPriorityList({
         </div>
       </div>
 
-
       {/* Filters and Search - Sticky */}
       <div className="sticky top-0 z-30 bg-card backdrop-blur-sm border border-border rounded-lg shadow-sm py-4 px-4 mb-4 space-y-4">
         <div className="flex flex-col sm:flex-row gap-4">
@@ -380,6 +379,7 @@ export function LeadsPriorityList({
                               onCommunicationSent={onCommunicationSent}
                               isCondensed={false}
                               isFocused={false}
+                              showRedBackground={false}
                             />
                           </div>
                         );
