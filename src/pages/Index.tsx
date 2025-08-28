@@ -25,7 +25,6 @@ const mockLeads: Lead[] = [
     lastActivity: '5 min ago',
     value: 28500,
     source: 'Website',
-    timeOnLot: '15 minutes',
     notes: 'Customer expressed urgent interest in financing options',
     journeyStage: 'visit',
     stageProgress: 65,
@@ -36,17 +35,17 @@ const mockLeads: Lead[] = [
     dealProbability: 90,
     sentiment: 'positive',
     lastAppointment: 'Today',
-    keyInsight: 'Currently on lot - ready to make decision today with right financing',
+    keyInsight: 'Ready to make decision today with right financing',
     preferredContact: 'phone',
     budget: { min: 26000, max: 30000 },
     timeline: [
       { date: '2 days ago', action: 'Initial Inquiry', details: 'Submitted online form for Toyota Camry', type: 'contact' },
       { date: '1 day ago', action: 'Phone Call', details: 'Discussed financing options and scheduled visit', type: 'contact' },
-      { date: 'Today 9am', action: 'Arrived on Lot', details: 'Currently viewing vehicles on lot', type: 'visit' },
+      { date: 'Today 9am', action: 'Visited Dealership', details: 'Customer visited to view vehicles', type: 'visit' },
       { date: 'Today 10am', action: 'Test Drive', details: 'Completed 15-minute test drive', type: 'milestone' }
     ],
     workPlan: [
-      { id: 'visit-1', title: 'Visit Stage - Attempt 1', description: 'Immediate contact while customer is on lot', dueDate: 'Now', status: 'pending', attemptNumber: 1, contactMethod: 'phone', journeyStage: 'visit' },
+      { id: 'visit-1', title: 'Visit Stage - Attempt 1', description: 'Follow up on customer visit', dueDate: 'Now', status: 'pending', attemptNumber: 1, contactMethod: 'phone', journeyStage: 'visit' },
       { id: 'visit-2', title: 'Visit Stage - Attempt 2', description: 'Follow-up call if initial contact unsuccessful', dueDate: 'In 30 min', status: 'scheduled', attemptNumber: 2, contactMethod: 'phone', journeyStage: 'visit' },
       { id: 'visit-3', title: 'Visit Stage - Attempt 3', description: 'Text message if calls go unanswered', dueDate: 'In 1 hour', status: 'scheduled', attemptNumber: 3, contactMethod: 'text', journeyStage: 'visit' }
     ]
@@ -136,7 +135,6 @@ const mockLeads: Lead[] = [
     lastActivity: '3 hours ago',
     value: 38000,
     source: 'Facebook',
-    timeOnLot: '5 minutes',
     notes: 'Looking for work truck, budget conscious',
     journeyStage: 'visit',
     stageProgress: 45,
@@ -331,8 +329,7 @@ const Index = () => {
           source: template.source,
           notes: template.notes,
           journeyStage: template.journeyStage,
-          stageProgress: template.stageProgress,
-          ...(Math.random() > 0.7 && { timeOnLot: `${Math.floor(Math.random() * 30) + 5} minutes` })
+          stageProgress: template.stageProgress
         };
 
         setLeads(prevLeads => [newLead, ...prevLeads]);

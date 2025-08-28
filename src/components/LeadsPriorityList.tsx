@@ -84,9 +84,6 @@ export function LeadsPriorityList({
     // Value multiplier
     score += (lead.value / 1000) * 2;
     
-    // Time on lot bonus
-    if (lead.timeOnLot) score += 50;
-    
     // Recent activity logic - MAJOR CHANGE HERE
     if (lead.lastActivity.includes('Just replied') || lead.lastActivity.includes('contact sent') || lead.lastActivity.includes('contact made')) {
       // Recently contacted leads get LOWER priority since we're waiting for their response

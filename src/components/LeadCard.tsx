@@ -80,7 +80,6 @@ export interface Lead {
   lastActivity: string;
   value: number;
   source: string;
-  timeOnLot?: string;
   notes?: string;
   journeyStage: 'engaged' | 'visit' | 'proposal' | 'sold' | 'delivered';
   stageProgress: number; // 0-100 percentage
@@ -318,12 +317,6 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
         ];
       
       case 'visit':
-        if (lead.timeOnLot) {
-          return [
-            { label: 'Immediate assistance', icon: Phone, action: () => onContact(lead.id, 'phone'), context: 'Customer currently on lot!' },
-            { label: 'Test drive ready', icon: Car, action: () => onViewDetails(lead.id), context: 'Convert visit to test drive' }
-          ];
-        }
         return [
           { label: 'Schedule test drive', icon: Car, action: () => onViewDetails(lead.id), context: 'Post-visit follow up with strong buying signals' },
           { label: 'Address concerns', icon: Phone, action: () => onContact(lead.id, 'phone'), context: 'Extended visit shows serious interest' }
@@ -477,12 +470,6 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                   ×
                 </Button>
               </div>
-            </div>
-          )}
-          
-          {lead.timeOnLot && (
-            <div className="mt-2 text-xs text-warning font-medium">
-              🚗 On lot: {lead.timeOnLot}
             </div>
           )}
         </CardContent>
@@ -1174,17 +1161,6 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           </div>
         </div>
 
-
-        {/* Customer on Lot Alert */}
-        {lead.timeOnLot && (
-          <div className="bg-warning/10 border border-warning/20 rounded-lg p-3">
-            <div className="flex items-center gap-2 text-warning">
-              <Car className="h-4 w-4" />
-              <span className="font-medium text-sm">Customer on lot: {lead.timeOnLot}</span>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">Immediate action recommended</p>
-          </div>
-        )}
       </CardContent>
       
       {/* Call Simulation Modal */}

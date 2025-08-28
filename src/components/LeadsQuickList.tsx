@@ -46,7 +46,6 @@ const getAIPriorityScore = (lead: Lead) => {
   else score += 5;
   
   // Timeline urgency
-  if (lead.timeOnLot) score += 20;
   if (lead.lastActivity?.includes('min ago')) score += 15;
   
   // Value weight
@@ -81,8 +80,8 @@ export function LeadsQuickList({ leads, onLeadClick, selectedLeadId }: LeadsQuic
               </TooltipTrigger>
               <TooltipContent className="max-w-sm">
                 <p className="text-sm">
-                  🤖 Leads are automatically ranked using: Priority level + Deal value + Time on lot + Recent activity. 
-                  <strong>Recently contacted leads move down</strong> since you're waiting for their response, 
+                  🤖 Leads are automatically ranked using: Priority level + Deal value + Recent activity. 
+                  <strong>Recently contacted leads move down</strong> since you're waiting for their response,
                   while new customer activity gets top priority.
                 </p>
               </TooltipContent>
@@ -153,19 +152,14 @@ export function LeadsQuickList({ leads, onLeadClick, selectedLeadId }: LeadsQuic
                     <span className="truncate">{lead.lastActivity}</span>
                   </div>
 
-                   {/* Journey Stage & Time on Lot */}
-                   <div className="flex items-center justify-between gap-1">
-                     {lead.journeyStage && (
-                       <Badge variant="outline" className="text-xs px-1.5 py-0.5 bg-primary/10 text-primary border-primary/30">
-                         {lead.journeyStage}
-                       </Badge>
-                     )}
-                     {lead.timeOnLot && (
-                       <Badge variant="secondary" className="text-xs px-1.5 py-0.5 bg-warning/20 text-warning border-warning/30">
-                         On Lot: {lead.timeOnLot}
-                       </Badge>
-                     )}
-                   </div>
+                     {/* Journey Stage */}
+                     <div className="flex items-center justify-between gap-1">
+                      {lead.journeyStage && (
+                        <Badge variant="outline" className="text-xs px-1.5 py-0.5 bg-primary/10 text-primary border-primary/30">
+                          {lead.journeyStage}
+                        </Badge>
+                      )}
+                     </div>
                 </div>
               </div>
             ))}

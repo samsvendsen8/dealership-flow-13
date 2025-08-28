@@ -132,12 +132,6 @@ export function LeadFocusView({
                     </div>
                   </div>
                   
-                  {lead.timeOnLot && (
-                    <div className="mt-2 text-xs text-warning font-medium">
-                      🚗 On lot: {lead.timeOnLot}
-                    </div>
-                  )}
-                  
                   {lead.nextFollowUp && (
                     <div className="mt-1 text-xs text-primary">
                       📅 Next: {lead.nextFollowUp}

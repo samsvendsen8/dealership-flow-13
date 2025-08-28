@@ -467,12 +467,6 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                                 {selectedLead.priority}
                               </Badge>
                             </div>
-                            {selectedLead.timeOnLot && (
-                              <div className="flex items-center justify-between">
-                                <span className="text-sm text-muted-foreground">Time on Lot</span>
-                                <span className="text-sm font-medium">{selectedLead.timeOnLot}</span>
-                              </div>
-                            )}
                           </div>
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">

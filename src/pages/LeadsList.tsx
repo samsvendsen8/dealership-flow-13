@@ -36,7 +36,7 @@ const mockLeads: Lead[] = [
     dealProbability: 90,
     sentiment: 'positive',
     lastAppointment: 'Today',
-    keyInsight: 'Currently on lot - ready to make decision today with right financing',
+    keyInsight: 'Ready to make decision today with right financing',
     preferredContact: 'phone',
     budget: { min: 26000, max: 30000 }
   },
