@@ -113,9 +113,9 @@ interface LeadCardProps {
 }
 
 const priorityStyles = {
-  hot: 'border-l-hot-lead bg-gradient-to-r from-hot-lead/5 to-transparent',
-  warm: 'border-l-warm-lead bg-gradient-to-r from-warm-lead/5 to-transparent',
-  cold: 'border-l-cold-lead bg-gradient-to-r from-cold-lead/5 to-transparent'
+  hot: 'border-l-hot-lead',
+  warm: 'border-l-warm-lead',
+  cold: 'border-l-cold-lead'
 };
 
 const statusStyles = {
@@ -808,13 +808,13 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           {/* Current Step in Journey Progress - Customer Response Takes Priority */}
           {journeyStages[selectedJourneyStage] && (
             <div className="mt-3 p-3 bg-muted/10 border rounded-lg">
-              {/* Customer Response Section (Higher Priority) */}
-              {mockCustomerResponse ? (
-                <>
+              {/* Customer Response Section (Always Priority at Top) */}
+              {mockCustomerResponse && (
+                <div className="mb-4 p-3 bg-success/5 border border-success/20 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <h5 className="font-medium text-xs flex items-center gap-2">
                       <Activity className="h-3 w-3 text-success" />
-                      Customer Reached Out
+                      🚨 Customer Reached Out
                     </h5>
                     <Badge variant="outline" className="text-xs bg-success/10 text-success border-success/20">
                       15 min ago
@@ -861,15 +861,18 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                       Priority: Respond to customer inquiry
                     </p>
                   </div>
-                </>
-              ) : (
-                /* Workplan Item Section (When no customer response) */
-                currentWorkPlanTask && (
+                </div>
+              )}
+
+              {/* Work Plan Section (Always Shown) */}
+              <div className="p-3 bg-muted/10 border rounded-lg">
+                {currentWorkPlanTask ? (
                   <>
+                    {/* Active Work Plan */}
                     <div className="flex items-center justify-between mb-2">
                       <h5 className="font-medium text-xs flex items-center gap-2">
                         <Clock className="h-3 w-3 text-primary" />
-                        Current Step
+                        Current Work Plan
                       </h5>
                       <Badge variant="outline" className="text-xs">
                         {currentWorkPlanTask.dueDate}
@@ -928,8 +931,53 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                       )}
                     </div>
                   </>
-                )
-              )}
+                ) : (
+                  <>
+                    {/* Completed Work Plan */}
+                    <div className="flex items-center justify-between mb-2">
+                      <h5 className="font-medium text-xs flex items-center gap-2">
+                        <CheckCircle className="h-3 w-3 text-success" />
+                        Current Work Plan Finished
+                      </h5>
+                      <Badge variant="outline" className="text-xs bg-success/10 text-success border-success/20">
+                        ✅ Complete
+                      </Badge>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium">All planned tasks completed for this stage</p>
+                      <p className="text-xs text-muted-foreground">
+                        Customer has responded or all contact attempts have been made.
+                      </p>
+                      
+                      {/* Show upcoming work plans */}
+                      <div className="pt-2 border-t border-border/50">
+                        <p className="text-xs font-medium text-muted-foreground mb-1">Upcoming Work Plans:</p>
+                        <div className="space-y-1">
+                          {Object.keys(journeyStages).slice(Object.keys(journeyStages).indexOf(lead.journeyStage) + 1, Object.keys(journeyStages).indexOf(lead.journeyStage) + 3).map((stage, idx) => (
+                            <div key={stage} className="text-xs text-muted-foreground">
+                              • {journeyStages[stage as keyof typeof journeyStages].label} Stage - 3 planned attempts
+                            </div>
+                          ))}
+                        </div>
+                        
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onViewDetails(lead.id);
+                          }}
+                          className="h-6 text-xs mt-2 w-full"
+                        >
+                          <Eye className="h-2 w-2 mr-1" />
+                          View All Work Plans
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           )}
           
