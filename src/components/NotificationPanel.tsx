@@ -32,6 +32,79 @@ const statusStyles = {
   closed: 'bg-status-closed text-white'
 };
 
+// AI Overview Component
+function AIHistoryOverview({ filter, leadName }: { filter: 'all' | 'text' | 'priority', leadName: string }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const getOverviewContent = () => {
+    switch (filter) {
+      case 'text':
+        return {
+          summary: "Recent messaging shows active engagement with quick responses.",
+          details: `${leadName} has been actively responding to text and email communications. Last exchange was about financing options with positive sentiment. Customer is asking specific questions about rates, indicating serious purchase intent. Response times average under 2 hours, showing high engagement level.`
+        };
+      case 'priority':
+        return {
+          summary: "High-priority items show strong purchase signals and urgency.",
+          details: `Priority interactions include completed qualification call, scheduled test drive, and active financing discussions. Customer has shown strong buying signals with specific questions about warranty coverage and payment options. Timeline indicates readiness to make decision within 1-2 weeks based on stated preferences.`
+        };
+      default:
+        return {
+          summary: "Customer journey shows steady progression with multiple touchpoints.",
+          details: `${leadName} has progressed from initial inquiry to active engagement across multiple channels. Timeline shows consistent follow-through on scheduled activities. High engagement with both digital communications and in-person interactions. Strong indicators of purchase intent with specific questions about financing and features.`
+        };
+    }
+  };
+
+  const content = getOverviewContent();
+
+  return (
+    <Card>
+      <CardContent className="p-3">
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <div className="p-1 rounded bg-primary/10">
+              <MessageCircle className="h-3 w-3 text-primary" />
+            </div>
+            <h4 className="text-xs font-medium text-foreground">AI Overview</h4>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="h-6 w-6 p-0"
+          >
+            {isExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+          </Button>
+        </div>
+        
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          {content.summary}
+        </p>
+        
+        {isExpanded && (
+          <div className="mt-3 pt-3 border-t border-border">
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {content.details}
+            </p>
+            <div className="mt-2 flex gap-1 flex-wrap">
+              <Badge variant="outline" className="text-xs px-1.5 py-0.5 h-auto">
+                Engagement: High
+              </Badge>
+              <Badge variant="outline" className="text-xs px-1.5 py-0.5 h-auto">
+                Intent: Strong
+              </Badge>
+              <Badge variant="outline" className="text-xs px-1.5 py-0.5 h-auto">
+                Timeline: 1-2 weeks
+              </Badge>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, contactMethod, aiSuggestedResponse }: NotificationPanelProps) {
   const [activeMainTab, setActiveMainTab] = useState<'contact' | 'customer-info' | 'customer-history'>('contact');
   const [activeSubTab, setActiveSubTab] = useState<'overview' | 'notes'>('overview');
@@ -547,13 +620,41 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
               )}
 
               {/* Customer History Content */}
-              {activeMainTab === 'customer-history' && selectedLead && (
-                <CustomerHistoryTimeline
-                  leadId={selectedLead.id}
-                  leadName={selectedLead.name}
-                  filter={historyFilter}
-                  onFilterChange={setHistoryFilter}
-                />
+              {activeMainTab === 'customer-history' && (
+                <div className="space-y-4">
+                  {/* History Scope Toggle */}
+                  <Card>
+                    <CardContent className="p-3">
+                      <div className="flex gap-1 bg-muted rounded-lg p-1">
+                        <button
+                          onClick={() => {/* TODO: implement scope toggle */}}
+                          className="flex-1 py-1.5 px-2 text-xs font-medium rounded-md bg-background text-foreground shadow-sm"
+                        >
+                          This Deal Only
+                        </button>
+                        <button
+                          onClick={() => {/* TODO: implement scope toggle */}}
+                          className="flex-1 py-1.5 px-2 text-xs font-medium rounded-md text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          Full Customer
+                        </button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* AI Overview Section */}
+                  <AIHistoryOverview 
+                    filter={historyFilter}
+                    leadName={selectedLead.name}
+                  />
+
+                  <CustomerHistoryTimeline
+                    leadId={selectedLead.id}
+                    leadName={selectedLead.name}
+                    filter={historyFilter}
+                    onFilterChange={setHistoryFilter}
+                  />
+                </div>
               )}
             </div>
           </div>
