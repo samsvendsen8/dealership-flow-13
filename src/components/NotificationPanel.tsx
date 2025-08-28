@@ -234,7 +234,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  Customer Info
+                  Details
                 </button>
                 <button
                   onClick={() => setActiveMainTab('customer-history')}
@@ -245,7 +245,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  Customer History
+                  History
                 </button>
               </div>
 
