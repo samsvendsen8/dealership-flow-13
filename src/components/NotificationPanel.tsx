@@ -60,11 +60,11 @@ function AIHistoryOverview({ filter, leadName }: { filter: 'all' | 'text' | 'pri
 
   return (
     <Card>
-      <CardContent className="p-3">
-        <div className="flex items-start justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <div className="p-1 rounded bg-primary/10">
-              <MessageCircle className="h-3 w-3 text-primary" />
+      <CardContent className="p-2">
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-1.5">
+            <div className="p-0.5 rounded bg-primary/10">
+              <MessageCircle className="h-2.5 w-2.5 text-primary" />
             </div>
             <h4 className="text-xs font-medium text-foreground">AI Overview</h4>
           </div>
@@ -72,29 +72,29 @@ function AIHistoryOverview({ filter, leadName }: { filter: 'all' | 'text' | 'pri
             variant="ghost"
             size="sm"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="h-6 w-6 p-0"
+            className="h-5 w-5 p-0"
           >
-            {isExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+            {isExpanded ? <ChevronDown className="h-2.5 w-2.5" /> : <ChevronRight className="h-2.5 w-2.5" />}
           </Button>
         </div>
         
-        <p className="text-xs text-muted-foreground leading-relaxed">
+        <p className="text-xs text-muted-foreground leading-tight">
           {content.summary}
         </p>
         
         {isExpanded && (
-          <div className="mt-3 pt-3 border-t border-border">
-            <p className="text-xs text-muted-foreground leading-relaxed">
+          <div className="mt-2 pt-2 border-t border-border">
+            <p className="text-xs text-muted-foreground leading-tight">
               {content.details}
             </p>
-            <div className="mt-2 flex gap-1 flex-wrap">
-              <Badge variant="outline" className="text-xs px-1.5 py-0.5 h-auto">
+            <div className="mt-1.5 flex gap-1 flex-wrap">
+              <Badge variant="outline" className="text-[10px] px-1 py-0 h-auto">
                 Engagement: High
               </Badge>
-              <Badge variant="outline" className="text-xs px-1.5 py-0.5 h-auto">
+              <Badge variant="outline" className="text-[10px] px-1 py-0 h-auto">
                 Intent: Strong
               </Badge>
-              <Badge variant="outline" className="text-xs px-1.5 py-0.5 h-auto">
+              <Badge variant="outline" className="text-[10px] px-1 py-0 h-auto">
                 Timeline: 1-2 weeks
               </Badge>
             </div>
@@ -624,17 +624,17 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                 <div className="space-y-4">
                   {/* History Scope Toggle */}
                   <Card>
-                    <CardContent className="p-3">
-                      <div className="flex gap-1 bg-muted rounded-lg p-1">
+                    <CardContent className="p-2">
+                      <div className="flex gap-1 bg-muted rounded-lg p-0.5">
                         <button
                           onClick={() => {/* TODO: implement scope toggle */}}
-                          className="flex-1 py-1.5 px-2 text-xs font-medium rounded-md bg-background text-foreground shadow-sm"
+                          className="flex-1 py-1 px-2 text-xs font-medium rounded-md bg-background text-foreground shadow-sm"
                         >
                           This Deal Only
                         </button>
                         <button
                           onClick={() => {/* TODO: implement scope toggle */}}
-                          className="flex-1 py-1.5 px-2 text-xs font-medium rounded-md text-muted-foreground hover:text-foreground transition-colors"
+                          className="flex-1 py-1 px-2 text-xs font-medium rounded-md text-muted-foreground hover:text-foreground transition-colors"
                         >
                           Full Customer
                         </button>
