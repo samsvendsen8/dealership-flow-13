@@ -36,10 +36,11 @@ interface CustomerHistoryTimelineProps {
   leadName: string;
   filter: 'all' | 'text' | 'priority';
   onFilterChange: (filter: 'all' | 'text' | 'priority') => void;
+  scope?: 'deal' | 'customer';
 }
 
-// Mock data for demonstration
-const mockHistoryItems: HistoryItem[] = [
+// Mock data for demonstration - Deal Only
+const dealOnlyHistoryItems: HistoryItem[] = [
   {
     id: '1',
     type: 'call',
@@ -133,6 +134,83 @@ const mockHistoryItems: HistoryItem[] = [
   }
 ];
 
+// Full Customer history with additional past interactions
+const fullCustomerHistoryItems: HistoryItem[] = [
+  ...dealOnlyHistoryItems,
+  {
+    id: '7',
+    type: 'milestone',
+    timestamp: '2023-08-15T10:00:00Z',
+    title: 'Previous vehicle purchase',
+    content: 'Purchased 2021 Honda Civic - excellent customer experience, trade-in after 18 months',
+    status: 'completed',
+    priority: 'medium',
+    tags: ['previous-purchase', 'loyal-customer']
+  },
+  {
+    id: '8',
+    type: 'call',
+    timestamp: '2023-08-10T16:20:00Z',
+    title: 'Purchase consultation',
+    content: 'Discussed options for first-time buyer, provided comprehensive financing guidance.',
+    status: 'completed',
+    priority: 'medium',
+    duration: '25 min',
+    outcome: 'Purchased Honda Civic',
+    tags: ['consultation', 'financing']
+  },
+  {
+    id: '9',
+    type: 'email',
+    timestamp: '2023-07-28T09:15:00Z',
+    title: 'Initial inquiry - Honda',
+    content: 'Interested in fuel-efficient compact cars under $25k. First-time buyer seeking guidance.',
+    status: 'completed',
+    priority: 'medium',
+    isIncoming: true,
+    tags: ['first-inquiry', 'budget']
+  },
+  {
+    id: '10',
+    type: 'appointment',
+    timestamp: '2023-08-02T14:00:00Z',
+    title: 'First showroom visit',
+    content: 'Test drove Honda Civic and Toyota Corolla - preferred Honda features and reliability',
+    status: 'completed',
+    priority: 'high',
+    tags: ['test-drive', 'comparison']
+  },
+  {
+    id: '11',
+    type: 'note',
+    timestamp: '2023-08-05T11:30:00Z',
+    title: 'Customer profile established',
+    content: 'Reliable customer, values fuel economy, appreciates thorough explanations, prefers Honda brand',
+    priority: 'medium',
+    tags: ['profile', 'preferences', 'loyalty']
+  },
+  {
+    id: '12',
+    type: 'text',
+    timestamp: '2023-12-20T15:45:00Z',
+    title: 'Holiday check-in',
+    content: 'Hi! How\'s the Honda Civic treating you? Hope you\'re enjoying the holidays!',
+    status: 'completed',
+    priority: 'low',
+    isIncoming: false
+  },
+  {
+    id: '12a',
+    type: 'text',
+    timestamp: '2023-12-20T16:30:00Z',
+    title: 'Customer response',
+    content: 'Hey! Love the car, no issues at all. Actually thinking about upgrading to something bigger soon for the family.',
+    status: 'completed',
+    priority: 'medium',
+    isIncoming: true
+  }
+];
+
 const typeIcons = {
   call: Phone,
   text: MessageCircle,
@@ -171,11 +249,15 @@ export function CustomerHistoryTimeline({
   leadId, 
   leadName, 
   filter, 
-  onFilterChange 
+  onFilterChange,
+  scope = 'deal'
 }: CustomerHistoryTimelineProps) {
   const [expandedMessageId, setExpandedMessageId] = useState<string | null>(null);
   
-  const filteredItems = mockHistoryItems.filter(item => {
+  // Select history based on scope
+  const historyItems = scope === 'customer' ? fullCustomerHistoryItems : dealOnlyHistoryItems;
+  
+  const filteredItems = historyItems.filter(item => {
     if (filter === 'text') {
       return ['text', 'email'].includes(item.type);
     }
@@ -215,7 +297,7 @@ export function CustomerHistoryTimeline({
   // Group messages by conversation thread (based on similar IDs like "2", "2a", "2b")
   const getConversationThread = (messageId: string) => {
     const baseId = messageId.split(/[a-z]$/)[0]; // Gets "2" from "2a" or "2b"
-    return mockHistoryItems.filter(item => 
+    return historyItems.filter(item => 
       (item.type === 'text' || item.type === 'email') && 
       (item.id === baseId || item.id.startsWith(baseId))
     ).sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());

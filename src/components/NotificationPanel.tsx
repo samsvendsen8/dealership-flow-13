@@ -113,6 +113,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
   const [selectedJourneyStage, setSelectedJourneyStage] = useState<string | null>(null);
   const [showCallModal, setShowCallModal] = useState(false);
   const [historyFilter, setHistoryFilter] = useState<'all' | 'text' | 'priority'>('all');
+  const [historyScope, setHistoryScope] = useState<'deal' | 'customer'>('deal');
   const { sendMessage, isLoading } = useMessaging();
   const { toast } = useToast();
 
@@ -621,26 +622,32 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
 
               {/* Customer History Content */}
               {activeMainTab === 'customer-history' && (
-                <div className="space-y-4">
-                  {/* History Scope Toggle */}
-                  <Card>
-                    <CardContent className="p-2">
-                      <div className="flex gap-1 bg-muted rounded-lg p-0.5">
-                        <button
-                          onClick={() => {/* TODO: implement scope toggle */}}
-                          className="flex-1 py-1 px-2 text-xs font-medium rounded-md bg-background text-foreground shadow-sm"
-                        >
-                          This Deal Only
-                        </button>
-                        <button
-                          onClick={() => {/* TODO: implement scope toggle */}}
-                          className="flex-1 py-1 px-2 text-xs font-medium rounded-md text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                          Full Customer
-                        </button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                <div className="space-y-3">
+                  {/* History Scope Toggle - No container */}
+                  <div className="flex gap-1 bg-muted rounded-lg p-0.5">
+                    <button
+                      onClick={() => setHistoryScope('deal')}
+                      className={cn(
+                        "flex-1 py-1 px-2 text-xs font-medium rounded-md transition-colors",
+                        historyScope === 'deal' 
+                          ? "bg-background text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      This Deal Only
+                    </button>
+                    <button
+                      onClick={() => setHistoryScope('customer')}
+                      className={cn(
+                        "flex-1 py-1 px-2 text-xs font-medium rounded-md transition-colors",
+                        historyScope === 'customer'
+                          ? "bg-background text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      Full Customer
+                    </button>
+                  </div>
 
                   {/* AI Overview Section */}
                   <AIHistoryOverview 
@@ -653,6 +660,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                     leadName={selectedLead.name}
                     filter={historyFilter}
                     onFilterChange={setHistoryFilter}
+                    scope={historyScope}
                   />
                 </div>
               )}
