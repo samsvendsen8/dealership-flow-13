@@ -254,7 +254,7 @@ export function LeadsPriorityList({
 
 
       {/* Filters and Search - Sticky */}
-      <div className="sticky top-0 z-30 bg-card backdrop-blur-sm border border-border rounded-lg shadow-sm py-4 px-4 mb-4 space-y-4">
+      <div className="sticky top-0 z-30 bg-card backdrop-blur-sm border border-border rounded-lg shadow-sm py-4 px-4 space-y-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -298,7 +298,7 @@ export function LeadsPriorityList({
 
       {/* Tabs Section */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-5 sticky top-28 z-20 bg-card backdrop-blur-sm border border-border shadow-sm mb-6 p-3 h-auto">
+        <TabsList className="grid w-full grid-cols-5 sticky top-28 z-20 bg-card backdrop-blur-sm border border-border shadow-sm p-3 h-auto">
           <TabsTrigger value="action-required" className="gap-2">
             🎯 Action Required
             <Badge variant="secondary" className="ml-1">
@@ -336,7 +336,7 @@ export function LeadsPriorityList({
           const currentLeads = getFilteredAndSortedLeads(leadsByCategory[category]);
           
           return (
-            <TabsContent key={category} value={category} className="mt-6">
+            <TabsContent key={category} value={category} className="">
               {/* Two Column Layout - Sticky Quick List + Single Card */}
               <div className="grid grid-cols-12 gap-6">
                 {/* Sticky Quick List Sidebar - 4 columns */}
