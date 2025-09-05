@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Clock, DollarSign, Car, Brain, Zap, Info } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Clock, DollarSign, Car, Brain, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { type Lead } from './LeadCard';
@@ -64,34 +64,38 @@ const getScoreColor = (score: number) => {
 export function LeadsQuickList({ leads, onLeadClick, selectedLeadId }: LeadsQuickListProps) {
   return (
     <Card className="h-full border-0 shadow-none">
-      <CardHeader className="pb-1 pt-3 px-3">
+      <CardHeader className="pb-2 pt-4 px-4">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-xs font-semibold">Quick Lead List</CardTitle>
+            <CardTitle className="text-sm font-semibold">Quick Lead List</CardTitle>
             <p className="text-xs text-muted-foreground">{leads.length} leads</p>
           </div>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="flex items-center gap-0.5 text-xs text-muted-foreground cursor-help">
-                  <Brain className="h-2.5 w-2.5 text-primary" />
-                  <span>AI</span>
-                </div>
+                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-muted/50">
+                  <Info className="h-3 w-3 text-muted-foreground" />
+                </Button>
               </TooltipTrigger>
               <TooltipContent className="max-w-sm">
-                <p className="text-sm">
-                  🤖 Leads are automatically ranked using: Priority level + Deal value + Recent activity. 
-                  <strong>Recently contacted leads move down</strong> since you're waiting for their response,
-                  while new customer activity gets top priority.
-                </p>
+                <div className="flex items-start gap-2">
+                  <Brain className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-sm mb-1">AI Priority Ranking</p>
+                    <p className="text-xs text-muted-foreground">
+                      Leads are automatically ranked using priority level, deal value, and recent activity. 
+                      Recently contacted leads move down since you're waiting for their response,
+                      while new customer activity gets top priority.
+                    </p>
+                  </div>
+                </div>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
       </CardHeader>
-      <CardContent className="p-0">
-        <ScrollArea className="h-[calc(100vh-140px)]">
-          <div className="space-y-1 px-2 pb-2">
+      <CardContent className="p-0 overflow-y-auto h-[calc(100vh-180px)]">
+        <div className="space-y-1 px-2 pb-2">
             {leads.map((lead) => (
               <div
                 key={lead.id}
@@ -160,7 +164,6 @@ export function LeadsQuickList({ leads, onLeadClick, selectedLeadId }: LeadsQuic
               </div>
             ))}
           </div>
-        </ScrollArea>
       </CardContent>
     </Card>
   );
