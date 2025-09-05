@@ -68,12 +68,12 @@ export function LeadsQuickList({ leads, onLeadClick, selectedLeadId }: LeadsQuic
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-xs font-semibold">Quick Lead List</CardTitle>
-            <p className="text-[10px] text-muted-foreground">{leads.length} leads</p>
+            <p className="text-xs text-muted-foreground">{leads.length} leads</p>
           </div>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="flex items-center gap-0.5 text-[10px] text-muted-foreground cursor-help">
+                <div className="flex items-center gap-0.5 text-xs text-muted-foreground cursor-help">
                   <Brain className="h-2.5 w-2.5 text-primary" />
                   <span>AI</span>
                 </div>
