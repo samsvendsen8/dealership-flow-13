@@ -115,19 +115,19 @@ export function LeadsQuickList({ leads, onLeadClick, selectedLeadId }: LeadsQuic
                   {/* Header Row */}
                   <div className="flex items-center justify-between gap-1">
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-xs text-foreground truncate">{lead.name}</h4>
+                      <h4 className="font-medium text-sm text-foreground truncate">{lead.name}</h4>
                     </div>
                     <div className="flex items-center gap-1">
                       <Badge 
                         variant="outline" 
                         className={cn(
-                          'text-[10px] px-1 py-0 h-4 font-medium border-0',
+                          'text-xs px-1 py-0 h-4 font-medium border-0',
                           getScoreColor(getAIPriorityScore(lead))
                         )}
                       >
                         {getAIPriorityScore(lead)}
                       </Badge>
-                      <span className="text-[11px]">{priorityIcons[lead.priority]}</span>
+                      <span className="text-xs">{priorityIcons[lead.priority]}</span>
                       <div className={cn('w-1 h-1 rounded-full', statusColors[lead.status])} />
                     </div>
                   </div>
@@ -135,23 +135,23 @@ export function LeadsQuickList({ leads, onLeadClick, selectedLeadId }: LeadsQuic
                   {/* Vehicle & Value Row */}
                   <div className="flex items-center justify-between gap-1">
                     <div className="flex items-center gap-1 text-muted-foreground min-w-0 flex-1">
-                      <Car className="h-2.5 w-2.5 flex-shrink-0" />
-                      <span className="text-[11px] truncate">{lead.vehicle}</span>
+                      <Car className="h-3 w-3 flex-shrink-0" />
+                      <span className="text-xs truncate">{lead.vehicle}</span>
                     </div>
                     <div className="flex items-center gap-0.5 text-success font-medium">
-                      <DollarSign className="h-2.5 w-2.5" />
-                      <span className="text-[11px]">${(lead.value / 1000).toFixed(0)}k</span>
+                      <DollarSign className="h-3 w-3" />
+                      <span className="text-xs">${(lead.value / 1000).toFixed(0)}k</span>
                     </div>
                   </div>
 
                   {/* Activity & Stage Row */}
                   <div className="flex items-center justify-between gap-1">
                     <div className="flex items-center gap-1 text-muted-foreground min-w-0 flex-1">
-                      <Clock className="h-2.5 w-2.5 flex-shrink-0" />
-                      <span className="text-[11px] truncate">{lead.lastActivity}</span>
+                      <Clock className="h-3 w-3 flex-shrink-0" />
+                      <span className="text-xs truncate">{lead.lastActivity}</span>
                     </div>
                     {lead.journeyStage && (
-                      <Badge variant="outline" className="text-[10px] px-1 py-0 h-3 bg-primary/5 text-primary border-primary/20 font-normal">
+                      <Badge variant="outline" className="text-xs px-1 py-0 h-4 bg-primary/5 text-primary border-primary/20 font-normal">
                         {lead.journeyStage}
                       </Badge>
                     )}
