@@ -601,6 +601,9 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           )}
         </div>
         
+        {/* Divider between Vehicle and Journey Progress */}
+        <div className="my-4 border-t border-border/50"></div>
+        
         {/* Enhanced Metrics Row */}
         {/* Removed Deal Value section */}
         
@@ -769,55 +772,55 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
               <div className="p-3 bg-muted/10 border rounded-lg">
                 {currentWorkPlanTask ? (
                   <>
-                    {/* Active Work Plan */}
+                    {/* Active Work Plan - MORE PROMINENT */}
                     <div className="flex items-center justify-between mb-2">
                       <h5 className="font-medium text-xs flex items-center gap-2">
-                        <Clock className="h-3 w-3 text-primary" />
-                        Current Work Plan
+                        <Clock className="h-3 w-3 text-warning animate-pulse" />
+                        <span className="text-warning font-semibold">Current Work Plan - ACTION NEEDED</span>
                       </h5>
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-xs bg-warning/10 text-warning border-warning/30 animate-pulse">
                         {currentWorkPlanTask.dueDate}
                       </Badge>
                     </div>
                     
-                    <div className="space-y-2">
-                      <p className="text-xs font-medium">{currentWorkPlanTask.title}</p>
+                    <div className="space-y-2 p-2 bg-warning/5 border border-warning/20 rounded-md">
+                      <p className="text-xs font-semibold text-warning">{currentWorkPlanTask.title}</p>
                       <p className="text-xs text-muted-foreground">{currentWorkPlanTask.description}</p>
                       
                       {/* Workplan Action Buttons */}
                       <div className="flex gap-1">
                         <Button
                           size="sm"
-                          variant="outline"
+                          variant="default"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleContactMethodClick('phone');
                           }}
-                          className="h-6 text-xs flex-1"
+                          className="h-6 text-xs flex-1 bg-warning hover:bg-warning/90 text-warning-foreground"
                         >
                           <Phone className="h-2 w-2 mr-1" />
                           Call
                         </Button>
                         <Button
                           size="sm"
-                          variant="outline"
+                          variant="default"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleContactMethodClick('text');
                           }}
-                          className="h-6 text-xs flex-1"
+                          className="h-6 text-xs flex-1 bg-warning hover:bg-warning/90 text-warning-foreground"
                         >
                           <MessageCircle className="h-2 w-2 mr-1" />
                           Text
                         </Button>
                         <Button
                           size="sm"
-                          variant="outline"
+                          variant="default"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleContactMethodClick('appointment');
                           }}
-                          className="h-6 text-xs flex-1"
+                          className="h-6 text-xs flex-1 bg-warning hover:bg-warning/90 text-warning-foreground"
                         >
                           <Calendar className="h-2 w-2 mr-1" />
                           Schedule
@@ -826,27 +829,27 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                       
                       {/* Context */}
                       {lead.workPlan && lead.workPlan.filter(t => t.journeyStage === lead.journeyStage).length > 1 && (
-                        <p className="text-xs text-muted-foreground">
-                          {lead.workPlan.filter(t => t.journeyStage === lead.journeyStage).length} attempts planned today
+                        <p className="text-xs text-warning font-medium">
+                          🚨 {lead.workPlan.filter(t => t.journeyStage === lead.journeyStage).length} attempts planned today
                         </p>
                       )}
                     </div>
                   </>
                 ) : (
                   <>
-                    {/* Completed Work Plan */}
+                    {/* Completed Work Plan - LESS PROMINENT */}
                     <div className="flex items-center justify-between mb-2">
                       <h5 className="font-medium text-xs flex items-center gap-2">
-                        <CheckCircle className="h-3 w-3 text-success" />
-                        Current Work Plan Finished
+                        <CheckCircle className="h-3 w-3 text-muted-foreground" />
+                        <span className="text-muted-foreground">Work Plan Complete</span>
                       </h5>
-                      <Badge variant="outline" className="text-xs bg-success/10 text-success border-success/20">
-                        ✅ Complete
+                      <Badge variant="outline" className="text-xs bg-muted/10 text-muted-foreground border-muted">
+                        ✅ Done
                       </Badge>
                     </div>
                     
                     <div className="space-y-2">
-                      <p className="text-xs font-medium">All planned tasks completed for this stage</p>
+                      <p className="text-xs text-muted-foreground">All planned tasks completed for this stage</p>
                       <p className="text-xs text-muted-foreground">
                         Customer has responded or all contact attempts have been made.
                       </p>
