@@ -5,6 +5,7 @@ import { LeadFocusView } from '@/components/LeadFocusView';
 import { NotificationPanel } from '@/components/NotificationPanel';
 import { ToastNotification } from '@/components/ToastNotification';
 import { GoalsDashboard } from '@/components/GoalsDashboard';
+import { DebugPanel } from '@/components/DebugPanel';
 import { useToast } from '@/hooks/use-toast';
 import { useRealTimeUpdates } from '@/hooks/useRealTimeUpdates';
 import { Button } from '@/components/ui/button';
@@ -229,6 +230,8 @@ const mockLeads: Lead[] = [
 ];
 
 const Index = () => {
+  console.log('Index component rendering - checking if visible');
+  
   const [leads, setLeads] = useState<Lead[]>(mockLeads);
   const [isNotificationPanelOpen, setIsNotificationPanelOpen] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | undefined>();
@@ -767,6 +770,9 @@ const Index = () => {
           />
         ))}
       </div>
+
+      {/* Debug Panel - Remove in production */}
+      <DebugPanel />
     </div>
   );
 };
