@@ -766,7 +766,7 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
               )}
 
               {/* Work Plan Section (Always Shown) */}
-              <div className="p-3 bg-muted/10 border rounded-lg">
+              <div className="mt-6 p-3 bg-muted/10 border rounded-lg">
                 {currentWorkPlanTask ? (
                   <>
                     {/* Active Work Plan */}
