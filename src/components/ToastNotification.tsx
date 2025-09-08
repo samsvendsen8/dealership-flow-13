@@ -199,13 +199,27 @@ export function ToastNotification({
                   <textarea
                     placeholder="refine AI response"
                     value={aiInstructions}
-                    onChange={(e) => setAiInstructions(e.target.value)}
-                    className="w-full text-xs border border-input rounded-md px-3 py-2 resize-none min-h-[2.5rem] max-h-[4.5rem] overflow-y-auto"
+                    onChange={(e) => {
+                      setAiInstructions(e.target.value);
+                      // Auto-resize textarea
+                      const target = e.target as HTMLTextAreaElement;
+                      target.style.height = 'auto';
+                      target.style.height = Math.min(target.scrollHeight, 72) + 'px';
+                    }}
+                    className="w-full text-xs border border-input rounded-md px-3 py-2 resize-none overflow-hidden"
                     rows={1}
                     style={{
-                      height: Math.min(Math.max(40, aiInstructions.split('\n').length * 20 + 20), 72) + 'px'
+                      height: '40px',
+                      minHeight: '40px',
+                      maxHeight: '72px'
                     }}
                     disabled={isRefining}
+                    onInput={(e) => {
+                      // Additional handler for input event
+                      const target = e.target as HTMLTextAreaElement;
+                      target.style.height = 'auto';
+                      target.style.height = Math.min(target.scrollHeight, 72) + 'px';
+                    }}
                   />
                   <Button
                     size="sm"
