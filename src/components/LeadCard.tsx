@@ -385,10 +385,6 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                   <Car className="h-3 w-3" />
                   {lead.vehicle}
                 </span>
-                <span className="flex items-center gap-1">
-                  <DollarSign className="h-3 w-3 text-success" />
-                  ${lead.value.toLocaleString()}
-                </span>
               </div>
               <div className="flex items-center gap-3 mt-1 text-xs">
                 <span>{lead.lastActivity}</span>

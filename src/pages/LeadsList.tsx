@@ -237,10 +237,11 @@ const LeadsList = () => {
 
   return (
     <div className="h-screen bg-background flex flex-col">
-      {/* Header - Compact */}
+      {/* Header and Filters - Combined Container */}
       <div className="border-b bg-card flex-shrink-0">
-        <div className="container mx-auto px-4 py-1">
-          <div className="flex items-center justify-between">
+        <div className="container mx-auto px-4 py-3">
+          {/* Header Section */}
+          <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
               <Link to="/">
                 <Button variant="ghost" size="sm" className="h-8">
@@ -254,75 +255,77 @@ const LeadsList = () => {
               {filteredAndSortedLeads.length} of {leads.length}
             </div>
           </div>
+          
+          {/* Divider */}
+          <div className="border-b mb-3"></div>
+          
+          {/* Filters Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-2">
+            <div className="lg:col-span-2">
+              <div className="relative">
+                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+                <Input
+                  placeholder="Search leads by name, vehicle, or email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-7 h-8 text-xs"
+                />
+              </div>
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="new">New</SelectItem>
+                <SelectItem value="contacted">Contacted</SelectItem>
+                <SelectItem value="qualified">Qualified</SelectItem>
+                <SelectItem value="proposal">Proposal</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue placeholder="Sort by Priority" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Priorities</SelectItem>
+                <SelectItem value="hot">Hot</SelectItem>
+                <SelectItem value="warm">Warm</SelectItem>
+                <SelectItem value="cold">Cold</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={journeyStageFilter} onValueChange={setJourneyStageFilter}>
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue placeholder="Journey Stage" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Stages</SelectItem>
+                <SelectItem value="initial_inquiry">Initial Inquiry</SelectItem>
+                <SelectItem value="engaged">Engaged</SelectItem>
+                <SelectItem value="visit">Visit</SelectItem>
+                <SelectItem value="proposal">Proposal</SelectItem>
+                <SelectItem value="negotiation">Negotiation</SelectItem>
+                <SelectItem value="closing">Closing</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="lastContact">Last Contact</SelectItem>
+                <SelectItem value="value">Deal Value</SelectItem>
+                <SelectItem value="priority">Priority</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
       {/* Main Content - Flex Fill */}
       <div className="flex-1 overflow-hidden">
         <div className="container mx-auto px-4 h-full flex flex-col">
-          {/* Filters - Compact Horizontal Bar */}
-          <div className="border rounded-lg p-2 flex-shrink-0 bg-card">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-2">
-              <div className="lg:col-span-2">
-                <div className="relative">
-                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
-                  <Input
-                    placeholder="Search leads..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-7 h-8 text-xs"
-                  />
-                </div>
-              </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="h-8 text-xs">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="new">New</SelectItem>
-                  <SelectItem value="contacted">Contacted</SelectItem>
-                  <SelectItem value="qualified">Qualified</SelectItem>
-                  <SelectItem value="proposal">Proposal</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                <SelectTrigger className="h-8 text-xs">
-                  <SelectValue placeholder="Priority" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Priorities</SelectItem>
-                  <SelectItem value="hot">Hot</SelectItem>
-                  <SelectItem value="warm">Warm</SelectItem>
-                  <SelectItem value="cold">Cold</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={journeyStageFilter} onValueChange={setJourneyStageFilter}>
-                <SelectTrigger className="h-8 text-xs">
-                  <SelectValue placeholder="Journey Stage" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Stages</SelectItem>
-                  <SelectItem value="initial_inquiry">Initial Inquiry</SelectItem>
-                  <SelectItem value="engaged">Engaged</SelectItem>
-                  <SelectItem value="visit">Visit</SelectItem>
-                  <SelectItem value="proposal">Proposal</SelectItem>
-                  <SelectItem value="negotiation">Negotiation</SelectItem>
-                  <SelectItem value="closing">Closing</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="h-8 text-xs">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="lastContact">Last Contact</SelectItem>
-                  <SelectItem value="value">Deal Value</SelectItem>
-                  <SelectItem value="priority">Priority</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
 
           {/* Leads Table - Flex Fill */}
           <Card className="flex-1 overflow-hidden">
@@ -342,12 +345,9 @@ const LeadsList = () => {
                           <p className="text-xs text-muted-foreground">{lead.phone}</p>
                         </div>
 
-                        {/* Vehicle & Value */}
+                        {/* Vehicle */}
                         <div className="lg:col-span-2">
                           <p className="font-medium text-xs text-foreground truncate">{lead.vehicle}</p>
-                          <p className="text-xs text-muted-foreground">
-                            ${(lead.value || 0).toLocaleString()}
-                          </p>
                         </div>
 
                         {/* Status & Priority */}
@@ -415,9 +415,6 @@ const LeadsList = () => {
                         <div className="lg:col-span-1">
                           <p className="text-xs font-medium text-foreground">
                             {formatLastContact(lead.lastActivity)}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {lead.daysSinceLastContact === 0 ? 'Today' : `${lead.daysSinceLastContact}d ago`}
                           </p>
                         </div>
 
