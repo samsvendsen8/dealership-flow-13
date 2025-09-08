@@ -325,60 +325,74 @@ const LeadsList = () => {
 
       {/* Main Content - Flex Fill */}
       <div className="flex-1 overflow-hidden">
-        <div className="container mx-auto px-4 h-full flex flex-col">
+        <div className="container mx-auto px-6 py-4 h-full flex flex-col">
 
           {/* Leads Table - Flex Fill */}
           <Card className="flex-1 overflow-hidden">
-            <CardContent className="p-0 flex-1 overflow-hidden">
+            <CardContent className="p-4 flex-1 overflow-hidden">
               <ScrollArea className="h-full">
-                <div className="space-y-0.5 p-2">
-                  {filteredAndSortedLeads.map((lead) => (
+                <div className="space-y-3 p-2">
+                  {filteredAndSortedLeads.map((lead) => {
+                    // Get current work plan task for this lead
+                    const getCurrentWorkPlanTask = () => {
+                      if (!lead.workPlan) return null;
+                      const incompleteTasks = lead.workPlan.filter(task => 
+                        task.journeyStage === lead.journeyStage && 
+                        !['completed', 'not_needed'].includes(task.status)
+                      );
+                      return incompleteTasks.find(task => task.status === 'pending') || 
+                             incompleteTasks.find(task => task.status === 'scheduled') ||
+                             null;
+                    };
+
+                    const currentWorkPlanTask = getCurrentWorkPlanTask();
+                    
+                    return (
                     <div
                       key={lead.id}
-                      className="border rounded-lg p-2 hover:bg-muted/50 transition-colors animate-fade-in"
+                      className="border rounded-lg p-4 hover:bg-muted/50 transition-colors animate-fade-in bg-card"
                     >
-                      <div className="grid grid-cols-1 lg:grid-cols-11 gap-2 items-center">
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
                         {/* Lead Info */}
-                        <div className="lg:col-span-2">
-                          <h3 className="font-semibold text-xs text-foreground">{lead.name}</h3>
-                          <p className="text-xs text-muted-foreground truncate">{lead.email}</p>
-                          <p className="text-xs text-muted-foreground">{lead.phone}</p>
-                        </div>
-
-                        {/* Vehicle */}
-                        <div className="lg:col-span-2">
-                          <p className="font-medium text-xs text-foreground truncate">{lead.vehicle}</p>
+                        <div className="lg:col-span-3">
+                          <div className="space-y-1">
+                            <h3 className="font-semibold text-sm text-foreground">{lead.name}</h3>
+                            <p className="text-xs text-muted-foreground truncate">{lead.email}</p>
+                            <p className="text-xs text-muted-foreground">{lead.phone}</p>
+                            <p className="text-xs font-medium text-foreground truncate">{lead.vehicle}</p>
+                          </div>
                         </div>
 
                         {/* Status & Priority */}
-                        <div className="lg:col-span-1">
-                          <div className="flex flex-col gap-0.5">
-                            <Badge className={`${statusColors[lead.status] || 'bg-gray-100 text-gray-800'} text-xs px-1.5 py-0.5 h-5`}>
+                        <div className="lg:col-span-2">
+                          <div className="flex flex-col gap-1">
+                            <Badge className={`${statusColors[lead.status] || 'bg-gray-100 text-gray-800'} text-xs px-2 py-1`}>
                               {lead.status}
                             </Badge>
-                            <Badge className={`${priorityColors[lead.priority]} text-xs px-1.5 py-0.5 h-5`}>
+                            <Badge className={`${priorityColors[lead.priority]} text-xs px-2 py-1`}>
                               {lead.priority}
                             </Badge>
                           </div>
                         </div>
 
-                        {/* Journey Stage with Visual Progress */}
-                        <div className="lg:col-span-3">
-                          <div className="space-y-0.5">
+                        {/* Enhanced Journey Progress with WorkPlan */}
+                        <div className="lg:col-span-5">
+                          <div className="space-y-2 p-3 bg-muted/20 rounded-lg">
+                            {/* Journey Stage Header */}
                             <div className="flex items-center justify-between">
-                              <Badge className={`${journeyStageColors[lead.journeyStage] || 'bg-gray-100 text-gray-800'} text-xs px-1.5 py-0.5 h-5`}>
+                              <Badge className={`${journeyStageColors[lead.journeyStage] || 'bg-gray-100 text-gray-800'} text-xs px-2 py-1`}>
                                 {lead.journeyStage?.replace('_', ' ')}
                               </Badge>
-                              <span className="text-xs text-muted-foreground">
-                                {lead.stageProgress}%
+                              <span className="text-xs text-muted-foreground font-medium">
+                                {lead.stageProgress}% Complete
                               </span>
                             </div>
                             
-                            {/* Journey Progress Bar */}
-                            <div className="space-y-0.5">
+                            {/* Journey Progress Bar with Enhanced Styling */}
+                            <div className="space-y-1">
                               <Progress 
                                 value={getJourneyProgress(lead.journeyStage)} 
-                                className="h-1"
+                                className="h-2"
                               />
                               <div className="flex justify-between text-xs text-muted-foreground">
                                 <span>Inquiry</span>
@@ -386,8 +400,8 @@ const LeadsList = () => {
                               </div>
                             </div>
                             
-                            {/* Journey Stage Dots */}
-                            <div className="flex items-center justify-between">
+                            {/* Journey Stage Dots with Better Spacing */}
+                            <div className="flex items-center justify-between px-1">
                               {journeyStages.map((stage, index) => {
                                 const currentStageIndex = journeyStages.findIndex(s => s.key === lead.journeyStage);
                                 const isCompleted = index <= currentStageIndex;
@@ -397,35 +411,49 @@ const LeadsList = () => {
                                   <div
                                     key={stage.key}
                                     className={cn(
-                                      "w-1 h-1 rounded-full transition-all duration-300",
+                                      "w-2 h-2 rounded-full transition-all duration-300",
                                       isCompleted 
                                         ? stage.color 
-                                        : "bg-muted",
-                                      isCurrent && "ring-1 ring-offset-1 ring-primary/50 scale-125"
+                                        : "bg-muted-foreground/30",
+                                      isCurrent && "ring-2 ring-offset-1 ring-primary/50 scale-125"
                                     )}
                                     title={stage.label}
                                   />
                                 );
                               })}
                             </div>
+
+                            {/* WorkPlan Integration */}
+                            {currentWorkPlanTask && (
+                              <div className="mt-2 pt-2 border-t border-border/50">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs font-medium text-primary">Next Action:</span>
+                                  <Badge variant="outline" className="text-xs">
+                                    {currentWorkPlanTask.dueDate}
+                                  </Badge>
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-1 truncate">
+                                  {currentWorkPlanTask.title}
+                                </p>
+                              </div>
+                            )}
+                            
+                            {/* Last Activity */}
+                            <div className="text-xs text-muted-foreground">
+                              Last: {formatLastContact(lead.lastActivity)}
+                            </div>
                           </div>
                         </div>
 
-                        {/* Last Contact */}
-                        <div className="lg:col-span-1">
-                          <p className="text-xs font-medium text-foreground">
-                            {formatLastContact(lead.lastActivity)}
-                          </p>
-                        </div>
-
                         {/* Actions */}
-                        <div className="lg:col-span-1">
-                          <div className="flex gap-0.5">
+                        <div className="lg:col-span-2">
+                          <div className="flex gap-1 justify-end">
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={() => handleContact(lead.id, 'phone')}
-                              className="h-6 w-6 p-0"
+                              className="h-8 w-8 p-0"
+                              title="Call Lead"
                             >
                               <Phone className="h-3 w-3" />
                             </Button>
@@ -433,7 +461,8 @@ const LeadsList = () => {
                               size="sm"
                               variant="ghost"
                               onClick={() => handleContact(lead.id, 'email')}
-                              className="h-6 w-6 p-0"
+                              className="h-8 w-8 p-0"
+                              title="Email Lead"
                             >
                               <Mail className="h-3 w-3" />
                             </Button>
@@ -441,7 +470,8 @@ const LeadsList = () => {
                               size="sm"
                               variant="ghost"
                               onClick={() => handleContact(lead.id, 'text')}
-                              className="h-6 w-6 p-0"
+                              className="h-8 w-8 p-0"
+                              title="Text Lead"
                             >
                               <MessageSquare className="h-3 w-3" />
                             </Button>
@@ -449,16 +479,17 @@ const LeadsList = () => {
                         </div>
                       </div>
 
-                      {/* Notes - Compact */}
+                      {/* Notes - Enhanced Styling */}
                       {lead.notes && (
-                        <div className="mt-1 pt-1 border-t">
+                        <div className="mt-3 pt-3 border-t border-border/50">
                           <p className="text-xs text-muted-foreground">
-                            <strong>Notes:</strong> {lead.notes}
+                            <span className="font-medium text-foreground">Notes:</span> {lead.notes}
                           </p>
                         </div>
                       )}
                     </div>
-                  ))}
+                    );
+                  })}
 
                   {filteredAndSortedLeads.length === 0 && (
                     <div className="text-center py-6">
