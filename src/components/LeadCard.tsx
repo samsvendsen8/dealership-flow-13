@@ -772,20 +772,26 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
               <div className="p-3 bg-muted/10 border rounded-lg">
                 {currentWorkPlanTask ? (
                   <>
-                    {/* Active Work Plan - MORE PROMINENT */}
+                    {/* Active Work Plan - Attention with Icons */}
                     <div className="flex items-center justify-between mb-2">
                       <h5 className="font-medium text-xs flex items-center gap-2">
-                        <Clock className="h-3 w-3 text-warning animate-pulse" />
-                        <span className="text-warning font-semibold">Current Work Plan - ACTION NEEDED</span>
+                        <AlertCircle className="h-3 w-3 text-primary" />
+                        <span className="text-foreground">Current Work Plan</span>
+                        <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
+                          Action Needed
+                        </Badge>
                       </h5>
-                      <Badge variant="outline" className="text-xs bg-warning/10 text-warning border-warning/30 animate-pulse">
+                      <Badge variant="outline" className="text-xs">
                         {currentWorkPlanTask.dueDate}
                       </Badge>
                     </div>
                     
-                    <div className="space-y-2 p-2 bg-warning/5 border border-warning/20 rounded-md">
-                      <p className="text-xs font-semibold text-warning">{currentWorkPlanTask.title}</p>
-                      <p className="text-xs text-muted-foreground">{currentWorkPlanTask.description}</p>
+                    <div className="space-y-2 p-2 border border-primary/20 rounded-md bg-primary/5">
+                      <div className="flex items-center gap-2">
+                        <Zap className="h-3 w-3 text-primary animate-pulse" />
+                        <p className="text-xs font-medium text-foreground">{currentWorkPlanTask.title}</p>
+                      </div>
+                      <p className="text-xs text-muted-foreground ml-5">{currentWorkPlanTask.description}</p>
                       
                       {/* Workplan Action Buttons */}
                       <div className="flex gap-1">
@@ -796,7 +802,7 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                             e.stopPropagation();
                             handleContactMethodClick('phone');
                           }}
-                          className="h-6 text-xs flex-1 bg-warning hover:bg-warning/90 text-warning-foreground"
+                          className="h-6 text-xs flex-1"
                         >
                           <Phone className="h-2 w-2 mr-1" />
                           Call
@@ -808,7 +814,7 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                             e.stopPropagation();
                             handleContactMethodClick('text');
                           }}
-                          className="h-6 text-xs flex-1 bg-warning hover:bg-warning/90 text-warning-foreground"
+                          className="h-6 text-xs flex-1"
                         >
                           <MessageCircle className="h-2 w-2 mr-1" />
                           Text
@@ -820,18 +826,21 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                             e.stopPropagation();
                             handleContactMethodClick('appointment');
                           }}
-                          className="h-6 text-xs flex-1 bg-warning hover:bg-warning/90 text-warning-foreground"
+                          className="h-6 text-xs flex-1"
                         >
                           <Calendar className="h-2 w-2 mr-1" />
                           Schedule
                         </Button>
                       </div>
                       
-                      {/* Context */}
+                      {/* Context with Icon */}
                       {lead.workPlan && lead.workPlan.filter(t => t.journeyStage === lead.journeyStage).length > 1 && (
-                        <p className="text-xs text-warning font-medium">
-                          🚨 {lead.workPlan.filter(t => t.journeyStage === lead.journeyStage).length} attempts planned today
-                        </p>
+                        <div className="flex items-center gap-1">
+                          <Target className="h-3 w-3 text-primary" />
+                          <p className="text-xs text-foreground font-medium">
+                            {lead.workPlan.filter(t => t.journeyStage === lead.journeyStage).length} attempts planned today
+                          </p>
+                        </div>
                       )}
                     </div>
                   </>

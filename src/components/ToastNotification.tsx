@@ -196,11 +196,15 @@ export function ToastNotification({
                   <span className="text-xs font-medium text-primary">Custom AI Refinement</span>
                 </div>
                 <div className="space-y-2">
-                  <Input
-                    placeholder="e.g., make this more about their car and less about them, include the price..."
+                  <textarea
+                    placeholder="refine AI response"
                     value={aiInstructions}
                     onChange={(e) => setAiInstructions(e.target.value)}
-                    className="text-xs"
+                    className="w-full text-xs border border-input rounded-md px-3 py-2 resize-none min-h-[2.5rem] max-h-[4.5rem] overflow-y-auto"
+                    rows={1}
+                    style={{
+                      height: Math.min(Math.max(40, aiInstructions.split('\n').length * 20 + 20), 72) + 'px'
+                    }}
                     disabled={isRefining}
                   />
                   <Button
