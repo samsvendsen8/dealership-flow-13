@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
-import { Search, Filter, SortDesc, Bell, Zap, Info } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Search, Filter, SortDesc, Bell, Zap, Info, Users } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -7,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { ThemeToggle } from '@/components/theme-toggle';
 import LeadCard, { type Lead } from './LeadCard';
 import { LeadsQuickList } from './LeadsQuickList';
 import { cn } from '@/lib/utils';
@@ -219,6 +221,13 @@ export function LeadsPriorityList({
           </p>
         </div>
         <div className="flex gap-2">
+          <Link to="/leads">
+            <Button variant="outline" className="gap-2">
+              <Users className="h-4 w-4" />
+              All Leads
+            </Button>
+          </Link>
+          <ThemeToggle />
           <Button 
             variant="outline" 
             className="gap-2"

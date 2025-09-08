@@ -637,23 +637,6 @@ const Index = () => {
         />
       ) : (
         <div className="container mx-auto px-6 py-8">
-          {/* Navigation Header */}
-          <div className="mb-8 flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Sales Dashboard</h1>
-              <p className="text-muted-foreground">Manage your priority leads and track progress</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Link to="/leads">
-                <Button variant="outline" className="gap-2">
-                  <Users className="h-4 w-4" />
-                  All Leads
-                </Button>
-              </Link>
-              <ThemeToggle />
-            </div>
-          </div>
-
           {/* Goals Dashboard */}
           <GoalsDashboard />
           
