@@ -604,7 +604,13 @@ const Index = () => {
     document.body.appendChild(confettiContainer);
     
     setTimeout(() => {
-      document.body.removeChild(confettiContainer);
+      try {
+        if (confettiContainer && confettiContainer.parentNode) {
+          confettiContainer.parentNode.removeChild(confettiContainer);
+        }
+      } catch (error) {
+        console.log('Confetti cleanup: element already removed');
+      }
     }, 2000);
   };
 

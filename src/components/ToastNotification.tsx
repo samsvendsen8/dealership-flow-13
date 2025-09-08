@@ -214,12 +214,6 @@ export function ToastNotification({
                       maxHeight: '72px'
                     }}
                     disabled={isRefining}
-                    onInput={(e) => {
-                      // Additional handler for input event
-                      const target = e.target as HTMLTextAreaElement;
-                      target.style.height = 'auto';
-                      target.style.height = Math.min(target.scrollHeight, 72) + 'px';
-                    }}
                   />
                   <Button
                     size="sm"
