@@ -498,12 +498,6 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
             <span className="text-xs text-muted-foreground font-medium">
               {priorityLabels[lead.priority]}
             </span>
-            {lead.dealProbability && (
-              <div className="flex items-center gap-1 text-xs">
-                <Target className="h-3 w-3 text-primary" />
-                <span className="font-medium text-primary">{lead.dealProbability}% likely</span>
-              </div>
-            )}
           </div>
         </div>
         
@@ -573,27 +567,7 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                 </div>
               </div>
 
-              {/* Opportunity Score */}
-              {lead.dealProbability && (
-                <div className="border-t border-primary/20 pt-3">
-                  <h5 className="font-medium text-sm flex items-center gap-2 mb-2">
-                    <Heart className="h-4 w-4 text-success" />
-                    Opportunity Score
-                  </h5>
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 bg-muted rounded-full h-2">
-                      <div 
-                        className="bg-gradient-to-r from-destructive via-warning to-success h-2 rounded-full transition-all"
-                        style={{ width: `${lead.dealProbability}%` }}
-                      />
-                    </div>
-                    <span className="font-bold text-sm">{lead.dealProbability}%</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Based on engagement level, response rate, and journey progress
-                  </p>
-                </div>
-              )}
+              {/* Removed Opportunity Score section */}
             </div>
           </CollapsibleContent>
         </Collapsible>
@@ -646,27 +620,6 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
               ${lead.value.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">Deal Value</p>
-            {lead.budget && (
-              <p className="text-xs text-muted-foreground">Budget: ${lead.budget.min.toLocaleString()}-${lead.budget.max.toLocaleString()}</p>
-            )}
-          </div>
-          <div className="text-center border-x border-border px-2">
-            <div className="flex items-center justify-center gap-1 text-lg font-bold text-primary">
-              {lead.contactAttempts || 0}
-            </div>
-            <p className="text-xs text-muted-foreground">Contact Attempts</p>
-            {lead.responseRate && (
-              <p className="text-xs text-success">{lead.responseRate}% response rate</p>
-            )}
-          </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-1 text-lg font-bold text-foreground">
-              {lead.daysSinceLastContact || 0}
-            </div>
-            <p className="text-xs text-muted-foreground">Days Since Contact</p>
-            {lead.nextFollowUp && (
-              <p className="text-xs text-primary">Next: {lead.nextFollowUp}</p>
-            )}
           </div>
         </div>
         

@@ -253,84 +253,91 @@ export function LeadsPriorityList({
       </div>
 
 
-      {/* Filters and Search - Sticky */}
-      <div className="sticky top-0 z-30 bg-card backdrop-blur-sm border border-border rounded-lg shadow-sm py-4 px-4 space-y-4">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search leads by name, vehicle, or email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+      {/* Combined Filters, Search and Tabs Section */}
+      <div className="sticky top-0 z-30 bg-card backdrop-blur-sm border border-border rounded-lg shadow-sm">
+        {/* Filters and Search */}
+        <div className="py-4 px-4 space-y-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search leads by name, vehicle, or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
+              <SelectTrigger className="w-48">
+                <SortDesc className="h-4 w-4 mr-2" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="priority">Sort by Priority</SelectItem>
+                <SelectItem value="value">Sort by Value</SelectItem>
+                <SelectItem value="activity">Sort by Activity</SelectItem>
+                <SelectItem value="status">Sort by Status</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={filterBy} onValueChange={(value: FilterOption) => setFilterBy(value)}>
+              <SelectTrigger className="w-40">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Leads</SelectItem>
+                <SelectItem value="hot">Hot Priority</SelectItem>
+                <SelectItem value="warm">Warm Priority</SelectItem>
+                <SelectItem value="cold">Cold Priority</SelectItem>
+                <SelectItem value="new">New Status</SelectItem>
+                <SelectItem value="contacted">Contacted</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
-            <SelectTrigger className="w-48">
-              <SortDesc className="h-4 w-4 mr-2" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="priority">Sort by Priority</SelectItem>
-              <SelectItem value="value">Sort by Value</SelectItem>
-              <SelectItem value="activity">Sort by Activity</SelectItem>
-              <SelectItem value="status">Sort by Status</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={filterBy} onValueChange={(value: FilterOption) => setFilterBy(value)}>
-            <SelectTrigger className="w-40">
-              <Filter className="h-4 w-4 mr-2" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Leads</SelectItem>
-              <SelectItem value="hot">Hot Priority</SelectItem>
-              <SelectItem value="warm">Warm Priority</SelectItem>
-              <SelectItem value="cold">Cold Priority</SelectItem>
-              <SelectItem value="new">New Status</SelectItem>
-              <SelectItem value="contacted">Contacted</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
-        {/* Removed AI Priority Scoring - moved to Quick Lead List */}
+        {/* Divider */}
+        <div className="border-t border-border"></div>
+
+        {/* Tabs Section */}
+        <div className="p-3">
+          <TabsList className="grid w-full grid-cols-5 bg-background/50 border border-border/50 shadow-sm h-auto">
+            <TabsTrigger value="action-required" className="gap-2">
+              🎯 Action Required
+              <Badge variant="secondary" className="ml-1">
+                {leadsByCategory['action-required'].length}
+              </Badge>
+            </TabsTrigger>
+            <TabsTrigger value="awaiting-response" className="gap-2">
+              ⏳ Awaiting Response
+              <Badge variant="secondary" className="ml-1">
+                {leadsByCategory['awaiting-response'].length}
+              </Badge>
+            </TabsTrigger>
+            <TabsTrigger value="re-engaged" className="gap-2">
+              🔥 Re-engaged
+              <Badge variant="secondary" className="ml-1">
+                {leadsByCategory['re-engaged'].length}
+              </Badge>
+            </TabsTrigger>
+            <TabsTrigger value="cold" className="gap-2">
+              ❄️ Cold Leads
+              <Badge variant="secondary" className="ml-1">
+                {leadsByCategory['cold'].length}
+              </Badge>
+            </TabsTrigger>
+            <TabsTrigger value="all" className="gap-2">
+              📋 All Leads
+              <Badge variant="secondary" className="ml-1">
+                {leadsByCategory['all'].length}
+              </Badge>
+            </TabsTrigger>
+          </TabsList>
+        </div>
       </div>
 
       {/* Tabs Section */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-5 sticky top-28 z-20 bg-card backdrop-blur-sm border border-border shadow-sm p-3 h-auto">
-          <TabsTrigger value="action-required" className="gap-2">
-            🎯 Action Required
-            <Badge variant="secondary" className="ml-1">
-              {leadsByCategory['action-required'].length}
-            </Badge>
-          </TabsTrigger>
-          <TabsTrigger value="awaiting-response" className="gap-2">
-            ⏳ Awaiting Response
-            <Badge variant="secondary" className="ml-1">
-              {leadsByCategory['awaiting-response'].length}
-            </Badge>
-          </TabsTrigger>
-          <TabsTrigger value="re-engaged" className="gap-2">
-            🔥 Re-engaged
-            <Badge variant="secondary" className="ml-1">
-              {leadsByCategory['re-engaged'].length}
-            </Badge>
-          </TabsTrigger>
-          <TabsTrigger value="cold" className="gap-2">
-            ❄️ Cold Leads
-            <Badge variant="secondary" className="ml-1">
-              {leadsByCategory['cold'].length}
-            </Badge>
-          </TabsTrigger>
-          <TabsTrigger value="all" className="gap-2">
-            📋 All Leads
-            <Badge variant="secondary" className="ml-1">
-              {leadsByCategory['all'].length}
-            </Badge>
-          </TabsTrigger>
-        </TabsList>
-
         {/* Tab Content for each category */}
         {(['action-required', 'awaiting-response', 're-engaged', 'cold', 'all'] as const).map((category) => {
           const currentLeads = getFilteredAndSortedLeads(leadsByCategory[category]);
@@ -341,7 +348,7 @@ export function LeadsPriorityList({
               <div className="grid grid-cols-12 gap-6">
                 {/* Sticky Quick List Sidebar - 4 columns */}
                 <div className="col-span-4">
-                  <div className="sticky top-44 z-10 h-[calc(100vh-14rem)] overflow-auto">
+                  <div className="sticky top-52 z-10 h-[calc(100vh-16rem)] overflow-auto">
                     <LeadsQuickList 
                       leads={currentLeads}
                       onLeadClick={(leadId) => {
@@ -355,7 +362,7 @@ export function LeadsPriorityList({
                 {/* Single Card Focus Area - 8 columns */}
                 <div className="col-span-8">
                   {currentLeads.length > 0 ? (
-                    <div className="sticky top-44 z-5">
+                    <div className="sticky top-52 z-5">
                       {(() => {
                         const displayLead = selectedLeadId ? 
                           currentLeads.find(lead => lead.id === selectedLeadId) : 
