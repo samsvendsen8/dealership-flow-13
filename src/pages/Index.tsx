@@ -741,20 +741,31 @@ const Index = () => {
 
       {/* Stacked Toast Notifications */}
       <div className="fixed top-4 right-4 space-y-3 z-50">
-        {toastQueue.map((toast, index) => (
-          <ToastNotification
-            key={toast.id}
-            isVisible={true}
-            leadName={toast.leadName}
-            message={toast.message}
-            suggestedResponse={toast.suggestedResponse}
-            onSend={(message) => handleSendResponse(toast.id, message)}
-            onEdit={handleEditResponse}
-            onViewDetails={() => handleViewToastDetails(toast.id)}
-            onDismiss={() => handleDismissToast(toast.id)}
-            stackIndex={index}
-          />
-        ))}
+        {toastQueue.map((toast, index) => {
+          // Find the associated lead for context
+          const associatedLead = leads.find(l => l.id === toast.leadId);
+          
+          return (
+            <ToastNotification
+              key={toast.id}
+              isVisible={true}
+              leadName={toast.leadName}
+              message={toast.message}
+              suggestedResponse={toast.suggestedResponse}
+              onSend={(message) => handleSendResponse(toast.id, message)}
+              onEdit={handleEditResponse}
+              onViewDetails={() => handleViewToastDetails(toast.id)}
+              onDismiss={() => handleDismissToast(toast.id)}
+              stackIndex={index}
+              leadInfo={associatedLead ? {
+                vehicle: associatedLead.vehicle,
+                value: associatedLead.value,
+                budget: associatedLead.budget,
+                source: associatedLead.source
+              } : undefined}
+            />
+          );
+        })}
       </div>
     </div>
   );

@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { X, Send, Edit3, Eye, ChevronDown, Sparkles } from 'lucide-react';
+import { X, Send, Edit3, Eye, ChevronDown, Sparkles, Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 interface ToastNotificationProps {
@@ -16,6 +19,12 @@ interface ToastNotificationProps {
   onViewDetails: () => void;
   onDismiss: () => void;
   stackIndex?: number;
+  leadInfo?: {
+    vehicle?: string;
+    value?: number;
+    budget?: { min: number; max: number };
+    source?: string;
+  };
 }
 
 export function ToastNotification({
@@ -27,11 +36,65 @@ export function ToastNotification({
   onEdit,
   onViewDetails,
   onDismiss,
-  stackIndex = 0
+  stackIndex = 0,
+  leadInfo
 }: ToastNotificationProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedResponse, setEditedResponse] = useState(suggestedResponse);
+  const [aiInstructions, setAiInstructions] = useState('');
+  const [isRefining, setIsRefining] = useState(false);
+  const { toast } = useToast();
   
+  // AI refinement function
+  const refineWithAI = async () => {
+    if (!aiInstructions.trim()) {
+      toast({
+        title: "Please enter instructions",
+        description: "Tell the AI how you'd like to modify the message",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsRefining(true);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('refine-message', {
+        body: {
+          originalMessage: editedResponse,
+          userInstructions: aiInstructions,
+          leadName,
+          leadInfo
+        }
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Failed to refine message');
+      }
+
+      if (data.success) {
+        setEditedResponse(data.refinedMessage);
+        setAiInstructions('');
+        setIsEditing(true);
+        toast({
+          title: "Message refined!",
+          description: "The AI has updated your message based on your instructions",
+        });
+      } else {
+        throw new Error(data.error || 'Failed to refine message');
+      }
+    } catch (error) {
+      console.error('Error refining message:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : 'Failed to refine message',
+        variant: "destructive",
+      });
+    } finally {
+      setIsRefining(false);
+    }
+  };
+
   // AI modification functions
   const modifyResponse = (type: string) => {
     let modified = suggestedResponse;
@@ -126,9 +189,45 @@ export function ToastNotification({
                 <p className="text-sm text-foreground">{suggestedResponse}</p>
               )}
               
+              {/* Custom AI Refinement Section */}
+              <div className="mt-3 pt-3 border-t border-border/30">
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="h-3 w-3 text-primary" />
+                  <span className="text-xs font-medium text-primary">Custom AI Refinement</span>
+                </div>
+                <div className="space-y-2">
+                  <Input
+                    placeholder="e.g., make this more about their car and less about them, include the price..."
+                    value={aiInstructions}
+                    onChange={(e) => setAiInstructions(e.target.value)}
+                    className="text-xs"
+                    disabled={isRefining}
+                  />
+                  <Button
+                    size="sm"
+                    onClick={refineWithAI}
+                    disabled={isRefining || !aiInstructions.trim()}
+                    className="w-full gap-2"
+                    variant="outline"
+                  >
+                    {isRefining ? (
+                      <>
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        Refining...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-3 w-3" />
+                        Refine with AI
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+
               {/* AI Modification Options - Available in both modes */}
               <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
-                <span className="text-xs text-muted-foreground">Quick AI edits:</span>
+                <span className="text-xs text-muted-foreground">Quick edits:</span>
                 <Button 
                   size="sm" 
                   variant="outline" 
