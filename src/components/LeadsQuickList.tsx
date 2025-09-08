@@ -64,17 +64,17 @@ const getScoreColor = (score: number) => {
 export function LeadsQuickList({ leads, onLeadClick, selectedLeadId }: LeadsQuickListProps) {
   return (
     <Card className="h-full border-0 shadow-none">
-      <CardHeader className="pb-2 pt-4 px-4">
+      <CardHeader className="pb-2 pt-4 px-3 sm:px-4">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-sm font-semibold">Quick Lead List</CardTitle>
+            <CardTitle className="text-sm sm:text-base font-semibold">Quick Lead List</CardTitle>
             <p className="text-xs text-muted-foreground">{leads.length} leads</p>
           </div>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-muted/50">
-                  <Info className="h-3 w-3 text-muted-foreground" />
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-muted/50 touch-manipulation">
+                  <Info className="h-4 w-4 text-muted-foreground" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="max-w-sm">
@@ -94,17 +94,17 @@ export function LeadsQuickList({ leads, onLeadClick, selectedLeadId }: LeadsQuic
           </TooltipProvider>
         </div>
       </CardHeader>
-      <CardContent className="p-0 overflow-y-auto h-[calc(100vh-180px)]">
-        <div className="space-y-1 px-2 pb-2">
+      <CardContent className="p-0 overflow-y-auto h-[calc(100vh-180px)] sm:h-[calc(100vh-200px)]">
+        <div className="space-y-1 px-2 sm:px-3 pb-2">
             {leads.map((lead) => (
               <div
                 key={lead.id}
                 className={cn(
-                  'relative border-l-2 bg-card/50 border border-border/50 rounded-md px-2 py-1.5 cursor-pointer transition-all duration-200 hover:bg-card hover:border-border hover:shadow-sm group',
+                  'relative border-l-2 bg-card/50 border border-border/50 rounded-md px-3 py-2 sm:px-2 sm:py-1.5 cursor-pointer transition-all duration-200 hover:bg-card hover:border-border hover:shadow-sm group touch-manipulation min-h-[44px] sm:min-h-0',
                   priorityStyles[lead.priority],
                   selectedLeadId === lead.id ? 
                     'ring-1 ring-primary bg-primary/5 shadow-sm border-primary/30 scale-[1.02]' : 
-                    'hover:scale-[1.005]'
+                    'hover:scale-[1.005] active:scale-[0.98]'
                 )}
                 onClick={() => onLeadClick(lead.id)}
               >
@@ -115,47 +115,47 @@ export function LeadsQuickList({ leads, onLeadClick, selectedLeadId }: LeadsQuic
                   </div>
                 )}
                 
-                <div className="space-y-0.5">
+                <div className="space-y-1 sm:space-y-0.5">
                   {/* Header Row */}
-                  <div className="flex items-center justify-between gap-1">
+                  <div className="flex items-center justify-between gap-2 sm:gap-1">
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-sm text-foreground truncate">{lead.name}</h4>
+                      <h4 className="font-medium text-base sm:text-sm text-foreground truncate">{lead.name}</h4>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5 sm:gap-1">
                       <Badge 
                         variant="outline" 
                         className={cn(
-                          'text-xs px-1 py-0 h-4 font-medium border-0',
+                          'text-xs px-1.5 py-0.5 h-5 sm:h-4 sm:px-1 font-medium border-0',
                           getScoreColor(getAIPriorityScore(lead))
                         )}
                       >
                         {getAIPriorityScore(lead)}
                       </Badge>
-                      <span className="text-xs">{priorityIcons[lead.priority]}</span>
-                      <div className={cn('w-1 h-1 rounded-full', statusColors[lead.status])} />
+                      <span className="text-sm sm:text-xs">{priorityIcons[lead.priority]}</span>
+                      <div className={cn('w-1.5 h-1.5 sm:w-1 sm:h-1 rounded-full', statusColors[lead.status])} />
                     </div>
                   </div>
 
                   {/* Vehicle & Value Row */}
-                  <div className="flex items-center justify-between gap-1">
-                    <div className="flex items-center gap-1 text-muted-foreground min-w-0 flex-1">
-                      <Car className="h-3 w-3 flex-shrink-0" />
-                      <span className="text-xs truncate">{lead.vehicle}</span>
+                  <div className="flex items-center justify-between gap-2 sm:gap-1">
+                    <div className="flex items-center gap-1.5 sm:gap-1 text-muted-foreground min-w-0 flex-1">
+                      <Car className="h-3.5 w-3.5 sm:h-3 sm:w-3 flex-shrink-0" />
+                      <span className="text-sm sm:text-xs truncate">{lead.vehicle}</span>
                     </div>
-                    <div className="flex items-center gap-0.5 text-success font-medium">
-                      <DollarSign className="h-3 w-3" />
-                      <span className="text-xs">${(lead.value / 1000).toFixed(0)}k</span>
+                    <div className="flex items-center gap-1 sm:gap-0.5 text-success font-medium">
+                      <DollarSign className="h-3.5 w-3.5 sm:h-3 sm:w-3" />
+                      <span className="text-sm sm:text-xs">${(lead.value / 1000).toFixed(0)}k</span>
                     </div>
                   </div>
 
                   {/* Activity & Stage Row */}
-                  <div className="flex items-center justify-between gap-1">
-                    <div className="flex items-center gap-1 text-muted-foreground min-w-0 flex-1">
-                      <Clock className="h-3 w-3 flex-shrink-0" />
-                      <span className="text-xs truncate">{lead.lastActivity}</span>
+                  <div className="flex items-center justify-between gap-2 sm:gap-1">
+                    <div className="flex items-center gap-1.5 sm:gap-1 text-muted-foreground min-w-0 flex-1">
+                      <Clock className="h-3.5 w-3.5 sm:h-3 sm:w-3 flex-shrink-0" />
+                      <span className="text-sm sm:text-xs truncate">{lead.lastActivity}</span>
                     </div>
                     {lead.journeyStage && (
-                      <Badge variant="outline" className="text-xs px-1 py-0 h-4 bg-primary/5 text-primary border-primary/20 font-normal">
+                      <Badge variant="outline" className="text-xs px-1.5 py-0.5 h-5 sm:h-4 sm:px-1 bg-primary/5 text-primary border-primary/20 font-normal">
                         {lead.journeyStage}
                       </Badge>
                     )}
