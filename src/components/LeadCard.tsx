@@ -389,25 +389,9 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                   <DollarSign className="h-3 w-3 text-success" />
                   ${lead.value.toLocaleString()}
                 </span>
-                {lead.dealProbability && (
-                  <span className="flex items-center gap-1">
-                    <Target className="h-3 w-3 text-primary" />
-                    {lead.dealProbability}%
-                  </span>
-                )}
               </div>
               <div className="flex items-center gap-3 mt-1 text-xs">
                 <span>{lead.lastActivity}</span>
-                {lead.contactAttempts && (
-                  <span className="text-muted-foreground">
-                    📞 {lead.contactAttempts} attempts
-                  </span>
-                )}
-                {lead.nextFollowUp && (
-                  <span className="text-primary">
-                    📅 Next: {lead.nextFollowUp}
-                  </span>
-                )}
               </div>
             </div>
             
