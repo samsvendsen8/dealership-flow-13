@@ -589,10 +589,6 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                 <p className="text-xs text-muted-foreground">Vehicle of Interest</p>
               </div>
             </div>
-            <div className="text-right">
-              <p className="font-medium text-sm">${lead.value.toLocaleString()}</p>
-              <p className="text-xs text-muted-foreground">Target Value</p>
-            </div>
           </div>
           {lead.tradeInVehicle && (
             <div className="mt-2 pt-2 border-t border-border">
@@ -606,22 +602,7 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
         </div>
         
         {/* Enhanced Metrics Row */}
-        <div 
-          className="grid grid-cols-3 gap-4 mt-4 p-3 bg-muted/20 rounded-lg cursor-pointer hover:bg-muted/30 transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-            onViewDetails(lead.id);
-          }}
-          title="View detailed metrics"
-        >
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-1 text-lg font-bold text-success">
-              <DollarSign className="h-4 w-4" />
-              ${lead.value.toLocaleString()}
-            </div>
-            <p className="text-xs text-muted-foreground">Deal Value</p>
-          </div>
-        </div>
+        {/* Removed Deal Value section */}
         
         {/* Journey Stage Progress with Timeline */}
         <div className="mt-3 p-3 bg-muted/30 rounded-md space-y-3 relative z-50" onClick={(e) => e.stopPropagation()}>
