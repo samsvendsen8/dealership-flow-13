@@ -605,7 +605,7 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
         {/* Removed Deal Value section */}
         
         {/* Journey Stage Progress with Timeline */}
-        <div className="mt-3 p-3 pb-5 bg-muted/30 rounded-md space-y-3 relative z-50" onClick={(e) => e.stopPropagation()}>
+        <div className="mt-3 p-3 pb-5 bg-muted/30 rounded-md space-y-3 relative z-50 h-auto min-h-fit" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-2" onClick={(e) => e.stopPropagation()}>
             <span className="text-xs font-medium text-muted-foreground">Journey Progress</span>
             {journeyStages[lead.journeyStage] && (
