@@ -5,7 +5,7 @@ import { LeadFocusView } from '@/components/LeadFocusView';
 import { NotificationPanel } from '@/components/NotificationPanel';
 import { ToastNotification } from '@/components/ToastNotification';
 import { GoalsDashboard } from '@/components/GoalsDashboard';
-import { DebugPanel } from '@/components/DebugPanel';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { useToast } from '@/hooks/use-toast';
 import { useRealTimeUpdates } from '@/hooks/useRealTimeUpdates';
 import { Button } from '@/components/ui/button';
@@ -643,12 +643,15 @@ const Index = () => {
               <h1 className="text-3xl font-bold text-foreground">Sales Dashboard</h1>
               <p className="text-muted-foreground">Manage your priority leads and track progress</p>
             </div>
-            <Link to="/leads">
-              <Button variant="outline" className="gap-2">
-                <Users className="h-4 w-4" />
-                All Leads
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link to="/leads">
+                <Button variant="outline" className="gap-2">
+                  <Users className="h-4 w-4" />
+                  All Leads
+                </Button>
+              </Link>
+              <ThemeToggle />
+            </div>
           </div>
 
           {/* Goals Dashboard */}
@@ -770,9 +773,6 @@ const Index = () => {
           />
         ))}
       </div>
-
-      {/* Debug Panel - Remove in production */}
-      <DebugPanel />
     </div>
   );
 };
