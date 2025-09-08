@@ -708,7 +708,7 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           
           {/* Current Step in Journey Progress - Customer Response Takes Priority */}
           {journeyStages[selectedJourneyStage] && (
-            <div className="mt-3 p-3 bg-muted/10 border rounded-lg">
+            <div className="mt-6 p-3 bg-muted/10 border rounded-lg">
               {/* Customer Response Section (Always Priority at Top) */}
               {mockCustomerResponse && (
                 <div className="mb-4 p-3 bg-success/5 border border-success/20 rounded-lg">
@@ -766,7 +766,7 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
               )}
 
               {/* Work Plan Section (Always Shown) */}
-              <div className="mt-6 p-3 bg-muted/10 border rounded-lg">
+              <div className="p-3 bg-muted/10 border rounded-lg">
                 {currentWorkPlanTask ? (
                   <>
                     {/* Active Work Plan */}
