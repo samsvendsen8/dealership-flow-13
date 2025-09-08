@@ -63,7 +63,7 @@ const getScoreColor = (score: number) => {
 
 export function LeadsQuickList({ leads, onLeadClick, selectedLeadId }: LeadsQuickListProps) {
   return (
-    <Card className="h-full border-0 shadow-none lg:h-auto">
+    <Card className="h-full border-0 shadow-none">
       <CardHeader className="pb-2 pt-4 px-3 sm:px-4">
         <div className="flex items-center justify-between">
           <div>
@@ -94,7 +94,7 @@ export function LeadsQuickList({ leads, onLeadClick, selectedLeadId }: LeadsQuic
           </TooltipProvider>
         </div>
       </CardHeader>
-      <CardContent className="p-0 overflow-y-auto h-[40vh] lg:h-[calc(100vh-200px)]">
+      <CardContent className="p-0 overflow-y-auto h-[calc(100vh-180px)] sm:h-[calc(100vh-200px)]">
         <div className="space-y-1 px-2 sm:px-3 pb-2">
             {leads.map((lead) => (
               <div

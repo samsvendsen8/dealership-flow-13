@@ -5,12 +5,11 @@ import { LeadFocusView } from '@/components/LeadFocusView';
 import { NotificationPanel } from '@/components/NotificationPanel';
 import { ToastNotification } from '@/components/ToastNotification';
 import { GoalsDashboard } from '@/components/GoalsDashboard';
-import { MobileNavbar } from '@/components/MobileNavbar';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { DebugPanel } from '@/components/DebugPanel';
 import { useToast } from '@/hooks/use-toast';
 import { useRealTimeUpdates } from '@/hooks/useRealTimeUpdates';
 import { Button } from '@/components/ui/button';
-import { Eye, List, Target, Users, Bell } from 'lucide-react';
+import { Eye, List, Target, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Lead } from '@/components/LeadCard';
 
@@ -76,11 +75,163 @@ const mockLeads: Lead[] = [
     keyInsight: 'Mentioned budget increase after seeing vehicle in person - ready to move forward',
     preferredContact: 'phone',
     budget: { min: 45000, max: 55000 },
-    tradeInVehicle: '2018 Honda Accord'
+    tradeInVehicle: '2018 Honda Accord',
+    timeline: [
+      { date: '5 days ago', action: 'Referral Contact', details: 'Initial contact through referral program', type: 'contact' },
+      { date: '3 days ago', action: 'First Call', details: 'Discussed vehicle requirements', type: 'contact' },
+      { date: '2 days ago', action: 'Showroom Visit', details: 'Viewed multiple Honda models', type: 'visit' },
+      { date: 'Yesterday', action: 'Test Drive', details: 'Test drove 2024 Honda Accord', type: 'milestone' },
+      { date: '1 hour ago', action: 'Price Negotiation', details: 'Discussed pricing and trade-in value', type: 'contact' }
+    ],
+    workPlan: [
+      { id: 'proposal-1', title: 'Proposal Stage - Attempt 1', description: 'Email detailed offer and trade-in value', dueDate: 'Today', status: 'pending', attemptNumber: 1, contactMethod: 'email', journeyStage: 'proposal' },
+      { id: 'proposal-2', title: 'Proposal Stage - Attempt 2', description: 'Call to discuss proposal questions', dueDate: 'Tomorrow 10am', status: 'scheduled', attemptNumber: 2, contactMethod: 'phone', journeyStage: 'proposal' },
+      { id: 'proposal-3', title: 'Proposal Stage - Attempt 3', description: 'Text to address any final concerns', dueDate: 'Day 3', status: 'scheduled', attemptNumber: 3, contactMethod: 'text', journeyStage: 'proposal' }
+    ]
+  },
+  {
+    id: 'c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a33',
+    name: 'Emily Rodriguez',
+    email: 'emily.rodriguez@email.com',
+    phone: '(555) 345-6789',
+    vehicle: '2024 BMW X3',
+    status: 'qualified',
+    priority: 'warm',
+    lastActivity: '2 hours ago',
+    value: 45000,
+    source: 'Google Ads',
+    notes: 'Interested in lease options, needs to discuss with spouse',
+    journeyStage: 'proposal',
+    stageProgress: 90,
+    contactAttempts: 4,
+    responseRate: 75,
+    daysSinceLastContact: 1,
+    nextFollowUp: 'Friday 10am',
+    dealProbability: 70,
+    sentiment: 'neutral',
+    lastAppointment: '3 days ago',
+    keyInsight: 'Spouse approval needed - scheduled joint call Friday morning',
+    preferredContact: 'email',
+    budget: { min: 40000, max: 48000 },
+    timeline: [
+      { date: '1 week ago', action: 'Online Inquiry', details: 'Submitted interest form via Google Ads', type: 'contact' },
+      { date: '5 days ago', action: 'Initial Call', details: 'Discussed BMW X3 lease options', type: 'contact' },
+      { date: '3 days ago', action: 'Showroom Visit', details: 'Viewed X3, needs spouse approval', type: 'visit' },
+      { date: '2 hours ago', action: 'Follow-up Email', details: 'Sent lease comparison document', type: 'contact' }
+    ],
+    workPlan: [
+      { id: 'proposal-1', title: 'Proposal Stage - Attempt 1', description: 'Send detailed lease options and terms', dueDate: 'Today', status: 'pending', attemptNumber: 1, contactMethod: 'email', journeyStage: 'proposal' },
+      { id: 'proposal-2', title: 'Proposal Stage - Attempt 2', description: 'Schedule call to include spouse in decision', dueDate: 'Tomorrow', status: 'scheduled', attemptNumber: 2, contactMethod: 'phone', journeyStage: 'proposal' },
+      { id: 'proposal-3', title: 'Proposal Stage - Attempt 3', description: 'Text to confirm final decision timeline', dueDate: 'Day 3', status: 'scheduled', attemptNumber: 3, contactMethod: 'text', journeyStage: 'proposal' }
+    ]
+  },
+  {
+    id: 'd3eebc99-9c0b-4ef8-bb6d-6bb9bd380a44',
+    name: 'David Thompson',
+    email: 'david.thompson@email.com',
+    phone: '(555) 456-7890',
+    vehicle: '2024 Ford F-150',
+    status: 'new',
+    priority: 'warm',
+    lastActivity: '3 hours ago',
+    value: 38000,
+    source: 'Facebook',
+    notes: 'Looking for work truck, budget conscious',
+    journeyStage: 'visit',
+    stageProgress: 45,
+    contactAttempts: 1,
+    responseRate: 100,
+    daysSinceLastContact: 0,
+    nextFollowUp: 'Monday 9am',
+    dealProbability: 60,
+    sentiment: 'neutral',
+    keyInsight: 'Price sensitive - mentioned competitor pricing, needs value proposition',
+    preferredContact: 'text',
+    budget: { min: 35000, max: 40000 },
+    timeline: [
+      { date: '4 hours ago', action: 'Facebook Inquiry', details: 'Messaged about Ford F-150 pricing', type: 'contact' },
+      { date: '3 hours ago', action: 'Phone Call', details: 'Discussed work truck needs and pricing', type: 'contact' },
+      { date: '30 min ago', action: 'Arrived for Test Drive', details: 'Currently test driving F-150', type: 'visit' }
+    ],
+    workPlan: [
+      { id: 'visit-1', title: 'Visit Stage - Attempt 1', description: 'Call to discuss budget and payment options', dueDate: 'Today', status: 'pending', attemptNumber: 1, contactMethod: 'phone', journeyStage: 'visit' },
+      { id: 'visit-2', title: 'Visit Stage - Attempt 2', description: 'Email current inventory and pricing', dueDate: 'Tomorrow', status: 'scheduled', attemptNumber: 2, contactMethod: 'email', journeyStage: 'visit' },
+      { id: 'visit-3', title: 'Visit Stage - Attempt 3', description: 'Text to schedule viewing appointment', dueDate: 'Day 3', status: 'scheduled', attemptNumber: 3, contactMethod: 'text', journeyStage: 'visit' }
+    ]
+  },
+  {
+    id: 'e4eebc99-9c0b-4ef8-bb6d-6bb9bd380a55',
+    name: 'Lisa Park',
+    email: 'lisa.park@email.com',
+    phone: '(555) 567-8901',
+    vehicle: '2024 Subaru Outback',
+    status: 'contacted',
+    priority: 'warm',
+    lastActivity: '30 min ago',
+    value: 29000,
+    source: 'Email Campaign',
+    notes: 'Customer replied with questions + missed previous call - needs follow-up',
+    journeyStage: 'engaged',
+    stageProgress: 40,
+    contactAttempts: 3,
+    responseRate: 67,
+    daysSinceLastContact: 0,
+    dealProbability: 55,
+    sentiment: 'positive',
+    lastAppointment: 'Never',
+    keyInsight: 'Customer responded positively but missed scheduled call - still has pending tasks',
+    preferredContact: 'email',
+    budget: { min: 25000, max: 32000 },
+    timeline: [
+      { date: '1 week ago', action: 'Email Campaign', details: 'Opened Subaru promotion email', type: 'contact' },
+      { date: '3 days ago', action: 'Form Submission', details: 'Requested Outback brochure and pricing', type: 'contact' },
+      { date: '1 day ago', action: 'Email Response', details: 'Replied asking about safety features and availability', type: 'contact' },
+      { date: '30 min ago', action: 'Customer Reply', details: 'Sent detailed questions about financing options', type: 'contact' }
+    ],
+    workPlan: [
+      { id: 'engaged-1', title: 'Engaged Stage - Attempt 1', description: 'Send safety ratings and feature comparison', dueDate: 'Yesterday', status: 'customer_replied', attemptNumber: 1, contactMethod: 'email', customerResponse: true, journeyStage: 'engaged' },
+      { id: 'engaged-2', title: 'Engaged Stage - Attempt 2', description: 'Call to answer questions and schedule visit', dueDate: 'Today 2pm', status: 'missed', attemptNumber: 2, contactMethod: 'phone', journeyStage: 'engaged' },
+      { id: 'engaged-3', title: 'Engaged Stage - Attempt 3', description: 'Follow-up email to address customer questions', dueDate: 'Today 4pm', status: 'pending', attemptNumber: 3, contactMethod: 'email', journeyStage: 'engaged' },
+      { id: 'engaged-4', title: 'Engaged Stage - Attempt 4', description: 'Text to confirm best time for call', dueDate: 'Tomorrow 10am', status: 'scheduled', attemptNumber: 4, contactMethod: 'text', journeyStage: 'engaged' }
+    ]
+  },
+  {
+    id: 'f5eebc99-9c0b-4ef8-bb6d-6bb9bd380a66',
+    name: 'James Wilson',
+    email: 'james.wilson@email.com',
+    phone: '(555) 678-9012',
+    vehicle: '2024 Tesla Model 3',
+    status: 'new',
+    priority: 'hot',
+    lastActivity: '30 min ago',
+    value: 42000,
+    source: 'Website',
+    notes: 'Cash buyer, ready to purchase today',
+    journeyStage: 'engaged',
+    stageProgress: 15,
+    contactAttempts: 0,
+    responseRate: 0,
+    daysSinceLastContact: 0,
+    nextFollowUp: 'Today 4pm',
+    dealProbability: 95,
+    sentiment: 'positive',
+    keyInsight: 'Cash buyer with urgent timeline - immediate follow-up critical',
+    preferredContact: 'phone',
+    budget: { min: 40000, max: 50000 },
+    timeline: [
+      { date: '30 min ago', action: 'Website Inquiry', details: 'Submitted urgent purchase form for Tesla Model 3', type: 'contact' }
+    ],
+    workPlan: [
+      { id: 'engaged-1', title: 'Engaged Stage - Attempt 1', description: 'Call within 15 minutes to secure initial contact', dueDate: 'Now', status: 'pending', attemptNumber: 1, contactMethod: 'phone', journeyStage: 'engaged' },
+      { id: 'engaged-2', title: 'Engaged Stage - Attempt 2', description: 'Email to confirm availability and options', dueDate: 'In 1 hour', status: 'scheduled', attemptNumber: 2, contactMethod: 'email', journeyStage: 'engaged' },
+      { id: 'engaged-3', title: 'Engaged Stage - Attempt 3', description: 'Text to coordinate next steps', dueDate: 'Today 6pm', status: 'scheduled', attemptNumber: 3, contactMethod: 'text', journeyStage: 'engaged' }
+    ]
   }
 ];
 
 const Index = () => {
+  console.log('Index component rendering - checking if visible');
+  
   const [leads, setLeads] = useState<Lead[]>(mockLeads);
   const [isNotificationPanelOpen, setIsNotificationPanelOpen] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | undefined>();
@@ -96,32 +247,243 @@ const Index = () => {
   }>>([]);
   const { toast } = useToast();
 
-  const handleLeadClick = (leadId: string) => {
-    const lead = leads.find(l => l.id === leadId);
-    setSelectedLead(lead);
-    setFocusedLeadId(leadId);
-  };
+  // Real-time updates for lead changes
+  useRealTimeUpdates((leadId: string, updates: any) => {
+    setLeads(prevLeads => 
+      prevLeads.map(lead => 
+        lead.id === leadId 
+          ? { ...lead, ...updates, lastActivity: updates.hasNewMessage ? 'Just replied' : lead.lastActivity }
+          : lead
+      )
+    );
+  });
+
+  // Real-time new lead generation - simulates incoming leads
+  useEffect(() => {
+    const newLeadTemplates = [
+      {
+        name: 'Jennifer Martinez',
+        email: 'jennifer.martinez@email.com',
+        vehicle: '2024 Mazda CX-5',
+        source: 'Website',
+        value: 31000,
+        notes: 'Interested in safety features and warranty',
+        journeyStage: 'engaged' as const,
+        stageProgress: 10
+      },
+      {
+        name: 'Robert Kim',
+        email: 'robert.kim@email.com',
+        vehicle: '2024 Chevrolet Silverado',
+        source: 'Facebook',
+        value: 52000,
+        notes: 'Looking for heavy-duty truck for business',
+        journeyStage: 'engaged' as const,
+        stageProgress: 15
+      },
+      {
+        name: 'Amanda Foster',
+        email: 'amanda.foster@email.com',
+        vehicle: '2024 Audi Q5',
+        source: 'Google Ads',
+        value: 48000,
+        notes: 'Premium features important, wants luxury',
+        journeyStage: 'engaged' as const,
+        stageProgress: 25
+      },
+      {
+        name: 'Carlos Rivera',
+        email: 'carlos.rivera@email.com',
+        vehicle: '2024 Hyundai Tucson',
+        source: 'Referral',
+        value: 35000,
+        notes: 'First-time buyer, needs financing help',
+        journeyStage: 'engaged' as const,
+        stageProgress: 8
+      },
+      {
+        name: 'Michelle Wong',
+        email: 'michelle.wong@email.com',
+        vehicle: '2024 Lexus RX',
+        source: 'Website',
+        value: 55000,
+        notes: 'Returning customer, ready to upgrade',
+        journeyStage: 'engaged' as const,
+        stageProgress: 35
+      }
+    ];
+
+    const interval = setInterval(() => {
+      // Only add new toasts if not paused
+      if (!toastsPaused && Math.random() > 0.6) {
+        const template = newLeadTemplates[Math.floor(Math.random() * newLeadTemplates.length)];
+        const leadCount = leads.length;
+        
+        const newLead: Lead = {
+          id: `new-${Date.now()}`,
+          name: template.name,
+          email: template.email,
+          phone: `(555) ${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 9000) + 1000}`,
+          vehicle: template.vehicle,
+          status: 'new',
+          priority: Math.random() > 0.7 ? 'hot' : Math.random() > 0.4 ? 'warm' : 'cold',
+          lastActivity: 'Just now',
+          value: template.value + Math.floor(Math.random() * 5000) - 2500,
+          source: template.source,
+          notes: template.notes,
+          journeyStage: template.journeyStage,
+          stageProgress: template.stageProgress
+        };
+
+        setLeads(prevLeads => [newLead, ...prevLeads]);
+        console.log('Adding new lead to toast queue:', newLead.name);
+        
+        // Add toast notification for hot leads
+        if (newLead.priority === 'hot') {
+          const newToast = {
+            id: `${newLead.id}-${Date.now()}`,
+            leadId: newLead.id,
+            leadName: newLead.name,
+            message: `New ${newLead.priority} lead just came in!`,
+            suggestedResponse: `Hi ${newLead.name}! Thanks for your interest in the ${newLead.vehicle}. I'd love to help you find the perfect vehicle. When would be a good time to discuss your needs?`
+          };
+          console.log('Adding toast:', newToast);
+          setToastQueue(prev => {
+            console.log('Previous toast queue:', prev);
+            const newQueue = [...prev, newToast];
+            console.log('New toast queue:', newQueue);
+            return newQueue;
+          });
+        }
+      }
+    }, 12000); // New lead every 12 seconds on average
+
+    return () => clearInterval(interval);
+  }, [leads.length, toastsPaused]);
+
+  // Random activity updates for existing leads
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!toastsPaused && Math.random() > 0.7) {
+        const randomLead = leads[Math.floor(Math.random() * leads.length)];
+        if (randomLead && randomLead.priority === 'hot') {
+          const activities = [
+            'viewed vehicle photos',
+            'requested pricing information',
+            'browsed financing options',
+            'checked availability',
+            'viewed similar models'
+          ];
+          
+          const activity = activities[Math.floor(Math.random() * activities.length)];
+          setToastQueue(prev => [...prev, {
+            id: `${randomLead.id}-${Date.now()}`,
+            leadId: randomLead.id,
+            leadName: randomLead.name,
+            message: `${randomLead.name} just ${activity}`,
+            suggestedResponse: `Hi ${randomLead.name}, I saw you were interested in the ${randomLead.vehicle}. I'm here to help with any questions and can arrange a test drive at your convenience!`
+          }]);
+        }
+      }
+    }, 20000); // Activity notification every 20 seconds
+
+    return () => clearInterval(interval);
+  }, [leads, toastsPaused]);
+
+  // Real-time updates for lead journey stage changes
+  useEffect(() => {
+    const channel = supabase
+      .channel('lead_updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'leads'
+        },
+        (payload) => {
+          // Update leads when journey stage changes
+          setLeads(prevLeads => 
+            prevLeads.map(lead => 
+              lead.id === (payload.new as any).id 
+                ? { ...lead, journeyStage: (payload.new as any).journey_stage }
+                : lead
+            )
+          );
+          
+          // Show toast notification for journey stage updates
+          toast({
+            title: "Journey Stage Updated",
+            description: "Lead moved to next stage after customer response",
+            duration: 3000,
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [toast]);
+
+  const [contactMethod, setContactMethod] = useState<'phone' | 'email' | 'text' | undefined>();
+  const [aiSuggestedResponse, setAiSuggestedResponse] = useState<string>('');
 
   const handleContact = (leadId: string, method: 'phone' | 'email' | 'text') => {
     const lead = leads.find(l => l.id === leadId);
     if (lead) {
-      toast({
-        title: `${method} contact initiated`,
-        description: `Contacting ${lead.name} via ${method}`,
-      });
+      // Generate AI suggested response based on contact method and lead data
+      const generateAiResponse = (contactMethod: string, leadData: Lead) => {
+        const responses = {
+          phone: `Hi ${leadData.name}, this is [Your Name] from [Dealership]. I wanted to personally reach out about your interest in the ${leadData.vehicle}. I have some great financing options and would love to schedule a time for you to see the vehicle. When would be convenient for a quick call?`,
+          email: `Dear ${leadData.name},\n\nThank you for your interest in the ${leadData.vehicle}! I wanted to reach out personally to answer any questions you might have.\n\nBased on your inquiry, I believe this vehicle would be perfect for your needs. I'd be happy to:\n• Arrange a test drive at your convenience\n• Discuss financing options\n• Provide detailed specifications\n\nWhen would be a good time to connect?\n\nBest regards,\n[Your Name]`,
+          text: `Hi ${leadData.name}! Thanks for your interest in the ${leadData.vehicle}. I'm here to help with any questions and can arrange a test drive whenever works for you. What's the best time to call? - [Your Name] at [Dealership]`
+        };
+        return responses[contactMethod as keyof typeof responses];
+      };
+
+      setContactMethod(method);
+      setAiSuggestedResponse(generateAiResponse(method, lead));
+      setSelectedLead(lead);
+      setIsNotificationPanelOpen(true);
     }
+  };
+
+  const handleOpenNotificationPanel = (leadId: string, method: 'phone' | 'email' | 'text') => {
+    const lead = leads.find(l => l.id === leadId);
+    if (lead) {
+      setSelectedLead(lead);
+      setContactMethod(method);
+      setIsNotificationPanelOpen(true);
+      
+      // Generate AI response for the specific method and context
+      const contextualResponse = generateContextualResponse(lead, method);
+      setAiSuggestedResponse(contextualResponse);
+    }
+  };
+
+  const generateContextualResponse = (lead: Lead, method: 'phone' | 'email' | 'text') => {
+    const responses = {
+      phone: `Hi ${lead.name}! This is [Your Name] from [Dealership Name]. I noticed you've shown strong interest in our ${lead.vehicle} and wanted to personally reach out. I have some exciting updates and would love to help you take the next step. What would be the best time for you to visit our showroom for a test drive?`,
+      email: `Subject: Your ${lead.vehicle} - Exclusive Offer & Next Steps Available\n\nHi ${lead.name},\n\nI hope this email finds you well! I wanted to personally follow up on your interest in the ${lead.vehicle}.\n\nBased on your profile, I've secured:\n• Preferred pricing options tailored to your budget\n• Priority scheduling for test drives\n• Exclusive financing rates (subject to approval)\n\nI'm confident we can find the perfect solution for you. When would be convenient for a quick call to discuss your timeline and any questions you might have?\n\nLooking forward to helping you drive away in your new ${lead.vehicle}!\n\nBest regards,\n[Your Name]\n[Your Title]\n[Dealership Name]`,
+      text: `Hi ${lead.name}! 👋 Hope you're having a great day! I have some exciting updates about the ${lead.vehicle} you were interested in. Just secured some special pricing options! 🚗💰 When's a good time for a quick chat? Can schedule your test drive right away! 📅✨`
+    };
+    
+    return responses[method];
   };
 
   const handleViewDetails = (leadId: string) => {
-    handleLeadClick(leadId);
+    const lead = leads.find(l => l.id === leadId);
+    if (viewMode === 'focus') {
+      setFocusedLeadId(leadId);
+    } else {
+      setSelectedLead(lead);
+      setIsNotificationPanelOpen(true);
+    }
   };
 
-  const handleSelectFocusLead = (leadId: string | null) => {
+  const handleSelectFocusLead = (leadId: string) => {
     setFocusedLeadId(leadId);
-    if (leadId) {
-      const lead = leads.find(l => l.id === leadId);
-      setSelectedLead(lead);
-    }
   };
 
   const handleBackToList = () => {
@@ -129,28 +491,80 @@ const Index = () => {
     setFocusedLeadId(null);
   };
 
+  const handleToggleNotifications = () => {
+    setIsNotificationPanelOpen(!isNotificationPanelOpen);
+  };
+
+  const handleTriggerToast = () => {
+    const hotLeads = leads.filter(lead => lead.priority === 'hot');
+    if (hotLeads.length > 0) {
+      const randomLead = hotLeads[Math.floor(Math.random() * hotLeads.length)];
+      setToastQueue(prev => [...prev, {
+        id: `${randomLead.id}-${Date.now()}`,
+        leadId: randomLead.id,
+        leadName: randomLead.name,
+        message: 'Customer just viewed vehicle details online',
+        suggestedResponse: `Hi ${randomLead.name}, I noticed you were looking at the ${randomLead.vehicle}. I'm here to answer any questions and can schedule a test drive whenever convenient for you!`
+      }]);
+    }
+  };
+
+  const handlePauseToasts = () => {
+    setToastsPaused(!toastsPaused);
+  };
+
   const handleSendResponse = (toastId: string, message: string) => {
-    console.log('Sending response:', { toastId, message });
+    // Find the toast and its associated lead
+    const toastItem = toastQueue.find(t => t.id === toastId);
+    if (!toastItem) return;
+    
+    // In a real app, this would send the message via the selected method
+    console.log('Sending response:', message);
+    
+    // Update the lead status
+    setLeads(prevLeads => 
+      prevLeads.map(lead => {
+        if (lead.id === toastItem.leadId) {
+          const stages: Lead['journeyStage'][] = ['engaged', 'visit', 'proposal', 'sold', 'delivered'];
+          const currentIndex = stages.indexOf(lead.journeyStage);
+          const nextStage = currentIndex < stages.length - 1 ? stages[currentIndex + 1] : lead.journeyStage;
+          
+          return {
+            ...lead,
+            journeyStage: nextStage,
+            stageProgress: Math.min(100, lead.stageProgress + 15),
+            lastActivity: 'Just replied',
+            status: 'contacted' as const
+          };
+        }
+        return lead;
+      })
+    );
+    
+    // Remove the toast from queue
     setToastQueue(prev => prev.filter(t => t.id !== toastId));
     
     toast({
-      title: "Message Sent",
-      description: "Your response has been sent to the lead",
+      title: "Response Sent!",
+      description: `Your message was sent to ${toastItem.leadName}`,
     });
   };
 
   const handleEditResponse = () => {
-    console.log('Edit response clicked');
+    // In a real app, this would open a full editor
+    console.log('Edit response');
   };
 
   const handleViewToastDetails = (toastId: string) => {
     const toastItem = toastQueue.find(t => t.id === toastId);
-    if (toastItem) {
-      const lead = leads.find(l => l.id === toastItem.leadId);
-      if (lead) {
-        setSelectedLead(lead);
-        setFocusedLeadId(lead.id);
-      }
+    if (!toastItem) return;
+    
+    const lead = leads.find(l => l.id === toastItem.leadId);
+    if (lead) {
+      setSelectedLead(lead);
+      setIsNotificationPanelOpen(true);
+      // Remove the toast from queue
+      setToastQueue(prev => prev.filter(t => t.id !== toastId));
     }
   };
 
@@ -158,62 +572,60 @@ const Index = () => {
     setToastQueue(prev => prev.filter(t => t.id !== toastId));
   };
 
+  const handleCommunicationSent = (leadId: string, method: 'phone' | 'email' | 'text') => {
+    const lead = leads.find(l => l.id === leadId);
+    if (lead) {
+      const methodText = method === 'phone' ? 'call' : method;
+      
+      // Show simple toast with confetti effect
+      toast({
+        title: "🎉 Message Sent!",
+        description: `${methodText.charAt(0).toUpperCase() + methodText.slice(1)} sent to ${lead.name} successfully`,
+        className: "celebration-toast",
+      });
+      
+      // Add confetti elements
+      createConfetti();
+    }
+  };
+
+  const createConfetti = () => {
+    const confettiContainer = document.createElement('div');
+    confettiContainer.className = 'fixed top-0 right-0 pointer-events-none z-[60]';
+    confettiContainer.innerHTML = Array.from({ length: 20 }, (_, i) => 
+      `<div class="confetti-piece animate-bounce" style="
+        left: ${80 + Math.random() * 15}%; 
+        animation-delay: ${i * 50}ms; 
+        animation-duration: ${800 + Math.random() * 400}ms;
+        background: hsl(var(--primary));
+      "></div>`
+    ).join('');
+    
+    document.body.appendChild(confettiContainer);
+    
+    setTimeout(() => {
+      document.body.removeChild(confettiContainer);
+    }, 2000);
+  };
+
+  const handleTaskCompleted = (leadId: string) => {
+    // Auto-advance to the next priority lead in the list
+    const currentIndex = leads.findIndex(l => l.id === leadId);
+    const nextLead = leads[currentIndex + 1];
+    
+    if (nextLead) {
+      // Smooth scroll to next lead and focus it
+      setTimeout(() => {
+        const nextCard = document.querySelector(`[data-lead-id="${nextLead.id}"]`);
+        if (nextCard) {
+          nextCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 500);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Mobile Navigation */}
-      <MobileNavbar 
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-        onNotificationToggle={() => setIsNotificationPanelOpen(!isNotificationPanelOpen)}
-        isNotificationPanelOpen={isNotificationPanelOpen}
-      />
-
-      {/* Desktop Navigation */}
-      <div className="hidden lg:flex items-center justify-between p-4 border-b bg-background/95 backdrop-blur">
-        <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold">Dealership CRM</h1>
-          <div className="flex gap-2">
-            <Button
-              variant={viewMode === 'list' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewMode('list')}
-              className="flex items-center gap-2"
-            >
-              <List className="h-4 w-4" />
-              List View
-            </Button>
-            <Button
-              variant={viewMode === 'focus' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewMode('focus')}
-              className="flex items-center gap-2"
-            >
-              <Eye className="h-4 w-4" />
-              Focus View
-            </Button>
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/leads" className="flex items-center gap-2">
-                <Target className="h-4 w-4" />
-                All Leads
-              </Link>
-            </Button>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <Button
-            variant={isNotificationPanelOpen ? "default" : "outline"}
-            size="sm"
-            onClick={() => setIsNotificationPanelOpen(!isNotificationPanelOpen)}
-            className="flex items-center gap-2"
-          >
-            <Bell className="h-4 w-4" />
-            Notifications
-          </Button>
-          <ThemeToggle />
-        </div>
-      </div>
-
       {viewMode === 'focus' ? (
         <LeadFocusView 
           leads={leads}
@@ -224,67 +636,125 @@ const Index = () => {
           onBack={handleBackToList}
         />
       ) : (
-        <div className="flex flex-col lg:flex-row lg:h-[calc(100vh-73px)]">
-          {/* Mobile: Stacked Layout */}
-          <div className="lg:hidden">
-            {/* Quick Leads List - Mobile */}
-            <div className="border-b bg-muted/30 p-2">
-              <LeadsPriorityList 
-                leads={leads}
-                onContact={handleContact}
-                onViewDetails={handleViewDetails}
-                onToggleNotifications={() => setIsNotificationPanelOpen(!isNotificationPanelOpen)}
-                onTriggerToast={() => {}}
-                onPauseToasts={() => setToastsPaused(!toastsPaused)}
-                onTaskCompleted={() => {}}
-                onCommunicationSent={() => {}}
-                toastsPaused={toastsPaused}
-                hasNotifications={isNotificationPanelOpen}
-              />
+        <div className="container mx-auto px-6 py-8">
+          {/* Navigation Header */}
+          <div className="mb-8 flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Sales Dashboard</h1>
+              <p className="text-muted-foreground">Manage your priority leads and track progress</p>
             </div>
-
-            {/* Goals Dashboard - Mobile */}
-            <div className="p-4">
-              <GoalsDashboard />
-            </div>
+            <Link to="/leads">
+              <Button variant="outline" className="gap-2">
+                <Users className="h-4 w-4" />
+                All Leads
+              </Button>
+            </Link>
           </div>
 
-          {/* Desktop: Side-by-side Layout */}
-          <div className="hidden lg:flex lg:flex-1 lg:overflow-hidden">
-            <div className="flex-1 p-4 overflow-auto">
-              <LeadsPriorityList 
-                leads={leads}
-                onContact={handleContact}
-                onViewDetails={handleViewDetails}
-                onToggleNotifications={() => setIsNotificationPanelOpen(!isNotificationPanelOpen)}
-                onTriggerToast={() => {}}
-                onPauseToasts={() => setToastsPaused(!toastsPaused)}
-                onTaskCompleted={() => {}}
-                onCommunicationSent={() => {}}
-                toastsPaused={toastsPaused}
-                hasNotifications={isNotificationPanelOpen}
-              />
-            </div>
-            
-            <div className="w-80 border-l bg-muted/30 overflow-auto">
-              <GoalsDashboard />
-            </div>
+          {/* Goals Dashboard */}
+          <GoalsDashboard />
+          
+          {/* View Toggle Button */}
+          <div className="fixed top-4 left-4 z-40">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                // Scroll to top of page
+                window.scrollTo({ 
+                  top: 0, 
+                  behavior: 'smooth' 
+                });
+                
+                // Try to zoom out the viewport if possible
+                if (document.body.style.zoom !== undefined) {
+                  document.body.style.zoom = '0.85';
+                  
+                  // Reset zoom after a delay
+                  setTimeout(() => {
+                    document.body.style.zoom = '1';
+                  }, 300);
+                } else {
+                  // Fallback: try to adjust viewport scale
+                  const viewport = document.querySelector('meta[name=viewport]');
+                  if (viewport) {
+                    const originalContent = viewport.getAttribute('content') || '';
+                    viewport.setAttribute('content', 'width=device-width, initial-scale=0.85');
+                    
+                    setTimeout(() => {
+                      viewport.setAttribute('content', originalContent);
+                    }, 300);
+                  }
+                }
+              }}
+              className="gap-2 bg-background/95 backdrop-blur-sm border shadow-lg"
+            >
+              <Target className="h-4 w-4" />
+              Fit View
+            </Button>
           </div>
 
-          {/* Notification Panel */}
-          <NotificationPanel 
-            isOpen={isNotificationPanelOpen}
-            onClose={() => setIsNotificationPanelOpen(false)}
-            onContact={(leadId: string, method: 'phone' | 'email' | 'text') => {
-              handleContact(leadId, method);
-              setIsNotificationPanelOpen(false);
-            }}
+          <LeadsPriorityList 
+            leads={leads}
+            onContact={handleContact}
+            onViewDetails={handleViewDetails}
+            onOpenNotificationPanel={handleOpenNotificationPanel}
+            onToggleNotifications={handleToggleNotifications}
+            onTriggerToast={handleTriggerToast}
+            onPauseToasts={handlePauseToasts}
+            onTaskCompleted={handleTaskCompleted}
+            onCommunicationSent={handleCommunicationSent}
+            toastsPaused={toastsPaused}
+            hasNotifications={isNotificationPanelOpen || toastQueue.length > 0}
           />
         </div>
       )}
 
-      {/* Mobile Toast Notifications */}
-      <div className="fixed bottom-4 left-4 right-4 space-y-2 z-50 lg:top-4 lg:right-4 lg:left-auto lg:bottom-auto lg:w-80">
+      {viewMode === 'list' && (
+        <NotificationPanel
+          isOpen={isNotificationPanelOpen}
+          onClose={() => {
+            setIsNotificationPanelOpen(false);
+            setContactMethod(undefined);
+            setAiSuggestedResponse('');
+          }}
+          selectedLead={selectedLead}
+          onContact={(leadId, method) => {
+            setLeads(prevLeads => 
+              prevLeads.map(l => {
+                if (l.id === leadId) {
+                  const stages: Lead['journeyStage'][] = ['engaged', 'visit', 'proposal', 'sold', 'delivered'];
+                  const currentIndex = stages.indexOf(l.journeyStage);
+                  const nextStage = currentIndex < stages.length - 1 ? stages[currentIndex + 1] : l.journeyStage;
+                  
+                  return {
+                    ...l,
+                    journeyStage: nextStage,
+                    stageProgress: Math.min(100, l.stageProgress + 15),
+                    lastActivity: `${method} contact sent`,
+                    status: 'contacted' as const
+                  };
+                }
+                return l;
+              })
+            );
+            
+            toast({
+              title: `Message Sent`,
+              description: `${method} sent to ${selectedLead?.name} - Journey stage updated!`,
+            });
+            
+            setIsNotificationPanelOpen(false);
+            setContactMethod(undefined);
+            setAiSuggestedResponse('');
+          }}
+          contactMethod={contactMethod}
+          aiSuggestedResponse={aiSuggestedResponse}
+        />
+      )}
+
+      {/* Stacked Toast Notifications */}
+      <div className="fixed top-4 right-4 space-y-3 z-50">
         {toastQueue.map((toast, index) => (
           <ToastNotification
             key={toast.id}
@@ -300,6 +770,9 @@ const Index = () => {
           />
         ))}
       </div>
+
+      {/* Debug Panel - Remove in production */}
+      <DebugPanel />
     </div>
   );
 };
