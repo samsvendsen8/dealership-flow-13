@@ -364,6 +364,7 @@ export function LeadsPriorityList({
                       onLeadClick={(leadId) => {
                         const clickedLead = currentLeads.find(lead => lead.id === leadId);
                         if (clickedLead) {
+                          setSelectedLeadId(leadId);
                           setQuickListSelectedLead(clickedLead);
                           setShowQuickListDetail(true);
                         }

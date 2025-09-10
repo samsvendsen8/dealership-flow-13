@@ -6,6 +6,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { cn } from '@/lib/utils';
 import { type Lead } from './LeadCard';
 import LeadCard from './LeadCard';
+import { NotificationPanelContent } from './NotificationPanelContent';
 
 interface LeadsQuickListProps {
   leads: Lead[];
@@ -100,15 +101,10 @@ export function LeadsQuickList({
           </div>
         </CardHeader>
         <CardContent className="p-0 overflow-y-auto h-[calc(100vh-180px)] sm:h-[calc(100vh-200px)]">
-          <div className="p-4">
-            <LeadCard
-              lead={selectedLead}
-              onContact={onContact || (() => {})}
-              onViewDetails={onViewDetails || (() => {})}
-              isCondensed={false}
-              isFocused={false}
-            />
-          </div>
+          <NotificationPanelContent 
+            lead={selectedLead}
+            onContact={onContact || (() => {})}
+          />
         </CardContent>
       </Card>
     );
