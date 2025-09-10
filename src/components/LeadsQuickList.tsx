@@ -99,14 +99,16 @@ export function LeadsQuickList({
             </div>
           </div>
         </CardHeader>
-        <CardContent className="p-2 overflow-y-auto h-[calc(100vh-180px)] sm:h-[calc(100vh-200px)]">
-          <LeadCard
-            lead={selectedLead}
-            onContact={onContact || (() => {})}
-            onViewDetails={onViewDetails || (() => {})}
-            isCondensed={true}
-            isFocused={false}
-          />
+        <CardContent className="p-0 overflow-y-auto h-[calc(100vh-180px)] sm:h-[calc(100vh-200px)]">
+          <div className="p-4">
+            <LeadCard
+              lead={selectedLead}
+              onContact={onContact || (() => {})}
+              onViewDetails={onViewDetails || (() => {})}
+              isCondensed={false}
+              isFocused={false}
+            />
+          </div>
         </CardContent>
       </Card>
     );

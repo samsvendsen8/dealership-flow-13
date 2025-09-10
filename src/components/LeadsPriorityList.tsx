@@ -354,17 +354,16 @@ export function LeadsPriorityList({
           
           return (
             <TabsContent key={category} value={category} className="">
-              {/* Dynamic Layout - Full width for detail view or two columns for normal view */}
-              <div className={cn("grid gap-6", showQuickListDetail ? "grid-cols-1" : "grid-cols-12")}>
-                {/* Quick List Sidebar - dynamic width */}
-                <div className={cn(showQuickListDetail ? "col-span-1" : "col-span-4")}>
+              {/* Two Column Layout - Sticky Quick List + Single Card */}
+              <div className="grid grid-cols-12 gap-6">
+                {/* Sticky Quick List Sidebar - 4 columns */}
+                <div className="col-span-4">
                   <div className="sticky top-52 z-10 h-[calc(100vh-16rem)] overflow-auto">
                     <LeadsQuickList 
                       leads={currentLeads}
                       onLeadClick={(leadId) => {
                         const clickedLead = currentLeads.find(lead => lead.id === leadId);
                         if (clickedLead) {
-                          setSelectedLeadId(leadId);
                           setQuickListSelectedLead(clickedLead);
                           setShowQuickListDetail(true);
                         }
@@ -382,9 +381,8 @@ export function LeadsPriorityList({
                   </div>
                 </div>
 
-                {/* Single Card Focus Area - only show when not in detail view */}
-                {!showQuickListDetail && (
-                  <div className="col-span-8">
+                {/* Single Card Focus Area - 8 columns */}
+                <div className="col-span-8">
                   {currentLeads.length > 0 ? (
                     <div className="sticky top-52 z-5">
                       {(() => {
@@ -435,8 +433,7 @@ export function LeadsPriorityList({
                       </p>
                     </div>
                   )}
-                  </div>
-                )}
+                </div>
               </div>
             </TabsContent>
           );
