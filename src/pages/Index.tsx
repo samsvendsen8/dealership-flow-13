@@ -238,6 +238,8 @@ const Index = () => {
   const [viewMode, setViewMode] = useState<'list' | 'focus'>('list');
   const [focusedLeadId, setFocusedLeadId] = useState<string | null>(null);
   const [toastsPaused, setToastsPaused] = useState(false);
+  const [showQuickListDetail, setShowQuickListDetail] = useState(false);
+  const [quickListSelectedLead, setQuickListSelectedLead] = useState<Lead | undefined>();
   const [toastQueue, setToastQueue] = useState<Array<{
     id: string;
     leadId: string;

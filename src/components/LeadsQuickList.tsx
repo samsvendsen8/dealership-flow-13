@@ -1,15 +1,21 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, DollarSign, Car, Brain, Info } from 'lucide-react';
+import { Clock, DollarSign, Car, Brain, Info, ArrowLeft } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { type Lead } from './LeadCard';
+import LeadCard from './LeadCard';
 
 interface LeadsQuickListProps {
   leads: Lead[];
   onLeadClick: (leadId: string) => void;
   selectedLeadId?: string;
+  showDetailView?: boolean;
+  selectedLead?: Lead;
+  onContact?: (leadId: string, method: 'phone' | 'email' | 'text') => void;
+  onViewDetails?: (leadId: string) => void;
+  onBackToList?: () => void;
 }
 
 const priorityStyles = {
@@ -61,7 +67,52 @@ const getScoreColor = (score: number) => {
   return 'text-cold-lead bg-cold-lead/10 border-cold-lead/30';
 };
 
-export function LeadsQuickList({ leads, onLeadClick, selectedLeadId }: LeadsQuickListProps) {
+export function LeadsQuickList({ 
+  leads, 
+  onLeadClick, 
+  selectedLeadId, 
+  showDetailView, 
+  selectedLead, 
+  onContact, 
+  onViewDetails, 
+  onBackToList 
+}: LeadsQuickListProps) {
+  // If showing detail view, render the selected lead's details
+  if (showDetailView && selectedLead) {
+    return (
+      <Card className="h-full border-0 shadow-none">
+        <CardHeader className="pb-2 pt-4 px-3 sm:px-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={onBackToList}
+                className="h-8 w-8 p-0"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <div>
+                <CardTitle className="text-sm sm:text-base font-semibold">Lead Details</CardTitle>
+                <p className="text-xs text-muted-foreground">{selectedLead.name}</p>
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-2 overflow-y-auto h-[calc(100vh-180px)] sm:h-[calc(100vh-200px)]">
+          <LeadCard
+            lead={selectedLead}
+            onContact={onContact || (() => {})}
+            onViewDetails={onViewDetails || (() => {})}
+            isCondensed={true}
+            isFocused={false}
+          />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Default list view
   return (
     <Card className="h-full border-0 shadow-none">
       <CardHeader className="pb-2 pt-4 px-3 sm:px-4">
