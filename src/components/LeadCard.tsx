@@ -501,7 +501,265 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           </div>
         </div>
         
-        {/* AI Analysis & Insights - Moved to top */}
+        {/* Work Plan Section - Moved to Top */}
+        <div className="mt-4 p-3 bg-primary/5 border border-primary/20 rounded-lg" onClick={(e) => e.stopPropagation()}>
+          {currentWorkPlanTask ? (
+            <>
+              {/* Active Work Plan Header */}
+              <div className="flex items-center justify-between mb-3">
+                <h5 className="font-medium text-sm flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 text-primary" />
+                  <span className="text-foreground">Work Plan</span>
+                  <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
+                    Action Needed
+                  </Badge>
+                </h5>
+                <Badge variant="outline" className="text-xs">
+                  {currentWorkPlanTask.dueDate}
+                </Badge>
+              </div>
+              
+              <div className="space-y-3 p-3 border border-primary/20 rounded-md bg-primary/5">
+                <div className="flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-primary" />
+                  <p className="text-sm font-medium text-foreground">{currentWorkPlanTask.title}</p>
+                </div>
+                <p className="text-sm text-muted-foreground ml-6">{currentWorkPlanTask.description}</p>
+                
+                {/* Context with Icon */}
+                {lead.workPlan && lead.workPlan.filter(t => t.journeyStage === lead.journeyStage).length > 1 && (
+                  <div className="flex items-center gap-2 ml-6">
+                    <Target className="h-3 w-3 text-primary" />
+                    <p className="text-xs text-foreground font-medium">
+                      {lead.workPlan.filter(t => t.journeyStage === lead.journeyStage).length} attempts planned today
+                    </p>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Completed Work Plan */}
+              <div className="flex items-center justify-between mb-2">
+                <h5 className="font-medium text-sm flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">Work Plan Complete</span>
+                </h5>
+                <Badge variant="outline" className="text-xs bg-muted/10 text-muted-foreground border-muted">
+                  ✅ Done
+                </Badge>
+              </div>
+              
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">All planned tasks completed for this stage</p>
+                <p className="text-sm text-muted-foreground">
+                  Customer has responded or all contact attempts have been made.
+                </p>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Single Compose Area - Directly Under Work Plan */}
+        <div className="mt-4 p-3 bg-muted/10 border rounded-lg" onClick={(e) => e.stopPropagation()}>
+          {/* Customer Response Section (Always Priority at Top) */}
+          {mockCustomerResponse && (
+            <div className="mb-4 p-3 bg-success/5 border border-success/20 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <h5 className="font-medium text-sm flex items-center gap-2">
+                  <Activity className="h-4 w-4 text-success" />
+                  🚨 Customer Reached Out
+                </h5>
+                <Badge variant="outline" className="text-xs bg-success/10 text-success border-success/20">
+                  15 min ago
+                </Badge>
+              </div>
+              
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Customer replied with questions</p>
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {mockCustomerResponse.content.substring(0, 100)}...
+                </p>
+                
+                {/* Customer Response Action Buttons */}
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="default"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onContact(lead.id, 'phone');
+                    }}
+                    className="h-7 text-xs flex-1"
+                  >
+                    <Phone className="h-3 w-3 mr-1" />
+                    Call Back
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="default"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onContact(lead.id, 'text');
+                    }}
+                    className="h-7 text-xs flex-1"
+                  >
+                    <MessageCircle className="h-3 w-3 mr-1" />
+                    Reply
+                  </Button>
+                </div>
+                
+                <p className="text-xs text-success">
+                  Priority: Respond to customer inquiry
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Workplan Action Buttons - Only show if no customer response */}
+          {!mockCustomerResponse && currentWorkPlanTask && (
+            <div className="space-y-3">
+              <h5 className="font-medium text-sm">Quick Actions</h5>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="default"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleContactMethodClick('phone');
+                  }}
+                  className="h-7 text-xs flex-1"
+                >
+                  <Phone className="h-3 w-3 mr-1" />
+                  Call
+                </Button>
+                <Button
+                  size="sm"
+                  variant="default"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleContactMethodClick('text');
+                  }}
+                  className="h-7 text-xs flex-1"
+                >
+                  <MessageCircle className="h-3 w-3 mr-1" />
+                  Text
+                </Button>
+                <Button
+                  size="sm"
+                  variant="default"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleContactMethodClick('appointment');
+                  }}
+                  className="h-7 text-xs flex-1"
+                >
+                  <Calendar className="h-3 w-3 mr-1" />
+                  Schedule
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Quick Message Form */}
+          {showQuickResponse && (
+            <div className="bg-muted/20 border rounded-lg p-3 space-y-3 mt-3">
+              <div className="flex items-center justify-between">
+                <h5 className="font-medium text-sm">Compose Message</h5>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowQuickResponse(false)}
+                  className="h-6 w-6 p-0"
+                >
+                  ×
+                </Button>
+              </div>
+              <textarea
+                value={responseText}
+                onChange={(e) => setResponseText(e.target.value)}
+                className="w-full h-20 p-2 border border-input rounded text-sm resize-none"
+                placeholder="Type your message here..."
+              />
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => handleQuickMessage('text')}
+                  disabled={isLoading}
+                  className="flex-1"
+                >
+                  <MessageCircle className="h-4 w-4 mr-1" />
+                  {isLoading ? "Sending..." : "Send Text"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleQuickMessage('phone')}
+                  disabled={isLoading}
+                >
+                  <Phone className="h-4 w-4 mr-1" />
+                  Call
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Quick Message Toggle Button - Only show if no customer response and not showing form */}
+          {!mockCustomerResponse && !showQuickResponse && (
+            <div className="mt-3">
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowQuickResponse(true);
+                }}
+              >
+                <Send className="h-4 w-4 mr-2" />
+                Compose Message
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* Vehicle of Interest with De-emphasized Journey Chip */}
+        <div 
+          className="bg-muted/10 border rounded-lg p-3 mt-4 cursor-pointer hover:bg-muted/20 transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            onViewDetails(lead.id);
+          }}
+          title="View vehicle details"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Car className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="font-medium text-sm">{lead.vehicle}</p>
+                <p className="text-xs text-muted-foreground">Vehicle of Interest</p>
+              </div>
+            </div>
+            {/* De-emphasized Journey Chip */}
+            {journeyStages[lead.journeyStage] && (
+              <div className="flex items-center gap-1">
+                <div className={cn("w-3 h-3 rounded-full", journeyStages[lead.journeyStage].color)} />
+                <span className="text-xs text-muted-foreground">{journeyStages[lead.journeyStage].label}</span>
+              </div>
+            )}
+          </div>
+          {lead.tradeInVehicle && (
+            <div className="mt-2 pt-2 border-t border-border">
+              <div className="flex items-center gap-2">
+                <RefreshCw className="h-3 w-3 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground">Trade-in: </span>
+                <span className="text-xs font-medium">{lead.tradeInVehicle}</span>
+              </div>
+            </div>
+          )}
+        </div>
+        
+        {/* AI Analysis & Insights - Moved Below */}
         <Collapsible open={isAnalysisOpen} onOpenChange={setIsAnalysisOpen} className="mt-4">
           <CollapsibleTrigger asChild>
             <Button variant="ghost" size="sm" className="w-full justify-between">
@@ -566,50 +824,13 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                   )}
                 </div>
               </div>
-
-              {/* Removed Opportunity Score section */}
             </div>
           </CollapsibleContent>
         </Collapsible>
-
-        {/* Vehicle of Interest - Less Prominent */}
-        <div 
-          className="bg-muted/10 border rounded-lg p-3 mt-4 cursor-pointer hover:bg-muted/20 transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-            onViewDetails(lead.id);
-          }}
-          title="View vehicle details"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Car className="h-4 w-4 text-muted-foreground" />
-              <div>
-                <p className="font-medium text-sm">{lead.vehicle}</p>
-                <p className="text-xs text-muted-foreground">Vehicle of Interest</p>
-              </div>
-            </div>
-          </div>
-          {lead.tradeInVehicle && (
-            <div className="mt-2 pt-2 border-t border-border">
-              <div className="flex items-center gap-2">
-                <RefreshCw className="h-3 w-3 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">Trade-in: </span>
-                <span className="text-xs font-medium">{lead.tradeInVehicle}</span>
-              </div>
-            </div>
-          )}
-        </div>
         
-        {/* Divider between Vehicle and Journey Progress */}
-        <div className="my-4 border-t border-border/50"></div>
-        
-        {/* Enhanced Metrics Row */}
-        {/* Removed Deal Value section */}
-        
-        {/* Journey Stage Progress with Timeline */}
-        <div className="mt-3 p-3 pb-5 bg-muted/30 rounded-md space-y-3 relative z-50 h-auto min-h-fit" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center justify-between mb-2" onClick={(e) => e.stopPropagation()}>
+        {/* Journey Stage Progress - Moved Further Down */}
+        <div className="mt-4 p-3 bg-muted/30 rounded-md space-y-3 relative z-50 h-auto min-h-fit" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center justify-between mb-2" onClick={(e) => e.stopPropagation()}>
             <span className="text-xs font-medium text-muted-foreground">Journey Progress</span>
             {journeyStages[lead.journeyStage] && (
               <span className="text-xs font-medium text-primary">
@@ -708,191 +929,33 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
               </div>
             </div>
           </TooltipProvider>
-          
-          {/* Current Step in Journey Progress - Customer Response Takes Priority */}
-          {journeyStages[selectedJourneyStage] && (
-            <div className="mt-6 p-3 bg-muted/10 border rounded-lg">
-              {/* Customer Response Section (Always Priority at Top) */}
-              {mockCustomerResponse && (
-                <div className="mb-4 p-3 bg-success/5 border border-success/20 rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <h5 className="font-medium text-xs flex items-center gap-2">
-                      <Activity className="h-3 w-3 text-success" />
-                      🚨 Customer Reached Out
-                    </h5>
-                    <Badge variant="outline" className="text-xs bg-success/10 text-success border-success/20">
-                      15 min ago
-                    </Badge>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <p className="text-xs font-medium">Customer replied with questions</p>
-                    <p className="text-xs text-muted-foreground line-clamp-2">
-                      {mockCustomerResponse.content.substring(0, 100)}...
-                    </p>
-                    
-                    {/* Customer Response Action Buttons - Separate from workplan */}
-                    <div className="flex gap-1">
-                      <Button
-                        size="sm"
-                        variant="default"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // Direct customer response handling - not workplan related
-                          onContact(lead.id, 'phone');
-                        }}
-                        className="h-6 text-xs flex-1"
-                      >
-                        <Phone className="h-2 w-2 mr-1" />
-                        Call Back
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="default"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // Direct customer response handling - not workplan related
-                          onContact(lead.id, 'text');
-                        }}
-                        className="h-6 text-xs flex-1"
-                      >
-                        <MessageCircle className="h-2 w-2 mr-1" />
-                        Reply
-                      </Button>
-                    </div>
-                    
-                    <p className="text-xs text-success">
-                      Priority: Respond to customer inquiry
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Work Plan Section (Always Shown) */}
-              <div className="p-3 bg-muted/10 border rounded-lg">
-                {currentWorkPlanTask ? (
-                  <>
-                    {/* Active Work Plan - Attention with Icons */}
-                    <div className="flex items-center justify-between mb-2">
-                      <h5 className="font-medium text-xs flex items-center gap-2">
-                        <AlertCircle className="h-3 w-3 text-primary" />
-                        <span className="text-foreground">Current Work Plan</span>
-                        <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
-                          Action Needed
-                        </Badge>
-                      </h5>
-                      <Badge variant="outline" className="text-xs">
-                        {currentWorkPlanTask.dueDate}
-                      </Badge>
-                    </div>
-                    
-                    <div className="space-y-2 p-2 border border-primary/20 rounded-md bg-primary/5">
-                      <div className="flex items-center gap-2">
-                        <Zap className="h-3 w-3 text-primary animate-pulse" />
-                        <p className="text-xs font-medium text-foreground">{currentWorkPlanTask.title}</p>
-                      </div>
-                      <p className="text-xs text-muted-foreground ml-5">{currentWorkPlanTask.description}</p>
-                      
-                      {/* Workplan Action Buttons */}
-                      <div className="flex gap-1">
-                        <Button
-                          size="sm"
-                          variant="default"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleContactMethodClick('phone');
-                          }}
-                          className="h-6 text-xs flex-1"
-                        >
-                          <Phone className="h-2 w-2 mr-1" />
-                          Call
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="default"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleContactMethodClick('text');
-                          }}
-                          className="h-6 text-xs flex-1"
-                        >
-                          <MessageCircle className="h-2 w-2 mr-1" />
-                          Text
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="default"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleContactMethodClick('appointment');
-                          }}
-                          className="h-6 text-xs flex-1"
-                        >
-                          <Calendar className="h-2 w-2 mr-1" />
-                          Schedule
-                        </Button>
-                      </div>
-                      
-                      {/* Context with Icon */}
-                      {lead.workPlan && lead.workPlan.filter(t => t.journeyStage === lead.journeyStage).length > 1 && (
-                        <div className="flex items-center gap-1">
-                          <Target className="h-3 w-3 text-primary" />
-                          <p className="text-xs text-foreground font-medium">
-                            {lead.workPlan.filter(t => t.journeyStage === lead.journeyStage).length} attempts planned today
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    {/* Completed Work Plan - LESS PROMINENT */}
-                    <div className="flex items-center justify-between mb-2">
-                      <h5 className="font-medium text-xs flex items-center gap-2">
-                        <CheckCircle className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-muted-foreground">Work Plan Complete</span>
-                      </h5>
-                      <Badge variant="outline" className="text-xs bg-muted/10 text-muted-foreground border-muted">
-                        ✅ Done
-                      </Badge>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <p className="text-xs text-muted-foreground">All planned tasks completed for this stage</p>
-                      <p className="text-xs text-muted-foreground">
-                        Customer has responded or all contact attempts have been made.
-                      </p>
-                      
-                      {/* Show upcoming work plans */}
-                      <div className="pt-2 border-t border-border/50">
-                        <p className="text-xs font-medium text-muted-foreground mb-1">Upcoming Work Plans:</p>
-                        <div className="space-y-1">
-                          {Object.keys(journeyStages).slice(Object.keys(journeyStages).indexOf(lead.journeyStage) + 1, Object.keys(journeyStages).indexOf(lead.journeyStage) + 3).map((stage, idx) => (
-                            <div key={stage} className="text-xs text-muted-foreground">
-                              • {journeyStages[stage as keyof typeof journeyStages].label} Stage - 3 planned attempts
-                            </div>
-                          ))}
-                        </div>
-                        
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onViewDetails(lead.id);
-                          }}
-                          className="h-6 text-xs mt-2 w-full"
-                        >
-                          <Eye className="h-2 w-2 mr-1" />
-                          View All Work Plans
-                        </Button>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
+           
+           {/* Current Step in Journey Progress - Simplified */}
+           {journeyStages[selectedJourneyStage] && (
+             <div className="mt-6 p-3 bg-muted/10 border rounded-lg">
+               <div className="flex items-center gap-2 mb-2">
+                 <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-xs text-white", journeyStages[selectedJourneyStage].color)}>
+                   {journeyStages[selectedJourneyStage].icon}
+                 </div>
+                 <span className="text-sm font-medium">{journeyStages[selectedJourneyStage].label} Stage Details</span>
+               </div>
+               <p className="text-xs text-muted-foreground">
+                 View detailed information about this journey stage
+               </p>
+               <Button
+                 size="sm"
+                 variant="outline"
+                 onClick={(e) => {
+                   e.stopPropagation();
+                   onViewDetails(lead.id);
+                 }}
+                 className="h-6 text-xs mt-2 w-full"
+               >
+                 <Eye className="h-2 w-2 mr-1" />
+                 View Stage Details
+               </Button>
+             </div>
+           )}
           
            {/* Journey Advance Button for customer replies */}
            <JourneyAdvanceButton
@@ -930,16 +993,6 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
        </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Customer Response Preview - Top Priority */}
-        {mockCustomerResponse && (
-          <CustomerResponsePreview
-            response={mockCustomerResponse}
-            leadName={lead.name}
-            onViewFull={() => onViewDetails(lead.id)}
-            onRespond={(method) => handleContactMethodClick(method)}
-          />
-        )}
-
         {/* Inline Action Form */}
         {showInlineAction && (
           <InlineActionForm
@@ -957,10 +1010,8 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           />
         )}
 
-
-
         {/* Quick History Toggle */}
-        {!showInlineAction && !mockCustomerResponse && (
+        {!showInlineAction && (
           <QuickHistoryToggle
             leadId={lead.id}
             leadName={lead.name}
@@ -1001,90 +1052,23 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           )}
         </div>
 
-        {/* Action Buttons */}
-        <div className="space-y-3">
-          {/* Quick Response Section */}
-          {showQuickResponse && (
-            <div className="bg-muted/20 border rounded-lg p-3 space-y-3" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center justify-between">
-                <h5 className="font-medium text-sm">Quick Message</h5>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowQuickResponse(false)}
-                  className="h-6 w-6 p-0"
-                >
-                  ×
-                </Button>
-              </div>
-              <textarea
-                value={responseText}
-                onChange={(e) => setResponseText(e.target.value)}
-                className="w-full h-20 p-2 border border-input rounded text-sm resize-none"
-                placeholder="Type your message here..."
-              />
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  onClick={() => handleQuickMessage('text')}
-                  disabled={isLoading}
-                  className="flex-1"
-                >
-                  <MessageCircle className="h-4 w-4 mr-1" />
-                  {isLoading ? "Sending..." : "Send Text"}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleQuickMessage('phone')}
-                  disabled={isLoading}
-                >
-                  <Phone className="h-4 w-4 mr-1" />
-                  Call
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleQuickMessage('appointment')}
-                  disabled={isLoading}
-                >
-                  <Calendar className="h-4 w-4 mr-1" />
-                  Schedule
-                </Button>
-              </div>
-            </div>
-          )}
-          
-          {/* Quick Action Buttons */}
-          <div className="flex gap-2">
+        {/* Quick Actions */}
+        <div className="flex gap-2">
+          {quickActions.slice(0, 2).map((action, idx) => (
             <Button
+              key={idx}
               size="sm"
-              variant="outline"
+              variant={idx === 0 ? "default" : "outline"}
               className="flex-1"
               onClick={(e) => {
                 e.stopPropagation();
-                setShowQuickResponse(!showQuickResponse);
+                action.action();
               }}
             >
-              <Send className="h-4 w-4 mr-2" />
-              Quick Message
+              <action.icon className="h-4 w-4 mr-2" />
+              {action.label}
             </Button>
-            {quickActions.slice(0, 2).map((action, idx) => (
-              <Button
-                key={idx}
-                size="sm"
-                variant={idx === 0 ? "default" : "outline"}
-                className="flex-1"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  action.action();
-                }}
-              >
-                <action.icon className="h-4 w-4 mr-2" />
-                {action.label}
-              </Button>
-            ))}
-          </div>
+          ))}
         </div>
 
       </CardContent>
