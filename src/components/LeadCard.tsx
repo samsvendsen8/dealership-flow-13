@@ -520,8 +520,31 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           </div>
         </div>
         
-        {/* Work Plan Section - Moved to Top */}
+        {/* Work Plan & Customer Response - Combined Section */}
         <div className="mt-4 p-3 bg-primary/5 border border-primary/20 rounded-lg" onClick={(e) => e.stopPropagation()}>
+          {/* Customer Response Section (Always Priority at Top) */}
+          {mockCustomerResponse && (
+            <div className="mb-4 p-3 bg-success/5 border border-success/20 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <h5 className="font-medium text-sm flex items-center gap-2">
+                  <Activity className="h-4 w-4 text-success" />
+                  🚨 Customer Reached Out
+                </h5>
+                <Badge variant="outline" className="text-xs bg-success/10 text-success border-success/20">
+                  15 min ago
+                </Badge>
+              </div>
+              
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Customer replied with questions</p>
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {mockCustomerResponse.content.substring(0, 100)}...
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Work Plan Section */}
           {currentWorkPlanTask ? (
             <>
               {/* Active Work Plan Header */}
@@ -577,108 +600,52 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
               </div>
             </>
           )}
+
+          {/* 3 Action Buttons - Always at Bottom */}
+          <div className="mt-4 pt-3 border-t border-primary/20">
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="default"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleContactMethodClick('phone');
+                }}
+                className="h-7 text-xs flex-1"
+              >
+                <Phone className="h-3 w-3 mr-1" />
+                Call
+              </Button>
+              <Button
+                size="sm"
+                variant="default"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleContactMethodClick('text');
+                }}
+                className="h-7 text-xs flex-1"
+              >
+                <MessageCircle className="h-3 w-3 mr-1" />
+                Text
+              </Button>
+              <Button
+                size="sm"
+                variant="default"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleContactMethodClick('email');
+                }}
+                className="h-7 text-xs flex-1"
+              >
+                <Mail className="h-3 w-3 mr-1" />
+                Email
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* Single Compose Area - Directly Under Work Plan */}
         <div className="mt-4 p-3 bg-muted/10 border rounded-lg" onClick={(e) => e.stopPropagation()}>
-          {/* Customer Response Section (Always Priority at Top) */}
-          {mockCustomerResponse && (
-            <div className="mb-4 p-3 bg-success/5 border border-success/20 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <h5 className="font-medium text-sm flex items-center gap-2">
-                  <Activity className="h-4 w-4 text-success" />
-                  🚨 Customer Reached Out
-                </h5>
-                <Badge variant="outline" className="text-xs bg-success/10 text-success border-success/20">
-                  15 min ago
-                </Badge>
-              </div>
-              
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Customer replied with questions</p>
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {mockCustomerResponse.content.substring(0, 100)}...
-                </p>
-                
-                {/* Customer Response Action Buttons */}
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="default"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onContact(lead.id, 'phone');
-                    }}
-                    className="h-7 text-xs flex-1"
-                  >
-                    <Phone className="h-3 w-3 mr-1" />
-                    Call Back
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="default"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onContact(lead.id, 'text');
-                    }}
-                    className="h-7 text-xs flex-1"
-                  >
-                    <MessageCircle className="h-3 w-3 mr-1" />
-                    Reply
-                  </Button>
-                </div>
-                
-                <p className="text-xs text-success">
-                  Priority: Respond to customer inquiry
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Workplan Action Buttons - Only show if no customer response */}
-          {!mockCustomerResponse && currentWorkPlanTask && (
-            <div className="space-y-3">
-              <h5 className="font-medium text-sm">Quick Actions</h5>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="default"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleContactMethodClick('phone');
-                  }}
-                  className="h-7 text-xs flex-1"
-                >
-                  <Phone className="h-3 w-3 mr-1" />
-                  Call
-                </Button>
-                <Button
-                  size="sm"
-                  variant="default"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleContactMethodClick('text');
-                  }}
-                  className="h-7 text-xs flex-1"
-                >
-                  <MessageCircle className="h-3 w-3 mr-1" />
-                  Text
-                </Button>
-                <Button
-                  size="sm"
-                  variant="default"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleContactMethodClick('appointment');
-                  }}
-                  className="h-7 text-xs flex-1"
-                >
-                  <Calendar className="h-3 w-3 mr-1" />
-                  Schedule
-                </Button>
-              </div>
-            </div>
-          )}
 
           {/* Quick Message Form */}
           {showQuickResponse && (
@@ -811,147 +778,66 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           </CollapsibleContent>
         </Collapsible>
         
-        {/* Journey Stage Progress - Moved Further Down */}
-        <div className="mt-4 p-3 bg-muted/30 rounded-md space-y-3 relative z-50 h-auto min-h-fit" onClick={(e) => e.stopPropagation()}>
-          <div className="flex items-center justify-between mb-2" onClick={(e) => e.stopPropagation()}>
-            <span className="text-xs font-medium text-muted-foreground">Journey Progress</span>
+        {/* Journey Stage Progress - Compact Version */}
+        <div className="mt-4 p-2 bg-muted/20 rounded-md" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-medium text-muted-foreground">Journey</span>
             {journeyStages[lead.journeyStage] && (
-              <span className="text-xs font-medium text-primary">
-                Step {Object.keys(journeyStages).indexOf(lead.journeyStage) + 1} of {Object.keys(journeyStages).length}: {journeyStages[lead.journeyStage].label}
+              <span className="text-xs text-primary">
+                {journeyStages[lead.journeyStage].label}
               </span>
             )}
           </div>
           
-          {/* Current Stage Info - Moved above progress bar */}
-          {journeyStages[lead.journeyStage] && (
+          {/* Journey Timeline Progress Bar - Compact */}
+          <div className="w-full bg-muted rounded-full h-1 relative">
             <div 
-              className="flex items-center gap-2 cursor-pointer hover:bg-muted/20 p-2 -m-2 rounded transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                onViewDetails(lead.id);
-              }}
-              title="Click to view detailed journey progress"
-            >
-              <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-xs text-white", journeyStages[lead.journeyStage].color)}>
-                {journeyStages[lead.journeyStage].icon}
-              </div>
-              <span className="text-sm font-medium">Current: {journeyStages[lead.journeyStage].label}</span>
-              <ArrowRight className="h-3 w-3 text-muted-foreground" />
-            </div>
-          )}
-          
-          {/* Journey Timeline Progress Bar */}
-          <TooltipProvider>
-            <div className="relative z-50 px-3">
-              {/* Progress Bar */}
-              <div className="w-full bg-muted rounded-full h-2 relative">
+              className="h-1 bg-primary rounded-full transition-all duration-500"
+              style={{ width: `${(Object.keys(journeyStages).indexOf(lead.journeyStage) + 1) * 20}%` }}
+            />
+            
+            {/* Journey Stage Icons - Smaller */}
+            {Object.entries(journeyStages).map(([stage, config], index, array) => {
+              const position = (index / (array.length - 1)) * 100;
+              const isCompleted = Object.keys(journeyStages).indexOf(lead.journeyStage) > index;
+              const isCurrentStep = lead.journeyStage === stage;
+              
+              return (
                 <div 
-                  className="h-2 bg-gradient-to-r from-primary/60 to-primary rounded-full transition-all duration-500"
-                  style={{ width: `${(Object.keys(journeyStages).indexOf(lead.journeyStage) + 1) * 20}%` }}
-                />
-                
-                {/* Journey Stage Icons - Overlapping the progress bar */}
-                {Object.entries(journeyStages).map(([stage, config], index, array) => {
-                  const position = (index / (array.length - 1)) * 100;
-                  const isCompleted = Object.keys(journeyStages).indexOf(lead.journeyStage) > index;
-                  const isCurrentStep = lead.journeyStage === stage;
-                  
-                  // Mock completion dates for demonstration
-                  const mockDates = {
-                    engaged: '2024-01-15 10:30 AM',
-                    visit: '2024-01-16 2:15 PM',
-                    proposal: '2024-01-17 11:45 AM',
-                    sold: '2024-01-18 4:20 PM',
-                    delivered: null
-                  };
-                  
-                  return (
-                    <Tooltip key={stage}>
-                      <TooltipTrigger asChild>
-                         <div 
-                           className={cn(
-                             'absolute w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-125 cursor-pointer z-50',
-                             selectedJourneyStage === stage
-                               ? 'bg-primary border-white text-white shadow-lg ring-2 ring-primary/50'
-                               : isCompleted 
-                               ? 'bg-primary/70 border-white text-white shadow-md' 
-                               : isCurrentStep
-                               ? 'bg-primary/20 border-primary text-primary animate-pulse'
-                               : 'bg-muted border-muted-foreground/30 text-muted-foreground'
-                           )}
-                           style={{ 
-                             left: `${position}%`, 
-                             top: '50%',
-                             transform: 'translate(-50%, -50%)'
-                           }}
-                           onClick={(e) => {
-                             e.stopPropagation();
-                             setSelectedJourneyStage(stage as Lead['journeyStage']);
-                           }}
-                         >
-                           <span className="text-xs">{config.icon}</span>
-                         </div>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="max-w-xs z-[9999] bg-popover border shadow-md">
-                        <div className="text-xs">
-                          <div className="font-medium">{config.label}</div>
-                          {isCompleted && mockDates[stage as keyof typeof mockDates] ? (
-                            <div className="text-success">
-                              ✓ Completed: {mockDates[stage as keyof typeof mockDates]}
-                            </div>
-                          ) : isCurrentStep ? (
-                            <div className="text-primary">📍 Current Step</div>
-                          ) : (
-                            <div className="text-muted-foreground">⏳ Pending</div>
-                          )}
-                        </div>
-                      </TooltipContent>
-                    </Tooltip>
-                  );
-                })}
-              </div>
-            </div>
-          </TooltipProvider>
-           
-           {/* Current Step in Journey Progress - Simplified */}
-           {journeyStages[selectedJourneyStage] && (
-             <div className="mt-6 p-3 bg-muted/10 border rounded-lg">
-               <div className="flex items-center gap-2 mb-2">
-                 <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-xs text-white", journeyStages[selectedJourneyStage].color)}>
-                   {journeyStages[selectedJourneyStage].icon}
-                 </div>
-                 <span className="text-sm font-medium">{journeyStages[selectedJourneyStage].label} Stage Details</span>
-               </div>
-               <p className="text-xs text-muted-foreground">
-                 View detailed information about this journey stage
-               </p>
-               <Button
-                 size="sm"
-                 variant="outline"
-                 onClick={(e) => {
-                   e.stopPropagation();
-                   onViewDetails(lead.id);
-                 }}
-                 className="h-6 text-xs mt-2 w-full"
-               >
-                 <Eye className="h-2 w-2 mr-1" />
-                 View Stage Details
-               </Button>
-             </div>
-           )}
+                  key={stage}
+                  className={cn(
+                    'absolute w-3 h-3 rounded-full border flex items-center justify-center text-xs transition-all cursor-pointer',
+                    isCompleted ? 'bg-primary border-white text-white' 
+                    : isCurrentStep ? 'bg-primary/20 border-primary text-primary'
+                    : 'bg-muted border-muted-foreground/30 text-muted-foreground'
+                  )}
+                  style={{ 
+                    left: `${position}%`, 
+                    top: '50%',
+                    transform: 'translate(-50%, -50%)'
+                  }}
+                  title={config.label}
+                >
+                  <span className="text-[8px]">{config.icon}</span>
+                </div>
+              );
+            })}
+          </div>
           
-           {/* Journey Advance Button for customer replies */}
-           <JourneyAdvanceButton
-             leadId={lead.id}
-             leadName={lead.name}
-             currentStage={lead.journeyStage}
-             leadStatus={lead.status}
-             hasCustomerReplied={lead.status === 'qualified'}
-             onStageAdvanced={() => {
-               // Could trigger a refresh here if needed
-             }}
-           />
-         </div>
+          {/* Journey Advance Button - Compact */}
+          <div className="mt-2">
+            <JourneyAdvanceButton
+              leadId={lead.id}
+              leadName={lead.name}
+              currentStage={lead.journeyStage}
+              leadStatus={lead.status}
+              hasCustomerReplied={lead.status === 'qualified'}
+              onStageAdvanced={() => {
+                // Could trigger a refresh here if needed
+              }}
+            />
+          </div>
+        </div>
          
          {/* Historical Work Plan Progress - Show when viewing previous stages */}
          {selectedJourneyStage !== lead.journeyStage && (
