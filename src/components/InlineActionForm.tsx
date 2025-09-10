@@ -120,35 +120,35 @@ export function InlineActionForm({
 
         {/* AI Response Interface */}
         {(actionType === 'text' || actionType === 'email') && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* AI Suggested Response */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 dark:bg-blue-950/20 dark:border-blue-800">
-              <div className="flex items-start space-x-2 mb-3">
-                <div className="bg-blue-100 dark:bg-blue-900/50 p-1.5 rounded">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 dark:bg-blue-950/20 dark:border-blue-800">
+              <div className="flex items-center space-x-2 mb-2">
+                <div className="bg-blue-100 dark:bg-blue-900/50 p-1 rounded">
                   <MessageSquare className="h-3 w-3 text-blue-600 dark:text-blue-400" />
                 </div>
-                <p className="text-sm font-medium text-blue-800 dark:text-blue-200">AI Suggested Response:</p>
+                <p className="text-xs font-medium text-blue-800 dark:text-blue-200">AI Suggested Response:</p>
               </div>
-              <div className="bg-white dark:bg-gray-900/50 border border-blue-200 dark:border-blue-700 rounded-md p-3">
-                <p className="text-sm text-gray-700 dark:text-gray-300">
+              <div className="bg-white dark:bg-gray-900/50 border border-blue-200 dark:border-blue-700 rounded-md p-2">
+                <p className="text-xs text-gray-700 dark:text-gray-300">
                   Hi {leadName}, I noticed you were looking at the 2024 Tesla Model 3. I'm here to answer any questions and can schedule a test drive whenever convenient for you!
                 </p>
               </div>
             </div>
 
             {/* Custom AI Refinement */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="flex items-center space-x-2">
-                <div className="bg-primary/10 p-1.5 rounded">
+                <div className="bg-primary/10 p-1 rounded">
                   <MessageSquare className="h-3 w-3 text-primary" />
                 </div>
-                <p className="text-sm font-medium text-primary">Custom AI Refinement</p>
+                <p className="text-xs font-medium text-primary">Custom AI Refinement</p>
               </div>
               <Textarea
                 placeholder="refine AI response"
-                className="min-h-[60px] text-sm"
+                className="min-h-[50px] text-xs"
               />
-              <Button variant="outline" size="sm" className="w-full">
+              <Button variant="outline" size="sm" className="w-full h-8">
                 <MessageSquare className="h-3 w-3 mr-2" />
                 Refine with AI
               </Button>
@@ -156,22 +156,22 @@ export function InlineActionForm({
 
             {/* Quick Edits */}
             <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Quick edits:</p>
-              <div className="flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" className="text-xs h-7">
+              <p className="text-xs text-muted-foreground">Quick edits:</p>
+              <div className="flex flex-wrap gap-1">
+                <Button variant="outline" size="sm" className="text-xs h-6 px-2">
                   Make Shorter
                 </Button>
-                <Button variant="outline" size="sm" className="text-xs h-7">
+                <Button variant="outline" size="sm" className="text-xs h-6 px-2">
                   Make Casual
                 </Button>
-                <Button variant="outline" size="sm" className="text-xs h-7">
+                <Button variant="outline" size="sm" className="text-xs h-6 px-2">
                   Add Urgency
                 </Button>
               </div>
             </div>
 
             {/* Send Button */}
-            <Button className="w-full">
+            <Button className="w-full h-8">
               <Mail className="h-4 w-4 mr-2" />
               Send
             </Button>
