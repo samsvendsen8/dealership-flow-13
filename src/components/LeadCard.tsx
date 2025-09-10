@@ -520,12 +520,35 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           </div>
         </div>
         
-        {/* Work Plan Section - Moved to Top */}
-        <div className="mt-4" onClick={(e) => e.stopPropagation()}>
+        {/* Combined Work Plan & Customer Response Section */}
+        <div className="mt-4 p-4 bg-primary/5 border border-primary/20 rounded-lg" onClick={(e) => e.stopPropagation()}>
+          {/* Customer Response Section (Priority at Top if exists) */}
+          {mockCustomerResponse && (
+            <div className="mb-4 p-3 bg-success/5 border border-success/20 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <h5 className="font-medium text-sm flex items-center gap-2">
+                  <Activity className="h-4 w-4 text-success" />
+                  🚨 Customer Reached Out
+                </h5>
+                <Badge variant="outline" className="text-xs bg-success/10 text-success border-success/20">
+                  15 min ago
+                </Badge>
+              </div>
+              
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Customer replied with questions</p>
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {mockCustomerResponse.content.substring(0, 100)}...
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Work Plan Section */}
           {currentWorkPlanTask ? (
-            <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
+            <div className="space-y-3">
               {/* Work Plan Header */}
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between">
                 <h5 className="font-medium text-base">Current Work Plan Step</h5>
                 <div className="flex items-center gap-2">
                   {/* Priority Score Pill */}
@@ -542,7 +565,7 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
               </div>
               
               {/* Step Details */}
-              <div className="space-y-2 mb-4">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <h6 className="font-medium text-sm text-foreground">{currentWorkPlanTask.title}</h6>
                   <div className="flex items-center gap-1">
@@ -565,69 +588,10 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                 </div>
                 <p className="text-sm text-muted-foreground">{currentWorkPlanTask.description}</p>
               </div>
-              
-              {/* Primary Actions */}
-              <div className="space-y-3">
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="default"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleContactMethodClick('phone');
-                    }}
-                    className="flex-1"
-                  >
-                    <Phone className="h-4 w-4 mr-2" />
-                    Call
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="default"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleContactMethodClick('text');
-                    }}
-                    className="flex-1"
-                  >
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    Text
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="default"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleContactMethodClick('email');
-                    }}
-                    className="flex-1"
-                  >
-                    <Mail className="h-4 w-4 mr-2" />
-                    Email
-                  </Button>
-                </div>
-                
-                {/* Reply with AI Button */}
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowQuickResponse(true);
-                    // Auto-populate with AI-generated response
-                    const aiResponse = `Hi ${lead.name}, following up on your interest in the ${lead.vehicle}. I'm here to help with any questions and can arrange a test drive at your convenience. What's the best time to connect?`;
-                    setResponseText(aiResponse);
-                  }}
-                  className="w-full"
-                >
-                  <Zap className="h-4 w-4 mr-2" />
-                  Reply with AI
-                </Button>
-              </div>
             </div>
           ) : (
-            <div className="p-4 bg-muted/10 border rounded-lg">
-              <div className="flex items-center justify-between mb-2">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
                 <h5 className="font-medium text-base">Current Work Plan Step</h5>
                 <Badge variant="outline" className="text-xs bg-muted/10 text-muted-foreground border-muted">
                   ✅ Complete
@@ -642,179 +606,50 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
               </div>
             </div>
           )}
-        </div>
 
-        {/* Single Compose Area - Directly Under Work Plan */}
-        <div className="mt-4 p-3 bg-muted/10 border rounded-lg" onClick={(e) => e.stopPropagation()}>
-          {/* Customer Response Section (Always Priority at Top) */}
-          {mockCustomerResponse && (
-            <div className="mb-4 p-3 bg-success/5 border border-success/20 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <h5 className="font-medium text-sm flex items-center gap-2">
-                  <Activity className="h-4 w-4 text-success" />
-                  🚨 Customer Reached Out
-                </h5>
-                <Badge variant="outline" className="text-xs bg-success/10 text-success border-success/20">
-                  15 min ago
-                </Badge>
-              </div>
-              
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Customer replied with questions</p>
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {mockCustomerResponse.content.substring(0, 100)}...
-                </p>
-                
-                {/* Customer Response Action Buttons */}
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="default"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onContact(lead.id, 'phone');
-                    }}
-                    className="h-7 text-xs flex-1"
-                  >
-                    <Phone className="h-3 w-3 mr-1" />
-                    Call Back
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="default"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onContact(lead.id, 'text');
-                    }}
-                    className="h-7 text-xs flex-1"
-                  >
-                    <MessageCircle className="h-3 w-3 mr-1" />
-                    Reply
-                  </Button>
-                </div>
-                
-                <p className="text-xs text-success">
-                  Priority: Respond to customer inquiry
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Workplan Action Buttons - Only show if no customer response */}
-          {!mockCustomerResponse && currentWorkPlanTask && (
-            <div className="space-y-3">
-              <h5 className="font-medium text-sm">Quick Actions</h5>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="default"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleContactMethodClick('phone');
-                  }}
-                  className="h-7 text-xs flex-1"
-                >
-                  <Phone className="h-3 w-3 mr-1" />
-                  Call
-                </Button>
-                <Button
-                  size="sm"
-                  variant="default"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleContactMethodClick('text');
-                  }}
-                  className="h-7 text-xs flex-1"
-                >
-                  <MessageCircle className="h-3 w-3 mr-1" />
-                  Text
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleContactMethodClick('appointment');
-                  }}
-                  className="h-7 text-xs"
-                >
-                  <Calendar className="h-3 w-3 mr-1" />
-                  Schedule
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Quick Message Form */}
-          {showQuickResponse && (
-            <div className="bg-muted/20 border rounded-lg p-3 space-y-3 mt-3">
-              <div className="flex items-center justify-between">
-                <h5 className="font-medium text-sm">Compose Message</h5>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowQuickResponse(false)}
-                  className="h-6 w-6 p-0"
-                >
-                  ×
-                </Button>
-              </div>
-              <textarea
-                value={responseText}
-                onChange={(e) => setResponseText(e.target.value)}
-                className="w-full h-20 p-2 border border-input rounded text-sm resize-none"
-                placeholder="Type your message here..."
-              />
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  onClick={() => handleQuickMessage('text')}
-                  disabled={isLoading}
-                  className="flex-1"
-                >
-                  <MessageCircle className="h-4 w-4 mr-1" />
-                  {isLoading ? "Sending..." : "Send Text"}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleQuickMessage('phone')}
-                  disabled={isLoading}
-                >
-                  <Phone className="h-4 w-4 mr-1" />
-                  Call
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleQuickMessage('appointment')}
-                  disabled={isLoading}
-                >
-                  <Calendar className="h-4 w-4 mr-1" />
-                  Schedule
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Quick Message Toggle Button - Only show if no customer response and not showing form */}
-          {!mockCustomerResponse && !showQuickResponse && (
-            <div className="mt-3">
+          {/* Shared Actions - Always at Bottom */}
+          <div className="mt-4 pt-3 border-t border-primary/20">
+            <div className="flex gap-2">
               <Button
                 size="sm"
-                variant="outline"
-                className="w-full"
+                variant="default"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setShowQuickResponse(true);
+                  handleContactMethodClick('phone');
                 }}
+                className="flex-1"
               >
-                <Send className="h-4 w-4 mr-2" />
-                Compose Message
+                <Phone className="h-4 w-4 mr-2" />
+                Call
+              </Button>
+              <Button
+                size="sm"
+                variant="default"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleContactMethodClick('text');
+                }}
+                className="flex-1"
+              >
+                <MessageCircle className="h-4 w-4 mr-2" />
+                Text
+              </Button>
+              <Button
+                size="sm"
+                variant="default"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleContactMethodClick('email');
+                }}
+                className="flex-1"
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                Email
               </Button>
             </div>
-          )}
+          </div>
         </div>
+
 
         {/* AI Analysis & Insights - Moved Below */}
         <Collapsible open={isAnalysisOpen} onOpenChange={setIsAnalysisOpen} className="mt-4">
@@ -987,32 +822,6 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
             </div>
           </TooltipProvider>
            
-           {/* Current Step in Journey Progress - Simplified */}
-           {journeyStages[selectedJourneyStage] && (
-             <div className="mt-6 p-3 bg-muted/10 border rounded-lg">
-               <div className="flex items-center gap-2 mb-2">
-                 <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-xs text-white", journeyStages[selectedJourneyStage].color)}>
-                   {journeyStages[selectedJourneyStage].icon}
-                 </div>
-                 <span className="text-sm font-medium">{journeyStages[selectedJourneyStage].label} Stage Details</span>
-               </div>
-               <p className="text-xs text-muted-foreground">
-                 View detailed information about this journey stage
-               </p>
-               <Button
-                 size="sm"
-                 variant="outline"
-                 onClick={(e) => {
-                   e.stopPropagation();
-                   onViewDetails(lead.id);
-                 }}
-                 className="h-6 text-xs mt-2 w-full"
-               >
-                 <Eye className="h-2 w-2 mr-1" />
-                 View Stage Details
-               </Button>
-             </div>
-           )}
           
            {/* Journey Advance Button for customer replies */}
            <JourneyAdvanceButton
