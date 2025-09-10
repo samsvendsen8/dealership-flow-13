@@ -650,6 +650,22 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           </div>
         </div>
 
+        {/* Inline Action Form */}
+        {showInlineAction && (
+          <InlineActionForm
+            actionType={inlineActionType}
+            leadName={lead.name}
+            leadId={lead.id}
+            workPlanItem={currentWorkPlanTask ? {
+              id: currentWorkPlanTask.id,
+              title: currentWorkPlanTask.title,
+              description: currentWorkPlanTask.description,
+              dueDate: currentWorkPlanTask.dueDate
+            } : undefined}
+            onComplete={handleInlineActionComplete}
+            onCancel={() => setShowInlineAction(false)}
+          />
+        )}
 
         {/* AI Analysis & Insights - Moved Below */}
         <Collapsible open={isAnalysisOpen} onOpenChange={setIsAnalysisOpen} className="mt-4">
@@ -859,22 +875,6 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
        </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Inline Action Form */}
-        {showInlineAction && (
-          <InlineActionForm
-            actionType={inlineActionType}
-            leadName={lead.name}
-            leadId={lead.id}
-            workPlanItem={currentWorkPlanTask ? {
-              id: currentWorkPlanTask.id,
-              title: currentWorkPlanTask.title,
-              description: currentWorkPlanTask.description,
-              dueDate: currentWorkPlanTask.dueDate
-            } : undefined}
-            onComplete={handleInlineActionComplete}
-            onCancel={() => setShowInlineAction(false)}
-          />
-        )}
 
         {/* Quick History Toggle */}
         {!showInlineAction && (
