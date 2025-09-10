@@ -489,6 +489,25 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
               </div>
               <p className="text-sm text-muted-foreground">{lead.email}</p>
               <p className="text-sm text-muted-foreground">{lead.phone}</p>
+              <div className="flex items-center gap-2 mt-1">
+                <Car className="h-3 w-3 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">{lead.vehicle}</span>
+                {lead.tradeInVehicle && (
+                  <>
+                    <span className="text-xs text-muted-foreground">•</span>
+                    <RefreshCw className="h-3 w-3 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">Trade: {lead.tradeInVehicle}</span>
+                  </>
+                )}
+                {/* De-emphasized Journey Chip */}
+                {journeyStages[lead.journeyStage] && (
+                  <>
+                    <span className="text-xs text-muted-foreground">•</span>
+                    <div className={cn("w-3 h-3 rounded-full", journeyStages[lead.journeyStage].color)} />
+                    <span className="text-xs text-muted-foreground">{journeyStages[lead.journeyStage].label}</span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
           <div className="flex flex-col items-end gap-2" onClick={(e) => e.stopPropagation()}>
@@ -723,42 +742,6 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           )}
         </div>
 
-        {/* Vehicle of Interest with De-emphasized Journey Chip */}
-        <div 
-          className="bg-muted/10 border rounded-lg p-3 mt-4 cursor-pointer hover:bg-muted/20 transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-            onViewDetails(lead.id);
-          }}
-          title="View vehicle details"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Car className="h-4 w-4 text-muted-foreground" />
-              <div>
-                <p className="font-medium text-sm">{lead.vehicle}</p>
-                <p className="text-xs text-muted-foreground">Vehicle of Interest</p>
-              </div>
-            </div>
-            {/* De-emphasized Journey Chip */}
-            {journeyStages[lead.journeyStage] && (
-              <div className="flex items-center gap-1">
-                <div className={cn("w-3 h-3 rounded-full", journeyStages[lead.journeyStage].color)} />
-                <span className="text-xs text-muted-foreground">{journeyStages[lead.journeyStage].label}</span>
-              </div>
-            )}
-          </div>
-          {lead.tradeInVehicle && (
-            <div className="mt-2 pt-2 border-t border-border">
-              <div className="flex items-center gap-2">
-                <RefreshCw className="h-3 w-3 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">Trade-in: </span>
-                <span className="text-xs font-medium">{lead.tradeInVehicle}</span>
-              </div>
-            </div>
-          )}
-        </div>
-        
         {/* AI Analysis & Insights - Moved Below */}
         <Collapsible open={isAnalysisOpen} onOpenChange={setIsAnalysisOpen} className="mt-4">
           <CollapsibleTrigger asChild>
