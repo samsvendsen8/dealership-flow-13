@@ -521,51 +521,116 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
         </div>
         
         {/* Work Plan Section - Moved to Top */}
-        <div className="mt-4 p-3 bg-primary/5 border border-primary/20 rounded-lg" onClick={(e) => e.stopPropagation()}>
+        <div className="mt-4" onClick={(e) => e.stopPropagation()}>
           {currentWorkPlanTask ? (
-            <>
-              {/* Active Work Plan Header */}
+            <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
+              {/* Work Plan Header */}
               <div className="flex items-center justify-between mb-3">
-                <h5 className="font-medium text-sm flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4 text-primary" />
-                  <span className="text-foreground">Work Plan</span>
-                  <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
-                    Action Needed
+                <h5 className="font-medium text-base">Current Work Plan Step</h5>
+                <div className="flex items-center gap-2">
+                  {/* Priority Score Pill */}
+                  <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20">
+                    Priority: High
                   </Badge>
-                </h5>
-                <Badge variant="outline" className="text-xs">
-                  {currentWorkPlanTask.dueDate}
-                </Badge>
+                  {/* Customer Replied Badge */}
+                  {mockCustomerResponse && (
+                    <Badge variant="default" className="text-xs bg-success text-white">
+                      Customer Replied Today
+                    </Badge>
+                  )}
+                </div>
               </div>
               
-              <div className="space-y-3 p-3 border border-primary/20 rounded-md bg-primary/5">
-                <div className="flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-primary" />
-                  <p className="text-sm font-medium text-foreground">{currentWorkPlanTask.title}</p>
-                </div>
-                <p className="text-sm text-muted-foreground ml-6">{currentWorkPlanTask.description}</p>
-                
-                {/* Context with Icon */}
-                {lead.workPlan && lead.workPlan.filter(t => t.journeyStage === lead.journeyStage).length > 1 && (
-                  <div className="flex items-center gap-2 ml-6">
-                    <Target className="h-3 w-3 text-primary" />
-                    <p className="text-xs text-foreground font-medium">
-                      {lead.workPlan.filter(t => t.journeyStage === lead.journeyStage).length} attempts planned today
-                    </p>
+              {/* Step Details */}
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center justify-between">
+                  <h6 className="font-medium text-sm text-foreground">{currentWorkPlanTask.title}</h6>
+                  <div className="flex items-center gap-1">
+                    {currentWorkPlanTask.dueDate === 'Now' || currentWorkPlanTask.dueDate === 'Today' ? (
+                      <>
+                        <div className="w-2 h-2 bg-destructive rounded-full animate-pulse" />
+                        <span className="text-xs font-medium text-destructive">
+                          {currentWorkPlanTask.dueDate === 'Now' ? 'Overdue' : 'Due Today'}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-2 h-2 bg-primary rounded-full" />
+                        <span className="text-xs font-medium text-primary">
+                          Upcoming - {currentWorkPlanTask.dueDate}
+                        </span>
+                      </>
+                    )}
                   </div>
-                )}
+                </div>
+                <p className="text-sm text-muted-foreground">{currentWorkPlanTask.description}</p>
               </div>
-            </>
+              
+              {/* Primary Actions */}
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="default"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleContactMethodClick('phone');
+                    }}
+                    className="flex-1"
+                  >
+                    <Phone className="h-4 w-4 mr-2" />
+                    Call
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="default"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleContactMethodClick('text');
+                    }}
+                    className="flex-1"
+                  >
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Text
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="default"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleContactMethodClick('email');
+                    }}
+                    className="flex-1"
+                  >
+                    <Mail className="h-4 w-4 mr-2" />
+                    Email
+                  </Button>
+                </div>
+                
+                {/* Reply with AI Button */}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowQuickResponse(true);
+                    // Auto-populate with AI-generated response
+                    const aiResponse = `Hi ${lead.name}, following up on your interest in the ${lead.vehicle}. I'm here to help with any questions and can arrange a test drive at your convenience. What's the best time to connect?`;
+                    setResponseText(aiResponse);
+                  }}
+                  className="w-full"
+                >
+                  <Zap className="h-4 w-4 mr-2" />
+                  Reply with AI
+                </Button>
+              </div>
+            </div>
           ) : (
-            <>
-              {/* Completed Work Plan */}
+            <div className="p-4 bg-muted/10 border rounded-lg">
               <div className="flex items-center justify-between mb-2">
-                <h5 className="font-medium text-sm flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Work Plan Complete</span>
-                </h5>
+                <h5 className="font-medium text-base">Current Work Plan Step</h5>
                 <Badge variant="outline" className="text-xs bg-muted/10 text-muted-foreground border-muted">
-                  ✅ Done
+                  ✅ Complete
                 </Badge>
               </div>
               
@@ -575,7 +640,7 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                   Customer has responded or all contact attempts have been made.
                 </p>
               </div>
-            </>
+            </div>
           )}
         </div>
 
@@ -666,12 +731,12 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                 </Button>
                 <Button
                   size="sm"
-                  variant="default"
+                  variant="outline"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleContactMethodClick('appointment');
                   }}
-                  className="h-7 text-xs flex-1"
+                  className="h-7 text-xs"
                 >
                   <Calendar className="h-3 w-3 mr-1" />
                   Schedule
@@ -718,6 +783,15 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
                 >
                   <Phone className="h-4 w-4 mr-1" />
                   Call
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleQuickMessage('appointment')}
+                  disabled={isLoading}
+                >
+                  <Calendar className="h-4 w-4 mr-1" />
+                  Schedule
                 </Button>
               </div>
             </div>
