@@ -628,9 +628,8 @@ export function NotificationPanelContent({ lead, onContact }: NotificationPanelC
             {/* History Tab */}
             {activeMainTab === 'customer-history' && (
               <div className="space-y-4">
-                {/* History Section Header and Scope Tabs */}
+                {/* History Section Scope Tabs */}
                 <div className="space-y-2">
-                  <h3 className="text-lg font-semibold">History</h3>
 
                   {/* Deal vs Customer Scope Tabs - Smaller */}
                   <div className="flex gap-0.5 p-0.5 bg-muted rounded-md w-fit">
