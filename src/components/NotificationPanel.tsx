@@ -650,7 +650,13 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                     </button>
                   </div>
 
-                  {/* AI Overview Section */}
+                  {/* AI Overview Section - Analyzes content below */}
+                  <AIHistoryOverview 
+                    filter={historyFilter}
+                    leadName={selectedLead.name}
+                  />
+
+                  {/* Original AI Overview Section */}
                   <AIHistoryOverview 
                     filter={historyFilter}
                     leadName={selectedLead.name}
