@@ -85,173 +85,189 @@ export function InlineActionForm({
   };
 
   return (
-    <Card className="p-4 border-primary/20 bg-primary/5">
-      <div className="space-y-4">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="bg-primary/10 p-2 rounded-lg">
-              <Icon className="h-4 w-4 text-primary" />
+    <Card className="p-6 border-primary/20 bg-primary/5">
+      <div className="space-y-6">
+        {/* Customer Header Section */}
+        <div className="pb-4 border-b border-border/50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="bg-primary/10 p-2 rounded-lg">
+                <Icon className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <h4 className="font-medium">{actionLabels[actionType]} - {leadName}</h4>
+                <p className="text-sm text-muted-foreground">Complete this work plan item</p>
+              </div>
             </div>
-            <div>
-              <h4 className="font-medium">{actionLabels[actionType]} - {leadName}</h4>
-              <p className="text-sm text-muted-foreground">Complete this work plan item</p>
-            </div>
+            <Button variant="ghost" size="sm" onClick={onCancel}>
+              Cancel
+            </Button>
           </div>
-          <Button variant="ghost" size="sm" onClick={onCancel}>
-            Cancel
-          </Button>
         </div>
 
-        {/* Work Plan Context (hidden for text/email per request) */}
+        {/* Work Plan Context Section */}
         {workPlanItem && !(actionType === 'text' || actionType === 'email') && (
-          <div className="bg-card border border-border rounded-lg p-3">
-            <div className="flex items-start space-x-2 mb-2">
-              <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
-              <div className="flex-1">
-                <p className="font-medium text-sm">{workPlanItem.title}</p>
-                <p className="text-xs text-muted-foreground">{workPlanItem.description}</p>
+          <div className="py-4 border-b border-border/50">
+            <div className="mb-3">
+              <h5 className="text-sm font-semibold text-foreground mb-1">Current Work Plan Step</h5>
+              <p className="text-xs text-muted-foreground">Why this action is needed</p>
+            </div>
+            <div className="bg-card border border-border rounded-lg p-3">
+              <div className="flex items-start space-x-2">
+                <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <div className="flex-1">
+                  <p className="font-medium text-sm">{workPlanItem.title}</p>
+                  <p className="text-xs text-muted-foreground">{workPlanItem.description}</p>
+                </div>
+                <Badge variant="outline" className="text-xs">
+                  {workPlanItem.dueDate}
+                </Badge>
               </div>
-              <Badge variant="outline" className="text-xs">
-                {workPlanItem.dueDate}
-              </Badge>
             </div>
           </div>
         )}
 
-        {/* Message Composer */}
+        {/* AI Insights & Action Section */}
         {(actionType === 'text' || actionType === 'email') && (
-          <div className="space-y-4">
-            {!messageSent ? (
-              <>
-                {/* Message Content */}
-                <div className="bg-card border border-border rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center space-x-2">
-                      <div className="bg-blue-100 dark:bg-blue-900/50 p-1.5 rounded">
-                        <MessageSquare className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          <div className="pt-2 pb-4 border-b border-border/50">
+            <div className="mb-4">
+              <h5 className="text-sm font-semibold text-foreground mb-1">AI-Powered Communication</h5>
+              <p className="text-xs text-muted-foreground">Smart messaging based on lead behavior and preferences</p>
+            </div>
+            <div className="space-y-4">
+              {!messageSent ? (
+                <>
+                  {/* Message Content */}
+                  <div className="bg-card border border-border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-2">
+                        <div className="bg-blue-100 dark:bg-blue-900/50 p-1.5 rounded">
+                          <MessageSquare className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium">AI-Generated Message</h4>
+                          <p className="text-xs text-muted-foreground">Edit as needed before sending</p>
+                        </div>
+                      </div>
+                      <Badge variant="secondary" className="text-xs">
+                        {actionType === 'email' ? 'Email' : 'Text'}
+                      </Badge>
+                    </div>
+                    
+                    {/* Message Preview */}
+                    <div className="bg-muted/30 border border-border rounded-md p-3 mb-3">
+                      <Textarea
+                        defaultValue={`Hi ${leadName}, I noticed you were looking at the 2024 Tesla Model 3. I'm here to answer any questions and can schedule a test drive whenever convenient for you!`}
+                        className="min-h-[80px] resize-none border-0 p-0 bg-transparent text-sm focus:ring-0"
+                        placeholder="Type your message here..."
+                      />
+                    </div>
+
+                    {/* AI Refinement - Inline */}
+                    <div className="bg-blue-50/50 dark:bg-blue-950/10 border border-blue-200/50 dark:border-blue-800/50 rounded-md p-3 mb-3 space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <div className="bg-blue-100 dark:bg-blue-900/50 p-1 rounded">
+                          <MessageSquare className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <p className="text-xs font-medium text-blue-800 dark:text-blue-200">Refine with AI</p>
+                      </div>
+                      <Textarea
+                        placeholder="e.g., make it more friendly, add pricing details, mention warranty..."
+                        className="min-h-[40px] text-xs bg-background border-input"
+                      />
+                      <Button variant="outline" size="sm" className="h-7">
+                        <MessageSquare className="h-3 w-3 mr-1" />
+                        Update Message
+                      </Button>
+                    </div>
+
+                    {/* Quick Actions */}
+                    <div className="flex flex-wrap gap-2">
+                      <Button variant="outline" size="sm" className="text-xs h-7 px-3">
+                        Make Shorter
+                      </Button>
+                      <Button variant="outline" size="sm" className="text-xs h-7 px-3">
+                        Make Casual
+                      </Button>
+                      <Button variant="outline" size="sm" className="text-xs h-7 px-3">
+                        Add Urgency
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Primary Send Action */}
+                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm">
+                        <p className="font-medium text-primary">Ready to send</p>
+                        <p className="text-xs text-muted-foreground">This message will be sent to {leadName}</p>
+                      </div>
+                      <Button 
+                        className="h-9 px-6"
+                        onClick={() => {
+                          setMessageSent(true);
+                          toast({
+                            title: "Message Sent",
+                            description: `${actionType === 'email' ? 'Email' : 'Text'} sent to ${leadName}`,
+                          });
+                        }}
+                      >
+                        <Mail className="h-4 w-4 mr-2" />
+                        Send {actionType === 'email' ? 'Email' : 'Text'}
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                /* Message Sent State */
+                <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-green-100 dark:bg-green-900/50 p-2 rounded-lg">
+                        <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
                       </div>
                       <div>
-                        <h4 className="font-medium">AI-Generated Message</h4>
-                        <p className="text-xs text-muted-foreground">Edit as needed before sending</p>
+                        <p className="font-medium text-green-800 dark:text-green-200">
+                          {actionType === 'email' ? 'Email' : 'Text'} Sent Successfully
+                        </p>
+                        <p className="text-sm text-green-600 dark:text-green-400">
+                          Message delivered to {leadName}
+                        </p>
                       </div>
-                    </div>
-                    <Badge variant="secondary" className="text-xs">
-                      {actionType === 'email' ? 'Email' : 'Text'}
-                    </Badge>
-                  </div>
-                  
-                  {/* Message Preview */}
-                  <div className="bg-muted/30 border border-border rounded-md p-3 mb-3">
-                    <Textarea
-                      defaultValue={`Hi ${leadName}, I noticed you were looking at the 2024 Tesla Model 3. I'm here to answer any questions and can schedule a test drive whenever convenient for you!`}
-                      className="min-h-[80px] resize-none border-0 p-0 bg-transparent text-sm focus:ring-0"
-                      placeholder="Type your message here..."
-                    />
-                  </div>
-
-                  {/* AI Refinement - Inline */}
-                  <div className="bg-blue-50/50 dark:bg-blue-950/10 border border-blue-200/50 dark:border-blue-800/50 rounded-md p-3 mb-3 space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <div className="bg-blue-100 dark:bg-blue-900/50 p-1 rounded">
-                        <MessageSquare className="h-3 w-3 text-blue-600 dark:text-blue-400" />
-                      </div>
-                      <p className="text-xs font-medium text-blue-800 dark:text-blue-200">Refine with AI</p>
-                    </div>
-                    <Textarea
-                      placeholder="e.g., make it more friendly, add pricing details, mention warranty..."
-                      className="min-h-[40px] text-xs bg-background border-input"
-                    />
-                    <Button variant="outline" size="sm" className="h-7">
-                      <MessageSquare className="h-3 w-3 mr-1" />
-                      Update Message
-                    </Button>
-                  </div>
-
-                  {/* Quick Actions */}
-                  <div className="flex flex-wrap gap-2">
-                    <Button variant="outline" size="sm" className="text-xs h-7 px-3">
-                      Make Shorter
-                    </Button>
-                    <Button variant="outline" size="sm" className="text-xs h-7 px-3">
-                      Make Casual
-                    </Button>
-                    <Button variant="outline" size="sm" className="text-xs h-7 px-3">
-                      Add Urgency
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Primary Send Action */}
-                <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm">
-                      <p className="font-medium text-primary">Ready to send</p>
-                      <p className="text-xs text-muted-foreground">This message will be sent to {leadName}</p>
                     </div>
                     <Button 
-                      className="h-9 px-6"
-                      onClick={() => {
-                        setMessageSent(true);
-                        toast({
-                          title: "Message Sent",
-                          description: `${actionType === 'email' ? 'Email' : 'Text'} sent to ${leadName}`,
-                        });
-                      }}
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setMessageSent(false)}
+                      className="border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900/30"
                     >
-                      <Mail className="h-4 w-4 mr-2" />
-                      Send {actionType === 'email' ? 'Email' : 'Text'}
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Send Another
                     </Button>
                   </div>
                 </div>
-              </>
-            ) : (
-              /* Message Sent State */
-              <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="bg-green-100 dark:bg-green-900/50 p-2 rounded-lg">
-                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-green-800 dark:text-green-200">
-                        {actionType === 'email' ? 'Email' : 'Text'} Sent Successfully
-                      </p>
-                      <p className="text-sm text-green-600 dark:text-green-400">
-                        Message delivered to {leadName}
-                      </p>
-                    </div>
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setMessageSent(false)}
-                    className="border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900/30"
-                  >
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    Send Another
-                  </Button>
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
 
-        {/* Divider */}
-        <div className="border-t border-border"></div>
+        {/* Notes Section */}
+        <div className="pt-2">
+          <div className="mb-4">
+            <h5 className="text-sm font-semibold text-foreground mb-1">Interaction Notes</h5>
+            <p className="text-xs text-muted-foreground">Document your interaction and complete the work plan step</p>
+          </div>
 
-        {/* Notes Input */}
-        <div>
-          <label className="text-sm font-medium mb-2 block">
-            Interaction Notes
-          </label>
-          <Textarea
-            placeholder={`Add notes about your ${actionLabels[actionType].toLowerCase()} with ${leadName}...`}
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={3}
-            className="resize-none bg-white dark:bg-background border-input"
-          />
+          {/* Notes Input */}
+          <div>
+            <Textarea
+              placeholder={`Add notes about your ${actionLabels[actionType].toLowerCase()} with ${leadName}...`}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={3}
+              className="resize-none bg-white dark:bg-background border-input"
+            />
+          </div>
         </div>
 
         <div className="flex items-center space-x-2">
