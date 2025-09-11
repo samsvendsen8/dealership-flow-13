@@ -520,6 +520,8 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           </div>
         </div>
         
+        <Separator className="my-3" />
+
         {/* Combined Work Plan & Customer Response Section */}
         <div className="mt-4 p-4 bg-primary/5 border border-primary/20 rounded-lg" onClick={(e) => e.stopPropagation()}>
           {/* Customer Response Section (Priority at Top if exists) */}
@@ -666,6 +668,8 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
             onCancel={() => setShowInlineAction(false)}
           />
         )}
+
+        <Separator className="my-4" />
 
         {/* AI Analysis & Insights - Moved Below */}
         <Collapsible open={isAnalysisOpen} onOpenChange={setIsAnalysisOpen} className="mt-4">
