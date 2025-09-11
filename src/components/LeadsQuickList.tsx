@@ -100,7 +100,7 @@ export function LeadsQuickList({
             </div>
           </div>
         </CardHeader>
-        <CardContent className="p-0 overflow-y-auto h-[calc(100vh-180px)] sm:h-[calc(100vh-200px)]">
+        <CardContent className="p-0 overflow-y-auto h-[calc(100vh-12rem)]">
           <NotificationPanelContent 
             lead={selectedLead}
             onContact={onContact || (() => {})}

@@ -346,69 +346,73 @@ export function LeadsPriorityList({
 
               {/* Single Card Focus Area - 8 columns */}
               <div className="col-span-8">
-                {selectedLeadId && getFilteredAndSortedLeads(leadsByCategory[tabValue]).length > 0 ? (
-                  <div className="sticky top-52 z-5">
-                    {(() => {
-                      const currentLeads = getFilteredAndSortedLeads(leadsByCategory[tabValue]);
-                      const displayLead = currentLeads.find(lead => lead.id === selectedLeadId);
-                      
-                      if (!displayLead) {
-                        // Show empty state if selected lead not found in current tab
+                <div className="sticky top-16 h-[calc(100vh-5rem)] overflow-hidden">
+                  {selectedLeadId && getFilteredAndSortedLeads(leadsByCategory[tabValue]).length > 0 ? (
+                    <div className="h-full">
+                      {(() => {
+                        const currentLeads = getFilteredAndSortedLeads(leadsByCategory[tabValue]);
+                        const displayLead = currentLeads.find(lead => lead.id === selectedLeadId);
+                        
+                        if (!displayLead) {
+                          // Show empty state if selected lead not found in current tab
+                          return (
+                            <EmptyLeadState 
+                              hasLeadsInQuickList={currentLeads.length > 0}
+                              onSelectFirstLead={currentLeads.length > 0 ? () => {
+                                const firstLead = currentLeads[0];
+                                setSelectedLeadId(firstLead.id);
+                                setQuickListSelectedLead(firstLead);
+                                setShowQuickListDetail(true);
+                              } : undefined}
+                            />
+                          );
+                        }
+                        
+                        const leadIndex = currentLeads.findIndex(lead => lead.id === displayLead.id);
+                        
                         return (
-                          <EmptyLeadState 
-                            hasLeadsInQuickList={currentLeads.length > 0}
-                            onSelectFirstLead={currentLeads.length > 0 ? () => {
-                              const firstLead = currentLeads[0];
-                              setSelectedLeadId(firstLead.id);
-                              setQuickListSelectedLead(firstLead);
-                              setShowQuickListDetail(true);
-                            } : undefined}
-                          />
-                        );
-                      }
-                      
-                      const leadIndex = currentLeads.findIndex(lead => lead.id === displayLead.id);
-                      
-                      return (
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between bg-card/80 backdrop-blur-sm border rounded-lg p-3">
-                            <div className="text-sm text-muted-foreground">
-                              Lead {leadIndex + 1} of {currentLeads.length} • {displayLead.name}
+                          <div className="space-y-4 h-full">
+                            <div className="flex items-center justify-between bg-card/80 backdrop-blur-sm border rounded-lg p-3">
+                              <div className="text-sm text-muted-foreground">
+                                Lead {leadIndex + 1} of {currentLeads.length} • {displayLead.name}
+                              </div>
+                              {leadIndex === 0 && displayLead.priority === 'hot' && (
+                                <Badge className="bg-hot-lead text-white">
+                                  🚨 TOP PRIORITY
+                                </Badge>
+                              )}
                             </div>
-                            {leadIndex === 0 && displayLead.priority === 'hot' && (
-                              <Badge className="bg-hot-lead text-white">
-                                🚨 TOP PRIORITY
-                              </Badge>
-                            )}
+                            
+                            <div className="h-[calc(100%-4rem)] overflow-hidden">
+                              <LeadCard
+                                lead={displayLead}
+                                onContact={onContact}
+                                onViewDetails={onViewDetails}
+                                onOpenNotificationPanel={onOpenNotificationPanel}
+                                onTaskCompleted={handleLocalTaskCompleted}
+                                onCommunicationSent={onCommunicationSent}
+                                isCondensed={false}
+                                isFocused={false}
+                              />
+                            </div>
                           </div>
-                          
-                          <LeadCard
-                            lead={displayLead}
-                            onContact={onContact}
-                            onViewDetails={onViewDetails}
-                            onOpenNotificationPanel={onOpenNotificationPanel}
-                            onTaskCompleted={handleLocalTaskCompleted}
-                            onCommunicationSent={onCommunicationSent}
-                            isCondensed={false}
-                            isFocused={false}
-                          />
-                        </div>
-                      );
-                    })()}
-                  </div>
-                ) : (
-                  <EmptyLeadState 
-                    hasLeadsInQuickList={getFilteredAndSortedLeads(leadsByCategory[tabValue]).length > 0}
-                    onSelectFirstLead={getFilteredAndSortedLeads(leadsByCategory[tabValue]).length > 0 ? () => {
-                      const firstLead = getFilteredAndSortedLeads(leadsByCategory[tabValue])[0];
-                      if (firstLead) {
-                        setSelectedLeadId(firstLead.id);
-                        setQuickListSelectedLead(firstLead);
-                        setShowQuickListDetail(true);
-                      }
-                    } : undefined}
-                  />
-                )}
+                        );
+                      })()}
+                    </div>
+                  ) : (
+                    <EmptyLeadState 
+                      hasLeadsInQuickList={getFilteredAndSortedLeads(leadsByCategory[tabValue]).length > 0}
+                      onSelectFirstLead={getFilteredAndSortedLeads(leadsByCategory[tabValue]).length > 0 ? () => {
+                        const firstLead = getFilteredAndSortedLeads(leadsByCategory[tabValue])[0];
+                        if (firstLead) {
+                          setSelectedLeadId(firstLead.id);
+                          setQuickListSelectedLead(firstLead);
+                          setShowQuickListDetail(true);
+                        }
+                      } : undefined}
+                    />
+                  )}
+                </div>
               </div>
             </div>
           </TabsContent>

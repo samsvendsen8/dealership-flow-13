@@ -102,7 +102,7 @@ function AIHistoryOverview({ filter, leadName }: { filter: 'all' | 'text' | 'pri
 }
 
 export function NotificationPanelContent({ lead, onContact }: NotificationPanelContentProps) {
-  const [activeMainTab, setActiveMainTab] = useState<'contact' | 'customer-info' | 'customer-history'>('contact');
+  const [activeMainTab, setActiveMainTab] = useState<'contact' | 'customer-info' | 'customer-history'>('customer-history');
   const [activeSubTab, setActiveSubTab] = useState<'overview' | 'notes'>('overview');
   const [responseText, setResponseText] = useState('');
   const [expandedHistoryItems, setExpandedHistoryItems] = useState<Set<string>>(new Set());
@@ -626,78 +626,22 @@ export function NotificationPanelContent({ lead, onContact }: NotificationPanelC
             {/* History Tab */}
             {activeMainTab === 'customer-history' && (
               <div className="space-y-4">
-                {/* Filter Controls */}
-                <Card>
-                  <CardContent className="p-3">
-                    <div className="flex flex-col gap-3">
-                      {/* Filter Toggle */}
-                      <div className="flex gap-1 p-1 bg-muted rounded-lg">
-                        <button
-                          onClick={() => setHistoryFilter('all')}
-                          className={cn(
-                            "flex-1 py-1.5 px-2 text-xs font-medium rounded-md transition-colors",
-                            historyFilter === 'all' 
-                              ? "bg-background text-foreground shadow-sm" 
-                              : "text-muted-foreground hover:text-foreground"
-                          )}
-                        >
-                          All Activity
-                        </button>
-                        <button
-                          onClick={() => setHistoryFilter('text')}
-                          className={cn(
-                            "flex-1 py-1.5 px-2 text-xs font-medium rounded-md transition-colors",
-                            historyFilter === 'text' 
-                              ? "bg-background text-foreground shadow-sm" 
-                              : "text-muted-foreground hover:text-foreground"
-                          )}
-                        >
-                          Messages
-                        </button>
-                        <button
-                          onClick={() => setHistoryFilter('priority')}
-                          className={cn(
-                            "flex-1 py-1.5 px-2 text-xs font-medium rounded-md transition-colors",
-                            historyFilter === 'priority' 
-                              ? "bg-background text-foreground shadow-sm" 
-                              : "text-muted-foreground hover:text-foreground"
-                          )}
-                        >
-                          Priority
-                        </button>
-                      </div>
+                {/* Simplified History View - Just show "History" header */}
+                <div className="flex items-center gap-2 mb-4">
+                  <h3 className="text-lg font-semibold">History</h3>
+                  <Badge variant="outline" className="text-xs">
+                    {historyData.length} activities
+                  </Badge>
+                </div>
 
-                      {/* Scope Toggle */}
-                      <div className="flex gap-1 p-1 bg-muted rounded-lg">
-                        <button
-                          onClick={() => setHistoryScope('deal')}
-                          className={cn(
-                            "flex-1 py-1.5 px-2 text-xs font-medium rounded-md transition-colors",
-                            historyScope === 'deal' 
-                              ? "bg-background text-foreground shadow-sm" 
-                              : "text-muted-foreground hover:text-foreground"
-                          )}
-                        >
-                          This Deal
-                        </button>
-                        <button
-                          onClick={() => setHistoryScope('customer')}
-                          className={cn(
-                            "flex-1 py-1.5 px-2 text-xs font-medium rounded-md transition-colors",
-                            historyScope === 'customer' 
-                              ? "bg-background text-foreground shadow-sm" 
-                              : "text-muted-foreground hover:text-foreground"
-                          )}
-                        >
-                          All Customer
-                        </button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* AI Overview */}
-                <AIHistoryOverview filter={historyFilter} leadName={lead.name} />
+                {/* Customer History Timeline */}
+                <CustomerHistoryTimeline 
+                  leadId={lead.id}
+                  leadName={lead.name}
+                  filter={historyFilter}
+                  onFilterChange={setHistoryFilter}
+                  scope={historyScope}
+                />
 
                 {/* Timeline */}
                 <CustomerHistoryTimeline
