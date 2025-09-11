@@ -375,7 +375,7 @@ export function LeadsPriorityList({
 
               {/* Single Card Focus Area or Appointment Details - 8 columns */}
               <div className="col-span-8">
-                <div className="sticky top-16 h-[calc(100vh-5rem)] overflow-hidden">
+                <div className="sticky top-16 h-[calc(100vh-5rem)] overflow-auto">
                   {tabValue === 'appointments' && showAppointmentDetail && selectedAppointment ? (
                     <AppointmentDetailsView 
                       appointment={selectedAppointment}

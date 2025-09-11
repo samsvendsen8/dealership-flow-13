@@ -152,8 +152,8 @@ export function LeadsQuickList({
                   'relative border-l-2 bg-card/50 border border-border/50 rounded-md px-3 py-2 sm:px-2 sm:py-1.5 cursor-pointer transition-all duration-200 hover:bg-card hover:border-border hover:shadow-sm group touch-manipulation min-h-[44px] sm:min-h-0',
                   priorityStyles[lead.priority],
                   selectedLeadId === lead.id ? 
-                    'ring-1 ring-primary bg-primary/5 shadow-sm border-primary/30 scale-[1.02]' : 
-                    'hover:scale-[1.005] active:scale-[0.98]',
+                    'ring-2 ring-primary border-primary bg-primary/5' : 
+                    'hover:bg-card/80',
                   // Subtle ranking gradient - higher ranked leads are slightly more prominent
                   index === 0 ? 'shadow-sm ring-1 ring-primary/20' : '',
                   index <= 2 ? 'border-border' : 'border-border/30',
@@ -164,15 +164,6 @@ export function LeadsQuickList({
                 }}
                 onClick={() => onLeadClick(lead.id)}
               >
-                {/* Subtle ranking indicator */}
-                <div className="absolute -left-1 top-2 sm:top-1.5">
-                  <div className={cn(
-                    'w-1 h-1 rounded-full transition-all duration-200',
-                    index === 0 ? 'bg-primary shadow-sm' : 
-                    index <= 2 ? 'bg-primary/60' : 
-                    'bg-muted-foreground/30'
-                  )} />
-                </div>
                 
                 <div className="space-y-1 sm:space-y-0.5">
                   {/* Header Row */}
