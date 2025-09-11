@@ -268,7 +268,7 @@ export function NotificationPanelContent({ lead, onContact }: NotificationPanelC
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex gap-1 p-1 bg-muted rounded-lg">
+            <div className="flex gap-1 p-1 bg-background border rounded-lg">
               <button
                 onClick={() => setActiveMainTab('contact')}
                 className={cn(
