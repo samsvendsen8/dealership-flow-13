@@ -424,7 +424,7 @@ export function LeadsPriorityList({
                               )}
                             </div>
                             
-                            <div className="h-[calc(100%-4rem)] overflow-hidden">
+                            <div className="min-h-[calc(100%-4rem)] overflow-visible">
                               <LeadCard
                                 lead={displayLead}
                                 onContact={onContact}
