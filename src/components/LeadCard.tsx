@@ -44,7 +44,7 @@ import { CelebrationAnimation } from './CelebrationAnimation';
 import { WorkItemSlideOut } from './WorkItemSlideOut';
 import { InlineActionForm } from './InlineActionForm';
 import { CustomerResponsePreview } from './CustomerResponsePreview';
-import { QuickHistoryToggle } from './QuickHistoryToggle';
+
 import { useMessaging } from '@/hooks/useMessaging';
 import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -878,13 +878,6 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
 
       <CardContent className="space-y-4">
 
-        {/* Quick History Toggle */}
-        {!showInlineAction && (
-          <QuickHistoryToggle
-            leadId={lead.id}
-            leadName={lead.name}
-          />
-        )}
 
         {/* Contact Preferences & History */}
         <div 

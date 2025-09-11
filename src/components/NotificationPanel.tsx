@@ -14,6 +14,7 @@ import { WorkPlanProgress } from './WorkPlanProgress';
 import { CallSimulationModal } from './CallSimulationModal';
 import { useMessaging } from '@/hooks/useMessaging';
 import { CustomerHistoryTimeline } from './CustomerHistoryTimeline';
+import { CustomerResponsePreview } from './CustomerResponsePreview';
 import { useToast } from '@/hooks/use-toast';
 
 interface NotificationPanelProps {
