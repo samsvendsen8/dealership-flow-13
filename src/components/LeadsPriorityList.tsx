@@ -68,13 +68,13 @@ export function LeadsPriorityList({
     onTaskCompleted?.(completedLeadId);
   };
 
-  // Handle tab change and reset to first lead
+  // Handle tab change and reset selection to show empty state
   const handleTabChange = (newTab: string) => {
     setActiveTab(newTab);
-    const newLeads = getFilteredAndSortedLeads(leadsByCategory[newTab as keyof typeof leadsByCategory]);
-    if (newLeads.length > 0) {
-      setSelectedLeadId(newLeads[0].id);
-    }
+    // Reset selection to show empty state on tab change
+    setSelectedLeadId(undefined);
+    setShowQuickListDetail(false);
+    setQuickListSelectedLead(undefined);
   };
 
   // Priority scoring function
@@ -346,15 +346,26 @@ export function LeadsPriorityList({
 
               {/* Single Card Focus Area - 8 columns */}
               <div className="col-span-8">
-                {getFilteredAndSortedLeads(leadsByCategory[tabValue]).length > 0 ? (
+                {selectedLeadId && getFilteredAndSortedLeads(leadsByCategory[tabValue]).length > 0 ? (
                   <div className="sticky top-52 z-5">
                     {(() => {
                       const currentLeads = getFilteredAndSortedLeads(leadsByCategory[tabValue]);
-                      const displayLead = selectedLeadId ? 
-                        currentLeads.find(lead => lead.id === selectedLeadId) : 
-                        currentLeads[0];
+                      const displayLead = currentLeads.find(lead => lead.id === selectedLeadId);
                       
-                      if (!displayLead) return null;
+                      if (!displayLead) {
+                        // Show empty state if selected lead not found in current tab
+                        return (
+                          <EmptyLeadState 
+                            hasLeadsInQuickList={currentLeads.length > 0}
+                            onSelectFirstLead={currentLeads.length > 0 ? () => {
+                              const firstLead = currentLeads[0];
+                              setSelectedLeadId(firstLead.id);
+                              setQuickListSelectedLead(firstLead);
+                              setShowQuickListDetail(true);
+                            } : undefined}
+                          />
+                        );
+                      }
                       
                       const leadIndex = currentLeads.findIndex(lead => lead.id === displayLead.id);
                       
@@ -387,9 +398,9 @@ export function LeadsPriorityList({
                   </div>
                 ) : (
                   <EmptyLeadState 
-                    hasLeadsInQuickList={leads.length > 0}
-                    onSelectFirstLead={leads.length > 0 ? () => {
-                      const firstLead = getFilteredAndSortedLeads(leadsByCategory[tabValue])[0] || leads[0];
+                    hasLeadsInQuickList={getFilteredAndSortedLeads(leadsByCategory[tabValue]).length > 0}
+                    onSelectFirstLead={getFilteredAndSortedLeads(leadsByCategory[tabValue]).length > 0 ? () => {
+                      const firstLead = getFilteredAndSortedLeads(leadsByCategory[tabValue])[0];
                       if (firstLead) {
                         setSelectedLeadId(firstLead.id);
                         setQuickListSelectedLead(firstLead);
