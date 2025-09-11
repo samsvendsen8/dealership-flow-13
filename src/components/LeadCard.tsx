@@ -888,7 +888,7 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
 
         {/* Contact Preferences & History */}
         <div 
-          className="bg-background border border-border rounded-lg p-3 cursor-pointer hover:bg-muted/10 transition-colors"
+          className="bg-white border border-border rounded-lg p-3 cursor-pointer hover:bg-muted/10 transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             onViewDetails(lead.id);

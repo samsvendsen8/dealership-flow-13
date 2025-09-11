@@ -305,20 +305,35 @@ export function LeadsPriorityList({
       {/* New Bucket Tabs */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
         <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="all" className="text-sm">
+          <TabsTrigger value="all" className="text-sm flex items-center gap-2">
             All / Unified
+            <Badge variant="secondary" className="text-xs">
+              {leads.length}
+            </Badge>
           </TabsTrigger>
-          <TabsTrigger value="prospects" className="text-sm">
+          <TabsTrigger value="prospects" className="text-sm flex items-center gap-2">
             Prospects
+            <Badge variant="secondary" className="text-xs">
+              {leadsByCategory.prospects.length}
+            </Badge>
           </TabsTrigger>
-          <TabsTrigger value="delivered" className="text-sm">
+          <TabsTrigger value="delivered" className="text-sm flex items-center gap-2">
             Delivered
+            <Badge variant="secondary" className="text-xs">
+              {leadsByCategory.delivered.length}
+            </Badge>
           </TabsTrigger>
-          <TabsTrigger value="lease-retention" className="text-sm">
+          <TabsTrigger value="lease-retention" className="text-sm flex items-center gap-2">
             Lease Retention
+            <Badge variant="secondary" className="text-xs">
+              {leadsByCategory['lease-retention'].length}
+            </Badge>
           </TabsTrigger>
-          <TabsTrigger value="appointments" className="text-sm">
+          <TabsTrigger value="appointments" className="text-sm flex items-center gap-2">
             Appointments
+            <Badge variant="secondary" className="text-xs">
+              {leadsByCategory.appointments.length}
+            </Badge>
           </TabsTrigger>
         </TabsList>
 
