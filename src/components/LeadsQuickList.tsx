@@ -145,7 +145,7 @@ export function LeadsQuickList({
       </CardHeader>
       <CardContent className="p-0 overflow-y-auto h-[calc(100vh-180px)] sm:h-[calc(100vh-200px)]">
         <div className="space-y-1 px-2 sm:px-3 pb-2">
-            {leads.map((lead) => (
+            {leads.map((lead, index) => (
               <div
                 key={lead.id}
                 className={cn(
@@ -153,10 +153,27 @@ export function LeadsQuickList({
                   priorityStyles[lead.priority],
                   selectedLeadId === lead.id ? 
                     'ring-1 ring-primary bg-primary/5 shadow-sm border-primary/30 scale-[1.02]' : 
-                    'hover:scale-[1.005] active:scale-[0.98]'
+                    'hover:scale-[1.005] active:scale-[0.98]',
+                  // Subtle ranking gradient - higher ranked leads are slightly more prominent
+                  index === 0 ? 'shadow-sm ring-1 ring-primary/20' : '',
+                  index <= 2 ? 'border-border' : 'border-border/30',
                 )}
+                style={{
+                  // Subtle opacity gradient for ranking
+                  opacity: 1 - (index * 0.02)
+                }}
                 onClick={() => onLeadClick(lead.id)}
               >
+                {/* Subtle ranking indicator */}
+                <div className="absolute -left-1 top-2 sm:top-1.5">
+                  <div className={cn(
+                    'w-1 h-1 rounded-full transition-all duration-200',
+                    index === 0 ? 'bg-primary shadow-sm' : 
+                    index <= 2 ? 'bg-primary/60' : 
+                    'bg-muted-foreground/30'
+                  )} />
+                </div>
+
                 {/* Selection indicator */}
                 {selectedLeadId === lead.id && (
                   <div className="absolute -right-1 top-1/2 transform -translate-y-1/2">
@@ -167,7 +184,18 @@ export function LeadsQuickList({
                 <div className="space-y-1 sm:space-y-0.5">
                   {/* Header Row */}
                   <div className="flex items-center justify-between gap-2 sm:gap-1">
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 flex items-center gap-2">
+                      {/* Small rank number for top 3 */}
+                      {index < 3 && (
+                        <div className={cn(
+                          'text-xs font-medium px-1.5 py-0.5 rounded-full min-w-[20px] text-center',
+                          index === 0 ? 'bg-primary/10 text-primary' :
+                          index === 1 ? 'bg-primary/5 text-primary/80' :
+                          'bg-muted text-muted-foreground'
+                        )}>
+                          {index + 1}
+                        </div>
+                      )}
                       <h4 className="font-medium text-base sm:text-sm text-foreground truncate">{lead.name}</h4>
                     </div>
                     <div className="flex items-center gap-1.5 sm:gap-1">
