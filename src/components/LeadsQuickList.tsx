@@ -123,18 +123,18 @@ export function LeadsQuickList({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-muted/50 touch-manipulation">
-                  <Info className="h-4 w-4 text-muted-foreground" />
+                  <Brain className="h-4 w-4 text-primary" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="max-w-sm">
                 <div className="flex items-start gap-2">
                   <Brain className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="font-medium text-sm mb-1">AI Priority Ranking</p>
+                    <p className="font-medium text-sm mb-1">🤖 AI Priority Ranking</p>
                     <p className="text-xs text-muted-foreground">
-                      Leads are automatically ranked using priority level, deal value, and recent activity. 
-                      Recently contacted leads move down since you're waiting for their response,
-                      while new customer activity gets top priority.
+                      Our AI automatically ranks leads using advanced scoring that considers deal probability, 
+                      urgency signals, value potential, and response patterns. Recently contacted leads are 
+                      deprioritized while hot opportunities rise to the top for maximum efficiency.
                     </p>
                   </div>
                 </div>
