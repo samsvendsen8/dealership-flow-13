@@ -77,9 +77,7 @@ export function WorkPlanProgress({
       {
         id: `${baseId}_1`,
         title: `${stage.charAt(0).toUpperCase() + stage.slice(1)} Attempt 1`,
-        description: stage === 'engaged' 
-          ? 'Initial contact to gauge interest and schedule visit'
-          : stage === 'visit'
+        description: stage === 'visit'
           ? 'Call to discuss budget and payment options'  
           : 'Follow up on proposal details',
         dueDate: 'Today',
@@ -92,9 +90,7 @@ export function WorkPlanProgress({
       {
         id: `${baseId}_2`,
         title: `${stage.charAt(0).toUpperCase() + stage.slice(1)} Attempt 2`, 
-        description: stage === 'engaged'
-          ? 'Email current inventory and pricing'
-          : stage === 'visit'
+        description: stage === 'visit'
           ? 'Email current inventory and pricing'
           : 'Send detailed proposal document',
         dueDate: 'Tomorrow',
@@ -106,9 +102,7 @@ export function WorkPlanProgress({
       {
         id: `${baseId}_3`,
         title: `${stage.charAt(0).toUpperCase() + stage.slice(1)} Attempt 3`,
-        description: stage === 'engaged'
-          ? 'Text to schedule viewing appointment' 
-          : stage === 'visit'
+        description: stage === 'visit'
           ? 'Text to schedule viewing appointment'
           : 'Final follow-up call',
         dueDate: 'Day 3',
