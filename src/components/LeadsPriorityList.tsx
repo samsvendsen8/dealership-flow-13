@@ -51,7 +51,7 @@ export function LeadsPriorityList({
   const [selectedLeadId, setSelectedLeadId] = useState<string | undefined>();
   const [showQuickListDetail, setShowQuickListDetail] = useState(false);
   const [quickListSelectedLead, setQuickListSelectedLead] = useState<Lead | undefined>();
-  const [activeTab, setActiveTab] = useState('action-required');
+  const [activeTab, setActiveTab] = useState('all');
 
   // Handle task completion - auto-advance to next lead
   const handleLocalTaskCompleted = (completedLeadId: string) => {
@@ -115,49 +115,35 @@ export function LeadsPriorityList({
     return score;
   }, []);
 
-  // Function to determine lead category for tabs
+  // Function to determine lead category for new bucket system
   const getLeadCategory = (lead: Lead) => {
-    const hasRecentContact = lead.lastActivity.includes('Just replied') || 
-                            lead.lastActivity.includes('contact sent') || 
-                            lead.lastActivity.includes('contact made');
-    
-    // Check for recent customer activity (replies, questions, etc.)
-    const hasRecentCustomerActivity = lead.lastActivity.includes('Just now') ||
-                                     lead.lastActivity.includes('min ago') ||
-                                     lead.lastActivity.includes('Customer Reply') ||
-                                     lead.lastActivity.includes('replied') ||
-                                     (lead.timeline && lead.timeline.some(item => 
-                                       item.date.includes('min ago') && 
-                                       (item.action.includes('Reply') || item.action.includes('Customer'))
-                                     ));
-    
-    // Check if lead has gone cold (no activity for extended period)
-    const isOldActivity = lead.lastActivity.includes('week ago') || 
-                         lead.lastActivity.includes('month ago') ||
-                         lead.priority === 'cold';
-    
-    // Priority order: Customer activity > Cold > Recent contact > Default action required
-    if (hasRecentCustomerActivity && !hasRecentContact) {
-      return 'action-required'; // Customer replied - needs immediate action
-    } else if (isOldActivity && !hasRecentCustomerActivity) {
-      return 'cold';
-    } else if (hasRecentContact && !hasRecentCustomerActivity) {
-      return 'awaiting-response';
-    } else if (lead.status === 'contacted' && !hasRecentCustomerActivity) {
-      return 'awaiting-response';
-    } else {
-      return 'action-required';
+    // Check if this is appointment related (confirmations for today/next 24-48 hours)
+    if (lead.lastActivity.includes('appointment') || lead.lastActivity.includes('scheduled') || lead.lastActivity.includes('confirmation')) {
+      return 'appointments';
     }
+    
+    // Check if this is lease retention (lease maturity outreach)
+    if (lead.lastActivity.includes('lease') || lead.lastActivity.includes('retention') || lead.lastActivity.includes('renewal')) {
+      return 'lease-retention';
+    }
+    
+    // Check if this is post-delivery follow-up
+    if (lead.lastActivity.includes('delivered') || lead.lastActivity.includes('delivery') || lead.status === 'closed') {
+      return 'delivered';
+    }
+    
+    // Everything else goes to prospects (new leads and sales funnel activity)
+    return 'prospects';
   };
 
-  // Organize leads by category
+  // Organize leads by category (new bucket system)
   const leadsByCategory = useMemo(() => {
     const categories = {
-      'action-required': [] as Lead[],
-      'awaiting-response': [] as Lead[],
-      're-engaged': [] as Lead[],
-      'cold': [] as Lead[],
-      'all': leads
+      'all': leads,
+      'prospects': [] as Lead[],
+      'delivered': [] as Lead[],
+      'lease-retention': [] as Lead[],
+      'appointments': [] as Lead[]
     };
 
     leads.forEach(lead => {
@@ -308,90 +294,115 @@ export function LeadsPriorityList({
         </div>
       </div>
 
-      {/* Content - All Leads */}
-      <div className="grid grid-cols-12 gap-6">
-        {/* Sticky Quick List Sidebar - 4 columns */}
-        <div className="col-span-4">
-          <div className="sticky top-52 z-10 h-[calc(100vh-16rem)] overflow-auto">
-            <LeadsQuickList 
-              leads={getFilteredAndSortedLeads(leadsByCategory['all'])}
-              onLeadClick={(leadId) => {
-                const clickedLead = getFilteredAndSortedLeads(leadsByCategory['all']).find(lead => lead.id === leadId);
-                if (clickedLead) {
-                  setSelectedLeadId(leadId);
-                  setQuickListSelectedLead(clickedLead);
-                  setShowQuickListDetail(true);
-                }
-              }}
-              selectedLeadId={selectedLeadId}
-              showDetailView={showQuickListDetail}
-              selectedLead={quickListSelectedLead}
-              onContact={onContact}
-              onViewDetails={onViewDetails}
-              onBackToList={() => {
-                setShowQuickListDetail(false);
-                setQuickListSelectedLead(undefined);
-              }}
-            />
-          </div>
-        </div>
+      {/* New Bucket Tabs */}
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="all" className="text-sm">
+            All / Unified
+          </TabsTrigger>
+          <TabsTrigger value="prospects" className="text-sm">
+            Prospects
+          </TabsTrigger>
+          <TabsTrigger value="delivered" className="text-sm">
+            Delivered
+          </TabsTrigger>
+          <TabsTrigger value="lease-retention" className="text-sm">
+            Lease Retention
+          </TabsTrigger>
+          <TabsTrigger value="appointments" className="text-sm">
+            Appointments
+          </TabsTrigger>
+        </TabsList>
 
-        {/* Single Card Focus Area - 8 columns */}
-        <div className="col-span-8">
-          {getFilteredAndSortedLeads(leadsByCategory['all']).length > 0 ? (
-            <div className="sticky top-52 z-5">
-              {(() => {
-                const currentLeads = getFilteredAndSortedLeads(leadsByCategory['all']);
-                const displayLead = selectedLeadId ? 
-                  currentLeads.find(lead => lead.id === selectedLeadId) : 
-                  currentLeads[0];
-                
-                if (!displayLead) return null;
-                
-                const leadIndex = currentLeads.findIndex(lead => lead.id === displayLead.id);
-                
-                return (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between bg-card/80 backdrop-blur-sm border rounded-lg p-3">
-                      <div className="text-sm text-muted-foreground">
-                        Lead {leadIndex + 1} of {currentLeads.length} • {displayLead.name}
-                      </div>
-                      {leadIndex === 0 && displayLead.priority === 'hot' && (
-                        <Badge className="bg-hot-lead text-white">
-                          🚨 TOP PRIORITY
-                        </Badge>
-                      )}
-                    </div>
-                    
-                    <LeadCard
-                      lead={displayLead}
-                      onContact={onContact}
-                      onViewDetails={onViewDetails}
-                      onOpenNotificationPanel={onOpenNotificationPanel}
-                      onTaskCompleted={handleLocalTaskCompleted}
-                      onCommunicationSent={onCommunicationSent}
-                      isCondensed={false}
-                      isFocused={false}
-                    />
+        {/* Tab Content */}
+        {(['all', 'prospects', 'delivered', 'lease-retention', 'appointments'] as const).map((tabValue) => (
+          <TabsContent key={tabValue} value={tabValue}>
+            <div className="grid grid-cols-12 gap-6">
+              {/* Sticky Quick List Sidebar - 4 columns */}
+              <div className="col-span-4">
+                <div className="sticky top-52 z-10 h-[calc(100vh-16rem)] overflow-auto">
+                  <LeadsQuickList 
+                    leads={getFilteredAndSortedLeads(leadsByCategory[tabValue])}
+                    onLeadClick={(leadId) => {
+                      const clickedLead = getFilteredAndSortedLeads(leadsByCategory[tabValue]).find(lead => lead.id === leadId);
+                      if (clickedLead) {
+                        setSelectedLeadId(leadId);
+                        setQuickListSelectedLead(clickedLead);
+                        setShowQuickListDetail(true);
+                      }
+                    }}
+                    selectedLeadId={selectedLeadId}
+                    showDetailView={showQuickListDetail}
+                    selectedLead={quickListSelectedLead}
+                    onContact={onContact}
+                    onViewDetails={onViewDetails}
+                    onBackToList={() => {
+                      setShowQuickListDetail(false);
+                      setQuickListSelectedLead(undefined);
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Single Card Focus Area - 8 columns */}
+              <div className="col-span-8">
+                {getFilteredAndSortedLeads(leadsByCategory[tabValue]).length > 0 ? (
+                  <div className="sticky top-52 z-5">
+                    {(() => {
+                      const currentLeads = getFilteredAndSortedLeads(leadsByCategory[tabValue]);
+                      const displayLead = selectedLeadId ? 
+                        currentLeads.find(lead => lead.id === selectedLeadId) : 
+                        currentLeads[0];
+                      
+                      if (!displayLead) return null;
+                      
+                      const leadIndex = currentLeads.findIndex(lead => lead.id === displayLead.id);
+                      
+                      return (
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between bg-card/80 backdrop-blur-sm border rounded-lg p-3">
+                            <div className="text-sm text-muted-foreground">
+                              Lead {leadIndex + 1} of {currentLeads.length} • {displayLead.name}
+                            </div>
+                            {leadIndex === 0 && displayLead.priority === 'hot' && (
+                              <Badge className="bg-hot-lead text-white">
+                                🚨 TOP PRIORITY
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          <LeadCard
+                            lead={displayLead}
+                            onContact={onContact}
+                            onViewDetails={onViewDetails}
+                            onOpenNotificationPanel={onOpenNotificationPanel}
+                            onTaskCompleted={handleLocalTaskCompleted}
+                            onCommunicationSent={onCommunicationSent}
+                            isCondensed={false}
+                            isFocused={false}
+                          />
+                        </div>
+                      );
+                    })()}
                   </div>
-                );
-              })()}
+                ) : (
+                  <EmptyLeadState 
+                    hasLeadsInQuickList={leads.length > 0}
+                    onSelectFirstLead={leads.length > 0 ? () => {
+                      const firstLead = getFilteredAndSortedLeads(leadsByCategory[tabValue])[0] || leads[0];
+                      if (firstLead) {
+                        setSelectedLeadId(firstLead.id);
+                        setQuickListSelectedLead(firstLead);
+                        setShowQuickListDetail(true);
+                      }
+                    } : undefined}
+                  />
+                )}
+              </div>
             </div>
-          ) : (
-            <EmptyLeadState 
-              hasLeadsInQuickList={leads.length > 0}
-              onSelectFirstLead={leads.length > 0 ? () => {
-                const firstLead = getFilteredAndSortedLeads(leadsByCategory['all'])[0] || leads[0];
-                if (firstLead) {
-                  setSelectedLeadId(firstLead.id);
-                  setQuickListSelectedLead(firstLead);
-                  setShowQuickListDetail(true);
-                }
-              } : undefined}
-            />
-          )}
-        </div>
-      </div>
+          </TabsContent>
+        ))}
+      </Tabs>
     </div>
   );
 }
