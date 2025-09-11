@@ -102,8 +102,8 @@ export function InlineActionForm({
           </Button>
         </div>
 
-        {/* Work Plan Context */}
-        {workPlanItem && (
+        {/* Work Plan Context (hidden for text/email per request) */}
+        {workPlanItem && !(actionType === 'text' || actionType === 'email') && (
           <div className="bg-card border border-border rounded-lg p-3">
             <div className="flex items-start space-x-2 mb-2">
               <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
