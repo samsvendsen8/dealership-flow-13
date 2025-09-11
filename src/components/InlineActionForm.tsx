@@ -137,20 +137,21 @@ export function InlineActionForm({
             </div>
 
             {/* Custom AI Refinement */}
-            <div className="space-y-2">
+            <div className="bg-background/50 border border-border rounded-md p-3 space-y-2">
               <div className="flex items-center space-x-2">
                 <div className="bg-primary/10 p-1 rounded">
                   <MessageSquare className="h-3 w-3 text-primary" />
                 </div>
-                <p className="text-xs font-medium text-primary">Custom AI Refinement</p>
+                <p className="text-xs font-medium text-primary">Ask AI to modify response</p>
               </div>
+              <p className="text-xs text-muted-foreground">Tell the AI how to improve or change the suggested response</p>
               <Textarea
-                placeholder="refine AI response"
-                className="min-h-[50px] text-xs"
+                placeholder="e.g., make it more friendly, add pricing details, mention warranty..."
+                className="min-h-[50px] text-xs bg-background border-input"
               />
-              <Button variant="outline" size="sm" className="w-full h-8">
+              <Button size="sm" className="w-full h-8 bg-primary text-primary-foreground hover:bg-primary/90">
                 <MessageSquare className="h-3 w-3 mr-2" />
-                Refine with AI
+                Update Response with AI
               </Button>
             </div>
 
@@ -199,7 +200,7 @@ export function InlineActionForm({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
-            className="resize-none"
+            className="resize-none bg-background border-input"
           />
         </div>
 
