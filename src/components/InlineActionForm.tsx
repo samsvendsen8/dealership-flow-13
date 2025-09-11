@@ -6,6 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Phone, Mail, MessageSquare, CheckCircle, Clock, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Separator } from '@/components/ui/separator';
 
 interface InlineActionFormProps {
   actionType: 'call' | 'text' | 'email' | 'appointment';
@@ -104,6 +105,9 @@ export function InlineActionForm({
             </Button>
           </div>
         </div>
+
+        {/* Visual Separator */}
+        <Separator className="my-2" />
 
         {/* Work Plan Context Section */}
         {workPlanItem && !(actionType === 'text' || actionType === 'email') && (
