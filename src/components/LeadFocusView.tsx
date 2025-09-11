@@ -44,7 +44,7 @@ export function LeadFocusView({
     <div className="h-screen flex bg-background">
       {/* Navigation Sidebar */}
       <div className={cn(
-        "border-r border-border bg-muted/30 transition-all duration-300",
+        "border-r border-border bg-background transition-all duration-300",
         isNavCollapsed ? "w-16" : "w-80"
       )}>
         <div className="p-4 border-b border-border">

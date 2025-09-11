@@ -669,8 +669,6 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           />
         )}
 
-        <Separator className="my-6" />
-
         {/* AI Analysis & Insights - Moved Below */}
         <Collapsible open={isAnalysisOpen} onOpenChange={setIsAnalysisOpen} className="mt-4">
           <CollapsibleTrigger asChild>

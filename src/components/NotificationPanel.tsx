@@ -291,7 +291,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                 <button
                   onClick={() => setActiveMainTab('contact')}
                   className={cn(
-                    "flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors",
+                    "flex-1 py-1 px-2 h-7 text-xs font-medium rounded-md transition-colors",
                     activeMainTab === 'contact' 
                       ? "bg-background text-foreground shadow-sm" 
                       : "text-muted-foreground hover:text-foreground"
@@ -302,7 +302,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                 <button
                   onClick={() => setActiveMainTab('customer-info')}
                   className={cn(
-                    "flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors",
+                    "flex-1 py-1 px-2 h-7 text-xs font-medium rounded-md transition-colors",
                     activeMainTab === 'customer-info' 
                       ? "bg-background text-foreground shadow-sm" 
                       : "text-muted-foreground hover:text-foreground"
@@ -313,7 +313,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                 <button
                   onClick={() => setActiveMainTab('customer-history')}
                   className={cn(
-                    "flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors",
+                    "flex-1 py-1 px-2 h-7 text-xs font-medium rounded-md transition-colors",
                     activeMainTab === 'customer-history' 
                       ? "bg-background text-foreground shadow-sm" 
                       : "text-muted-foreground hover:text-foreground"
