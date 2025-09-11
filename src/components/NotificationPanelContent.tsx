@@ -238,7 +238,7 @@ export function NotificationPanelContent({ lead, onContact }: NotificationPanelC
     <div className="h-full">
       <ScrollArea className="h-full">
         {/* Sticky Header */}
-        <div className="sticky top-0 z-20 bg-background border-b border-border pb-4">
+        <div className="sticky top-0 z-20 bg-white border-b border-border pb-4">
           <div className="pt-2 px-4">
             {/* Header */}
             <div className="flex items-start justify-between mb-4">

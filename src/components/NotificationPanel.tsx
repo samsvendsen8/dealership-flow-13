@@ -257,36 +257,37 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
       {selectedLead ? (
         <ScrollArea className="h-full">
           <div className="p-6 space-y-6">
-            {/* Header with close button */}
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-primary/10">
-                    <User className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-foreground">{selectedLead.name}</h2>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge className={statusStyles[selectedLead.status]}>{selectedLead.status}</Badge>
-                      <Badge variant="outline" className={cn(
-                        "capitalize",
-                        selectedLead.priority === 'hot' && 'border-hot-lead text-hot-lead',
-                        selectedLead.priority === 'warm' && 'border-warm-lead text-warm-lead',
-                        selectedLead.priority === 'cold' && 'border-cold-lead text-cold-lead'
-                      )}>
-                        {selectedLead.priority} priority
-                      </Badge>
+            {/* Header + Tabs wrapper (white background) */}
+            <div className="bg-white border rounded-lg p-4 space-y-4">
+              {/* Header with close button */}
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-full bg-primary/10">
+                      <User className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-foreground">{selectedLead.name}</h2>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge className={statusStyles[selectedLead.status]}>{selectedLead.status}</Badge>
+                        <Badge variant="outline" className={cn(
+                          "capitalize",
+                          selectedLead.priority === 'hot' && 'border-hot-lead text-hot-lead',
+                          selectedLead.priority === 'warm' && 'border-warm-lead text-warm-lead',
+                          selectedLead.priority === 'cold' && 'border-cold-lead text-cold-lead'
+                        )}>
+                          {selectedLead.priority} priority
+                        </Badge>
+                      </div>
                     </div>
                   </div>
                 </div>
+                <Button variant="ghost" size="sm" onClick={onClose}>
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
-              <Button variant="ghost" size="sm" onClick={onClose}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
 
-            {/* Tab Navigation - moved up below user info */}
-            <div className="space-y-4">
+              {/* Tab Navigation */}
               <div className="flex gap-1 p-1 bg-white border rounded-lg">
                 <button
                   onClick={() => setActiveMainTab('contact')}
@@ -322,8 +323,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                   History
                 </button>
               </div>
-
-              {/* Contact Tab Content */}
+            </div>
               {activeMainTab === 'contact' && (
                 <div className="space-y-4">
                   {/* AI Response Section */}
@@ -665,7 +665,6 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                 </div>
               )}
             </div>
-          </div>
           {/* Bottom padding for send button */}
           <div className="pb-6" />
         </ScrollArea>
