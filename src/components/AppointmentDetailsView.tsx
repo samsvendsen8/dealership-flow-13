@@ -103,7 +103,7 @@ export function AppointmentDetailsView({
         </div>
       </CardHeader>
       
-      <CardContent className="p-3 sm:p-4 overflow-y-auto h-[calc(100vh-12rem)]">
+      <CardContent className="p-3 sm:p-4 overflow-y-auto h-[calc(100%-4rem)]">
         <div className="space-y-4">
           {/* Appointment Overview */}
           <Card>

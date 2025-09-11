@@ -131,7 +131,7 @@ export function TodaysAppointments({
         </div>
       </CardHeader>
       
-      <CardContent className="p-0 h-[calc(100vh-180px)] sm:h-[calc(100vh-200px)]">
+      <CardContent className="p-0 h-[calc(100%-4rem)]">
         <div className="space-y-1 px-2 sm:px-3 pb-2 overflow-y-auto h-full">
           {mockAppointments.map((appointment) => (
             <div

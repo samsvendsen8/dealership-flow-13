@@ -328,7 +328,7 @@ export function LeadsPriorityList({
             <div className="grid grid-cols-12 gap-6">
               {/* Sticky Quick List or Appointments Sidebar - 4 columns */}
               <div className="col-span-4">
-                <div className="sticky top-52 z-10 h-[calc(100vh-16rem)]">
+                <div className="sticky top-52 z-10 h-[calc(100vh-5rem)]">
                   {tabValue === 'appointments' ? (
                     <TodaysAppointments 
                       onAppointmentClick={(appointment) => {
