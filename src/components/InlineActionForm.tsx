@@ -88,7 +88,7 @@ export function InlineActionForm({
     <Card className="p-6 border-primary/20 bg-primary/5">
       <div className="space-y-6">
         {/* Customer Header Section */}
-        <div className="pb-4 border-b border-border/50">
+        <div className="pb-6 border-b-2 border-border">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="bg-primary/10 p-2 rounded-lg">
@@ -107,19 +107,21 @@ export function InlineActionForm({
 
         {/* Work Plan Context Section */}
         {workPlanItem && !(actionType === 'text' || actionType === 'email') && (
-          <div className="py-4 border-b border-border/50">
-            <div className="mb-3">
-              <h5 className="text-sm font-semibold text-foreground mb-1">Current Work Plan Step</h5>
-              <p className="text-xs text-muted-foreground">Why this action is needed</p>
+          <div className="py-6 border-b-2 border-border bg-muted/20">
+            <div className="mb-4">
+              <h5 className="text-base font-semibold text-foreground mb-2">Current Work Plan Step</h5>
+              <p className="text-sm text-muted-foreground">Why this action is needed</p>
             </div>
-            <div className="bg-card border border-border rounded-lg p-3">
-              <div className="flex items-start space-x-2">
-                <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
-                <div className="flex-1">
-                  <p className="font-medium text-sm">{workPlanItem.title}</p>
-                  <p className="text-xs text-muted-foreground">{workPlanItem.description}</p>
+            <div className="bg-card border-2 border-primary/20 rounded-lg p-4 shadow-sm">
+              <div className="flex items-start space-x-3">
+                <div className="bg-primary/10 p-2 rounded-lg">
+                  <Clock className="h-4 w-4 text-primary" />
                 </div>
-                <Badge variant="outline" className="text-xs">
+                <div className="flex-1">
+                  <p className="font-semibold text-sm text-foreground">{workPlanItem.title}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{workPlanItem.description}</p>
+                </div>
+                <Badge variant="outline" className="text-xs font-medium">
                   {workPlanItem.dueDate}
                 </Badge>
               </div>
