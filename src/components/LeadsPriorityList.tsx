@@ -11,6 +11,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { ThemeToggle } from '@/components/theme-toggle';
 import LeadCard, { type Lead } from './LeadCard';
 import { LeadsQuickList } from './LeadsQuickList';
+import { EmptyLeadState } from './EmptyLeadState';
 import { cn } from '@/lib/utils';
 
 interface LeadsPriorityListProps {
@@ -322,7 +323,7 @@ export function LeadsPriorityList({
                   setShowQuickListDetail(true);
                 }
               }}
-              selectedLeadId={selectedLeadId || (getFilteredAndSortedLeads(leadsByCategory['all']).length > 0 ? getFilteredAndSortedLeads(leadsByCategory['all'])[0].id : undefined)}
+              selectedLeadId={selectedLeadId}
               showDetailView={showQuickListDetail}
               selectedLead={quickListSelectedLead}
               onContact={onContact}
@@ -377,10 +378,17 @@ export function LeadsPriorityList({
               })()}
             </div>
           ) : (
-            <div className="text-center p-12 text-muted-foreground">
-              <h3 className="text-lg font-semibold mb-2">No leads found</h3>
-              <p>Try adjusting your search or filter criteria.</p>
-            </div>
+            <EmptyLeadState 
+              hasLeadsInQuickList={leads.length > 0}
+              onSelectFirstLead={leads.length > 0 ? () => {
+                const firstLead = getFilteredAndSortedLeads(leadsByCategory['all'])[0] || leads[0];
+                if (firstLead) {
+                  setSelectedLeadId(firstLead.id);
+                  setQuickListSelectedLead(firstLead);
+                  setShowQuickListDetail(true);
+                }
+              } : undefined}
+            />
           )}
         </div>
       </div>
