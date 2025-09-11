@@ -125,10 +125,13 @@ export function InlineActionForm({
             <div className="bg-card border border-border rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-2">
-                  <div className="bg-primary/10 p-1.5 rounded">
-                    <MessageSquare className="h-4 w-4 text-primary" />
+                  <div className="bg-blue-100 dark:bg-blue-900/50 p-1.5 rounded">
+                    <MessageSquare className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <h4 className="font-medium">Your Message</h4>
+                  <div>
+                    <h4 className="font-medium">AI-Generated Message</h4>
+                    <p className="text-xs text-muted-foreground">Edit as needed before sending</p>
+                  </div>
                 </div>
                 <Badge variant="secondary" className="text-xs">
                   {actionType === 'email' ? 'Email' : 'Text'}
@@ -144,45 +147,36 @@ export function InlineActionForm({
                 />
               </div>
 
-              {/* Quick Actions Row */}
-              <div className="flex items-center justify-between">
-                <div className="flex flex-wrap gap-1">
-                  <Button variant="outline" size="sm" className="text-xs h-7 px-3">
-                    Make Shorter
-                  </Button>
-                  <Button variant="outline" size="sm" className="text-xs h-7 px-3">
-                    Make Casual
-                  </Button>
-                  <Button variant="outline" size="sm" className="text-xs h-7 px-3">
-                    Add Urgency
-                  </Button>
+              {/* AI Refinement - Inline */}
+              <div className="bg-blue-50/50 dark:bg-blue-950/10 border border-blue-200/50 dark:border-blue-800/50 rounded-md p-3 mb-3 space-y-2">
+                <div className="flex items-center space-x-2">
+                  <div className="bg-blue-100 dark:bg-blue-900/50 p-1 rounded">
+                    <MessageSquare className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <p className="text-xs font-medium text-blue-800 dark:text-blue-200">Refine with AI</p>
                 </div>
-                
-                {/* AI Update - Now Secondary */}
-                <Button variant="ghost" size="sm" className="text-xs h-7 px-3 text-muted-foreground hover:text-foreground">
+                <Textarea
+                  placeholder="e.g., make it more friendly, add pricing details, mention warranty..."
+                  className="min-h-[40px] text-xs bg-background border-input"
+                />
+                <Button variant="outline" size="sm" className="h-7">
                   <MessageSquare className="h-3 w-3 mr-1" />
-                  Refine with AI
+                  Update Message
                 </Button>
               </div>
-            </div>
 
-            {/* AI Refinement (Collapsible) */}
-            <div className="bg-muted/20 border border-border rounded-md p-3 space-y-2 hidden">
-              <div className="flex items-center space-x-2">
-                <div className="bg-primary/10 p-1 rounded">
-                  <MessageSquare className="h-3 w-3 text-primary" />
-                </div>
-                <p className="text-xs font-medium">AI Refinement</p>
+              {/* Quick Actions */}
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" className="text-xs h-7 px-3">
+                  Make Shorter
+                </Button>
+                <Button variant="outline" size="sm" className="text-xs h-7 px-3">
+                  Make Casual
+                </Button>
+                <Button variant="outline" size="sm" className="text-xs h-7 px-3">
+                  Add Urgency
+                </Button>
               </div>
-              <p className="text-xs text-muted-foreground">Tell AI how to improve the message</p>
-              <Textarea
-                placeholder="e.g., make it more friendly, add pricing details, mention warranty..."
-                className="min-h-[50px] text-xs bg-background border-input"
-              />
-              <Button variant="outline" size="sm" className="h-7">
-                <MessageSquare className="h-3 w-3 mr-1" />
-                Update Message
-              </Button>
             </div>
 
             {/* Primary Send Action */}
