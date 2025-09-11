@@ -190,14 +190,15 @@ export function ToastNotification({
               )}
               
               {/* Custom AI Refinement Section */}
-              <div className="mt-3 pt-3 border-t border-border/30">
+              <div className="mt-3 pt-3 border-t border-border/30 bg-background/50 rounded-md p-3">
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles className="h-3 w-3 text-primary" />
-                  <span className="text-xs font-medium text-primary">Custom AI Refinement</span>
+                  <span className="text-xs font-medium text-primary">Ask AI to modify response</span>
                 </div>
+                <p className="text-xs text-muted-foreground mb-2">Tell the AI how to improve or change the suggested response</p>
                 <div className="space-y-2">
                   <textarea
-                    placeholder="refine AI response"
+                    placeholder="e.g., make it more friendly, add pricing details, mention warranty..."
                     value={aiInstructions}
                     onChange={(e) => {
                       setAiInstructions(e.target.value);
@@ -206,7 +207,7 @@ export function ToastNotification({
                       target.style.height = 'auto';
                       target.style.height = Math.min(target.scrollHeight, 72) + 'px';
                     }}
-                    className="w-full text-xs border border-input rounded-md px-3 py-2 resize-none overflow-hidden"
+                    className="w-full text-xs border border-input rounded-md px-3 py-2 resize-none overflow-hidden bg-background"
                     rows={1}
                     style={{
                       height: '40px',
@@ -219,8 +220,7 @@ export function ToastNotification({
                     size="sm"
                     onClick={refineWithAI}
                     disabled={isRefining || !aiInstructions.trim()}
-                    className="w-full gap-2"
-                    variant="outline"
+                    className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
                   >
                     {isRefining ? (
                       <>
@@ -230,7 +230,7 @@ export function ToastNotification({
                     ) : (
                       <>
                         <Sparkles className="h-3 w-3" />
-                        Refine with AI
+                        Update Response with AI
                       </>
                     )}
                   </Button>
