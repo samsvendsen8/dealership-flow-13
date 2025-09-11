@@ -287,7 +287,7 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
 
             {/* Tab Navigation - moved up below user info */}
             <div className="space-y-4">
-              <div className="flex gap-1 p-1 bg-background border rounded-lg">
+              <div className="flex gap-1 p-1 bg-white border rounded-lg">
                 <button
                   onClick={() => setActiveMainTab('contact')}
                   className={cn(
