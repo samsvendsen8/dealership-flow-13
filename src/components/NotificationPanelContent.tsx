@@ -626,25 +626,44 @@ export function NotificationPanelContent({ lead, onContact }: NotificationPanelC
             {/* History Tab */}
             {activeMainTab === 'customer-history' && (
               <div className="space-y-4">
-                {/* Simplified History View - Just show "History" header */}
-                <div className="flex items-center gap-2 mb-4">
-                  <h3 className="text-lg font-semibold">History</h3>
-                  <Badge variant="outline" className="text-xs">
-                    {historyData.length} activities
-                  </Badge>
+                {/* History Section Header and Scope Tabs */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-semibold">History</h3>
+                    <Badge variant="outline" className="text-xs">
+                      {historyData.length} activities
+                    </Badge>
+                  </div>
+
+                  {/* Deal vs Customer Scope Tabs */}
+                  <div className="flex gap-1 p-1 bg-muted rounded-lg">
+                    <button
+                      onClick={() => setHistoryScope('deal')}
+                      className={cn(
+                        "flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors",
+                        historyScope === 'deal' 
+                          ? "bg-background text-foreground shadow-sm" 
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      This Deal Only
+                    </button>
+                    <button
+                      onClick={() => setHistoryScope('customer')}
+                      className={cn(
+                        "flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors",
+                        historyScope === 'customer' 
+                          ? "bg-background text-foreground shadow-sm" 
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      Full Customer
+                    </button>
+                  </div>
                 </div>
 
                 {/* Customer History Timeline */}
                 <CustomerHistoryTimeline 
-                  leadId={lead.id}
-                  leadName={lead.name}
-                  filter={historyFilter}
-                  onFilterChange={setHistoryFilter}
-                  scope={historyScope}
-                />
-
-                {/* Timeline */}
-                <CustomerHistoryTimeline
                   leadId={lead.id}
                   leadName={lead.name}
                   filter={historyFilter}
