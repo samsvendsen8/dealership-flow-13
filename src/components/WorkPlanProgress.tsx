@@ -65,7 +65,7 @@ export function WorkPlanProgress({
   isExpanded = false 
 }: WorkPlanProgressProps) {
   const isViewingCurrentStage = !currentLeadStage || journeyStage.toLowerCase() === currentLeadStage.toLowerCase();
-  const stageOrder = ['engaged', 'visit', 'proposal', 'sold', 'delivered'];
+  const stageOrder = ['visit', 'proposal', 'sold', 'delivered'];
   const currentStageIndex = stageOrder.indexOf(currentLeadStage?.toLowerCase() || '');
   const viewingStageIndex = stageOrder.indexOf(journeyStage.toLowerCase());
   const isViewingCompletedStage = currentStageIndex !== -1 && viewingStageIndex !== -1 && viewingStageIndex < currentStageIndex;
