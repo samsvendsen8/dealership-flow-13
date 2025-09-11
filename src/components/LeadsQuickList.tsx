@@ -143,8 +143,8 @@ export function LeadsQuickList({
           </TooltipProvider>
         </div>
       </CardHeader>
-      <CardContent className="p-0 overflow-y-auto h-[calc(100vh-180px)] sm:h-[calc(100vh-200px)]">
-        <div className="space-y-1 px-2 sm:px-3 pb-2">
+      <CardContent className="p-0 h-[calc(100vh-180px)] sm:h-[calc(100vh-200px)]">
+        <div className="space-y-1 px-2 sm:px-3 pb-2 overflow-y-auto h-full">
             {leads.map((lead, index) => (
               <div
                 key={lead.id}

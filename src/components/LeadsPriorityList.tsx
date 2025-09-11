@@ -320,7 +320,7 @@ export function LeadsPriorityList({
             <div className="grid grid-cols-12 gap-6">
               {/* Sticky Quick List Sidebar - 4 columns */}
               <div className="col-span-4">
-                <div className="sticky top-52 z-10 h-[calc(100vh-16rem)] overflow-auto">
+                <div className="sticky top-52 z-10 h-[calc(100vh-16rem)]">
                   <LeadsQuickList 
                     leads={getFilteredAndSortedLeads(leadsByCategory[tabValue])}
                     onLeadClick={(leadId) => {

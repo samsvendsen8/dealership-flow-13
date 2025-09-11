@@ -10,7 +10,7 @@ interface EmptyLeadStateProps {
 export function EmptyLeadState({ hasLeadsInQuickList, onSelectFirstLead }: EmptyLeadStateProps) {
   if (hasLeadsInQuickList) {
     return (
-      <div className="flex items-center justify-center h-[calc(100vh-16rem)]">
+      <div className="flex items-start justify-center h-[calc(100vh-16rem)] pt-16">
         <Card className="p-8 max-w-md text-center bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
           <div className="mb-6">
             <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -46,7 +46,7 @@ export function EmptyLeadState({ hasLeadsInQuickList, onSelectFirstLead }: Empty
   }
 
   return (
-    <div className="flex items-center justify-center h-[calc(100vh-16rem)]">
+    <div className="flex items-start justify-center h-[calc(100vh-16rem)] pt-16">
       <Card className="p-8 max-w-md text-center">
         <div className="mb-6">
           <div className="bg-muted w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
