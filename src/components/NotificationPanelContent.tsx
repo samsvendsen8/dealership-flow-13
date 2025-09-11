@@ -565,7 +565,7 @@ export function NotificationPanelContent({ lead, onContact }: NotificationPanelC
                   <button
                     onClick={() => setHistoryScope('deal')}
                     className={cn(
-                      "flex-1 px-2 py-1 text-xs font-medium rounded-sm transition-colors",
+                      "flex-1 px-2 py-1 h-7 text-xs font-medium rounded-sm transition-colors",
                       historyScope === 'deal' 
                         ? "bg-background text-foreground shadow-sm" 
                         : "text-muted-foreground hover:text-foreground"
@@ -576,7 +576,7 @@ export function NotificationPanelContent({ lead, onContact }: NotificationPanelC
                   <button
                     onClick={() => setHistoryScope('customer')}
                     className={cn(
-                      "flex-1 px-2 py-1 text-xs font-medium rounded-sm transition-colors",
+                      "flex-1 px-2 py-1 h-7 text-xs font-medium rounded-sm transition-colors",
                       historyScope === 'customer' 
                         ? "bg-background text-foreground shadow-sm" 
                         : "text-muted-foreground hover:text-foreground"

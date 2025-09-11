@@ -520,7 +520,7 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           </div>
         </div>
         
-        <Separator className="my-3" />
+        <Separator className="my-6" />
 
         {/* Combined Work Plan & Customer Response Section */}
         <div className="mt-4 p-4 bg-primary/5 border border-primary/20 rounded-lg" onClick={(e) => e.stopPropagation()}>
@@ -669,7 +669,7 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
           />
         )}
 
-        <Separator className="my-4" />
+        <Separator className="my-6" />
 
         {/* AI Analysis & Insights - Moved Below */}
         <Collapsible open={isAnalysisOpen} onOpenChange={setIsAnalysisOpen} className="mt-4">
@@ -890,7 +890,7 @@ function LeadCard({ lead, onContact, onViewDetails, onOpenNotificationPanel, onT
 
         {/* Contact Preferences & History */}
         <div 
-          className="bg-muted/10 rounded-lg p-3 cursor-pointer hover:bg-muted/20 transition-colors"
+          className="bg-background border border-border rounded-lg p-3 cursor-pointer hover:bg-muted/10 transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             onViewDetails(lead.id);
