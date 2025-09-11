@@ -241,23 +241,25 @@ export function NotificationPanelContent({ lead, onContact }: NotificationPanelC
           {/* Header */}
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-primary/10">
-                  <User className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-foreground">{lead.name}</h2>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Badge className={statusStyles[lead.status]}>{lead.status}</Badge>
-                    <Badge variant="outline" className={cn(
-                      "capitalize",
-                      lead.priority === 'hot' && 'border-hot-lead text-hot-lead',
-                      lead.priority === 'warm' && 'border-warm-lead text-warm-lead',
-                      lead.priority === 'cold' && 'border-cold-lead text-cold-lead'
-                    )}>
-                      {lead.priority} priority
-                    </Badge>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-primary/10">
+                    <User className="h-5 w-5 text-primary" />
                   </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-foreground">{lead.name}</h2>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge className={statusStyles[lead.status]}>{lead.status}</Badge>
+                  <Badge variant="outline" className={cn(
+                    "capitalize",
+                    lead.priority === 'hot' && 'border-hot-lead text-hot-lead',
+                    lead.priority === 'warm' && 'border-warm-lead text-warm-lead',
+                    lead.priority === 'cold' && 'border-cold-lead text-cold-lead'
+                  )}>
+                    {lead.priority} priority
+                  </Badge>
                 </div>
               </div>
             </div>
@@ -627,20 +629,15 @@ export function NotificationPanelContent({ lead, onContact }: NotificationPanelC
             {activeMainTab === 'customer-history' && (
               <div className="space-y-4">
                 {/* History Section Header and Scope Tabs */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-semibold">History</h3>
-                    <Badge variant="outline" className="text-xs">
-                      {historyData.length} activities
-                    </Badge>
-                  </div>
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold">History</h3>
 
-                  {/* Deal vs Customer Scope Tabs */}
-                  <div className="flex gap-1 p-1 bg-muted rounded-lg">
+                  {/* Deal vs Customer Scope Tabs - Smaller */}
+                  <div className="flex gap-0.5 p-0.5 bg-muted rounded-md w-fit">
                     <button
                       onClick={() => setHistoryScope('deal')}
                       className={cn(
-                        "flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors",
+                        "px-2 py-1 text-xs font-medium rounded-sm transition-colors",
                         historyScope === 'deal' 
                           ? "bg-background text-foreground shadow-sm" 
                           : "text-muted-foreground hover:text-foreground"
@@ -651,7 +648,7 @@ export function NotificationPanelContent({ lead, onContact }: NotificationPanelC
                     <button
                       onClick={() => setHistoryScope('customer')}
                       className={cn(
-                        "flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors",
+                        "px-2 py-1 text-xs font-medium rounded-sm transition-colors",
                         historyScope === 'customer' 
                           ? "bg-background text-foreground shadow-sm" 
                           : "text-muted-foreground hover:text-foreground"
