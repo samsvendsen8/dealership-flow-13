@@ -118,64 +118,86 @@ export function InlineActionForm({
           </div>
         )}
 
-        {/* AI Response Interface */}
+        {/* Message Composer */}
         {(actionType === 'text' || actionType === 'email') && (
-          <div className="space-y-3">
-            {/* AI Suggested Response */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 dark:bg-blue-950/20 dark:border-blue-800">
-              <div className="flex items-center space-x-2 mb-2">
-                <div className="bg-blue-100 dark:bg-blue-900/50 p-1 rounded">
-                  <MessageSquare className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+          <div className="space-y-4">
+            {/* Message Content */}
+            <div className="bg-card border border-border rounded-lg p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-2">
+                  <div className="bg-primary/10 p-1.5 rounded">
+                    <MessageSquare className="h-4 w-4 text-primary" />
+                  </div>
+                  <h4 className="font-medium">Your Message</h4>
                 </div>
-                <p className="text-xs font-medium text-blue-800 dark:text-blue-200">AI Suggested Response:</p>
+                <Badge variant="secondary" className="text-xs">
+                  {actionType === 'email' ? 'Email' : 'Text'}
+                </Badge>
               </div>
-              <div className="bg-white dark:bg-gray-900/50 border border-blue-200 dark:border-blue-700 rounded-md p-2">
-                <p className="text-xs text-gray-700 dark:text-gray-300">
-                  Hi {leadName}, I noticed you were looking at the 2024 Tesla Model 3. I'm here to answer any questions and can schedule a test drive whenever convenient for you!
-                </p>
+              
+              {/* Message Preview */}
+              <div className="bg-muted/30 border border-border rounded-md p-3 mb-3">
+                <Textarea
+                  defaultValue={`Hi ${leadName}, I noticed you were looking at the 2024 Tesla Model 3. I'm here to answer any questions and can schedule a test drive whenever convenient for you!`}
+                  className="min-h-[80px] resize-none border-0 p-0 bg-transparent text-sm focus:ring-0"
+                  placeholder="Type your message here..."
+                />
+              </div>
+
+              {/* Quick Actions Row */}
+              <div className="flex items-center justify-between">
+                <div className="flex flex-wrap gap-1">
+                  <Button variant="outline" size="sm" className="text-xs h-7 px-3">
+                    Make Shorter
+                  </Button>
+                  <Button variant="outline" size="sm" className="text-xs h-7 px-3">
+                    Make Casual
+                  </Button>
+                  <Button variant="outline" size="sm" className="text-xs h-7 px-3">
+                    Add Urgency
+                  </Button>
+                </div>
+                
+                {/* AI Update - Now Secondary */}
+                <Button variant="ghost" size="sm" className="text-xs h-7 px-3 text-muted-foreground hover:text-foreground">
+                  <MessageSquare className="h-3 w-3 mr-1" />
+                  Refine with AI
+                </Button>
               </div>
             </div>
 
-            {/* Custom AI Refinement */}
-            <div className="bg-background/50 border border-border rounded-md p-3 space-y-2">
+            {/* AI Refinement (Collapsible) */}
+            <div className="bg-muted/20 border border-border rounded-md p-3 space-y-2 hidden">
               <div className="flex items-center space-x-2">
                 <div className="bg-primary/10 p-1 rounded">
                   <MessageSquare className="h-3 w-3 text-primary" />
                 </div>
-                <p className="text-xs font-medium text-primary">Ask AI to modify response</p>
+                <p className="text-xs font-medium">AI Refinement</p>
               </div>
-              <p className="text-xs text-muted-foreground">Tell the AI how to improve or change the suggested response</p>
+              <p className="text-xs text-muted-foreground">Tell AI how to improve the message</p>
               <Textarea
                 placeholder="e.g., make it more friendly, add pricing details, mention warranty..."
-                className="min-h-[50px] text-xs bg-white dark:bg-background border-input"
+                className="min-h-[50px] text-xs bg-background border-input"
               />
-              <Button size="sm" className="w-auto h-8 bg-primary text-primary-foreground hover:bg-primary/90">
-                <MessageSquare className="h-3 w-3 mr-2" />
-                Update Response with AI
+              <Button variant="outline" size="sm" className="h-7">
+                <MessageSquare className="h-3 w-3 mr-1" />
+                Update Message
               </Button>
             </div>
 
-            {/* Quick Edits */}
-            <div className="space-y-2">
-              <p className="text-xs text-muted-foreground">Quick edits:</p>
-              <div className="flex flex-wrap gap-1">
-                <Button variant="outline" size="sm" className="text-xs h-6 px-2">
-                  Make Shorter
-                </Button>
-                <Button variant="outline" size="sm" className="text-xs h-6 px-2">
-                  Make Casual
-                </Button>
-                <Button variant="outline" size="sm" className="text-xs h-6 px-2">
-                  Add Urgency
+            {/* Primary Send Action */}
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
+              <div className="flex items-center justify-between">
+                <div className="text-sm">
+                  <p className="font-medium text-primary">Ready to send</p>
+                  <p className="text-xs text-muted-foreground">This message will be sent to {leadName}</p>
+                </div>
+                <Button className="h-9 px-6">
+                  <Mail className="h-4 w-4 mr-2" />
+                  Send {actionType === 'email' ? 'Email' : 'Text'}
                 </Button>
               </div>
             </div>
-
-            {/* Send Button */}
-            <Button className="w-auto h-8">
-              <Mail className="h-4 w-4 mr-2" />
-              Send
-            </Button>
           </div>
         )}
 
