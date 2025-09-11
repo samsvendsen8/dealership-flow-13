@@ -147,9 +147,9 @@ export function InlineActionForm({
               <p className="text-xs text-muted-foreground">Tell the AI how to improve or change the suggested response</p>
               <Textarea
                 placeholder="e.g., make it more friendly, add pricing details, mention warranty..."
-                className="min-h-[50px] text-xs bg-background border-input"
+                className="min-h-[50px] text-xs bg-white dark:bg-background border-input"
               />
-              <Button size="sm" className="w-full h-8 bg-primary text-primary-foreground hover:bg-primary/90">
+              <Button size="sm" className="w-auto h-8 bg-primary text-primary-foreground hover:bg-primary/90">
                 <MessageSquare className="h-3 w-3 mr-2" />
                 Update Response with AI
               </Button>
@@ -172,23 +172,15 @@ export function InlineActionForm({
             </div>
 
             {/* Send Button */}
-            <Button className="w-full h-8">
+            <Button className="w-auto h-8">
               <Mail className="h-4 w-4 mr-2" />
               Send
             </Button>
           </div>
         )}
 
-        {/* Toast Message Content */}
-        <div className="bg-green-50 border border-green-200 rounded-lg p-3 dark:bg-green-950/20 dark:border-green-800">
-          <div className="flex items-start space-x-2">
-            <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 dark:text-green-400" />
-            <div>
-              <p className="font-medium text-green-800 dark:text-green-200 text-sm">Action Completed</p>
-              <p className="text-green-700 dark:text-green-300 text-xs">{actionLabels[actionType]} logged for {leadName}</p>
-            </div>
-          </div>
-        </div>
+        {/* Divider */}
+        <div className="border-t border-border"></div>
 
         {/* Notes Input */}
         <div>
@@ -200,7 +192,7 @@ export function InlineActionForm({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
-            className="resize-none bg-background border-input"
+            className="resize-none bg-white dark:bg-background border-input"
           />
         </div>
 
