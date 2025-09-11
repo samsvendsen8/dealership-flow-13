@@ -11,6 +11,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { ThemeToggle } from '@/components/theme-toggle';
 import LeadCard, { type Lead } from './LeadCard';
 import { LeadsQuickList } from './LeadsQuickList';
+import { TodaysAppointments } from './TodaysAppointments';
+import { AppointmentDetailsView } from './AppointmentDetailsView';
 import { EmptyLeadState } from './EmptyLeadState';
 import { cn } from '@/lib/utils';
 
@@ -51,6 +53,9 @@ export function LeadsPriorityList({
   const [selectedLeadId, setSelectedLeadId] = useState<string | undefined>();
   const [showQuickListDetail, setShowQuickListDetail] = useState(false);
   const [quickListSelectedLead, setQuickListSelectedLead] = useState<Lead | undefined>();
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | undefined>();
+  const [showAppointmentDetail, setShowAppointmentDetail] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(undefined);
   const [activeTab, setActiveTab] = useState('all');
 
   // Handle task completion - auto-advance to next lead
@@ -75,6 +80,9 @@ export function LeadsPriorityList({
     setSelectedLeadId(undefined);
     setShowQuickListDetail(false);
     setQuickListSelectedLead(undefined);
+    setSelectedAppointmentId(undefined);
+    setShowAppointmentDetail(false);
+    setSelectedAppointment(undefined);
   };
 
   // Priority scoring function
@@ -318,36 +326,69 @@ export function LeadsPriorityList({
         {(['all', 'prospects', 'delivered', 'lease-retention', 'appointments'] as const).map((tabValue) => (
           <TabsContent key={tabValue} value={tabValue}>
             <div className="grid grid-cols-12 gap-6">
-              {/* Sticky Quick List Sidebar - 4 columns */}
+              {/* Sticky Quick List or Appointments Sidebar - 4 columns */}
               <div className="col-span-4">
                 <div className="sticky top-52 z-10 h-[calc(100vh-16rem)]">
-                  <LeadsQuickList 
-                    leads={getFilteredAndSortedLeads(leadsByCategory[tabValue])}
-                    onLeadClick={(leadId) => {
-                      const clickedLead = getFilteredAndSortedLeads(leadsByCategory[tabValue]).find(lead => lead.id === leadId);
-                      if (clickedLead) {
-                        setSelectedLeadId(leadId);
-                        setQuickListSelectedLead(clickedLead);
-                        setShowQuickListDetail(true);
-                      }
-                    }}
-                    selectedLeadId={selectedLeadId}
-                    showDetailView={showQuickListDetail}
-                    selectedLead={quickListSelectedLead}
-                    onContact={onContact}
-                    onViewDetails={onViewDetails}
-                    onBackToList={() => {
-                      setShowQuickListDetail(false);
-                      setQuickListSelectedLead(undefined);
-                    }}
-                  />
+                  {tabValue === 'appointments' ? (
+                    <TodaysAppointments 
+                      onAppointmentClick={(appointment) => {
+                        setSelectedAppointmentId(appointment.id);
+                        setSelectedAppointment(appointment);
+                        setShowAppointmentDetail(true);
+                        // Clear lead selection when showing appointment
+                        setSelectedLeadId(undefined);
+                        setShowQuickListDetail(false);
+                      }}
+                      selectedAppointmentId={selectedAppointmentId}
+                      onScheduleNew={() => {
+                        // Handle schedule new appointment
+                        console.log('Schedule new appointment');
+                      }}
+                    />
+                  ) : (
+                    <LeadsQuickList 
+                      leads={getFilteredAndSortedLeads(leadsByCategory[tabValue])}
+                      onLeadClick={(leadId) => {
+                        const clickedLead = getFilteredAndSortedLeads(leadsByCategory[tabValue]).find(lead => lead.id === leadId);
+                        if (clickedLead) {
+                          setSelectedLeadId(leadId);
+                          setQuickListSelectedLead(clickedLead);
+                          setShowQuickListDetail(true);
+                          // Clear appointment selection when showing lead
+                          setSelectedAppointmentId(undefined);
+                          setShowAppointmentDetail(false);
+                        }
+                      }}
+                      selectedLeadId={selectedLeadId}
+                      showDetailView={showQuickListDetail}
+                      selectedLead={quickListSelectedLead}
+                      onContact={onContact}
+                      onViewDetails={onViewDetails}
+                      onBackToList={() => {
+                        setShowQuickListDetail(false);
+                        setQuickListSelectedLead(undefined);
+                      }}
+                    />
+                  )}
                 </div>
               </div>
 
-              {/* Single Card Focus Area - 8 columns */}
+              {/* Single Card Focus Area or Appointment Details - 8 columns */}
               <div className="col-span-8">
                 <div className="sticky top-16 h-[calc(100vh-5rem)] overflow-hidden">
-                  {selectedLeadId && getFilteredAndSortedLeads(leadsByCategory[tabValue]).length > 0 ? (
+                  {tabValue === 'appointments' && showAppointmentDetail && selectedAppointment ? (
+                    <AppointmentDetailsView 
+                      appointment={selectedAppointment}
+                      onBack={() => {
+                        setShowAppointmentDetail(false);
+                        setSelectedAppointment(undefined);
+                      }}
+                      onContact={(method) => {
+                        // Handle contact for appointment
+                        console.log(`Contact appointment customer via ${method}`);
+                      }}
+                    />
+                  ) : selectedLeadId && getFilteredAndSortedLeads(leadsByCategory[tabValue]).length > 0 ? (
                     <div className="h-full">
                       {(() => {
                         const currentLeads = getFilteredAndSortedLeads(leadsByCategory[tabValue]);
@@ -401,15 +442,15 @@ export function LeadsPriorityList({
                     </div>
                   ) : (
                     <EmptyLeadState 
-                      hasLeadsInQuickList={getFilteredAndSortedLeads(leadsByCategory[tabValue]).length > 0}
-                      onSelectFirstLead={getFilteredAndSortedLeads(leadsByCategory[tabValue]).length > 0 ? () => {
+                      hasLeadsInQuickList={tabValue === 'appointments' ? true : getFilteredAndSortedLeads(leadsByCategory[tabValue]).length > 0}
+                      onSelectFirstLead={tabValue === 'appointments' ? undefined : (getFilteredAndSortedLeads(leadsByCategory[tabValue]).length > 0 ? () => {
                         const firstLead = getFilteredAndSortedLeads(leadsByCategory[tabValue])[0];
                         if (firstLead) {
                           setSelectedLeadId(firstLead.id);
                           setQuickListSelectedLead(firstLead);
                           setShowQuickListDetail(true);
                         }
-                      } : undefined}
+                      } : undefined)}
                     />
                   )}
                 </div>

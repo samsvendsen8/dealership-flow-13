@@ -173,13 +173,6 @@ export function LeadsQuickList({
                     'bg-muted-foreground/30'
                   )} />
                 </div>
-
-                {/* Selection indicator */}
-                {selectedLeadId === lead.id && (
-                  <div className="absolute -right-1 top-1/2 transform -translate-y-1/2">
-                    <div className="w-2 h-2 bg-primary rounded-full border border-background"></div>
-                  </div>
-                )}
                 
                 <div className="space-y-1 sm:space-y-0.5">
                   {/* Header Row */}
