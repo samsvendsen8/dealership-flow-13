@@ -237,36 +237,37 @@ export function NotificationPanelContent({ lead, onContact }: NotificationPanelC
   return (
     <div className="h-full">
       <ScrollArea className="h-full">
-        <div className="p-4 pt-2 space-y-4">
-          {/* Header */}
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-primary/10">
-                    <User className="h-5 w-5 text-primary" />
+        {/* Sticky Header */}
+        <div className="sticky top-0 z-20 bg-background border-b border-border pb-4">
+          <div className="pt-2 px-4">
+            {/* Header */}
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-full bg-primary/10">
+                      <User className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-foreground">{lead.name}</h2>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-foreground">{lead.name}</h2>
+                  <div className="flex items-center gap-2">
+                    <Badge className={statusStyles[lead.status]}>{lead.status}</Badge>
+                    <Badge variant="outline" className={cn(
+                      "capitalize",
+                      lead.priority === 'hot' && 'border-hot-lead text-hot-lead',
+                      lead.priority === 'warm' && 'border-warm-lead text-warm-lead',
+                      lead.priority === 'cold' && 'border-cold-lead text-cold-lead'
+                    )}>
+                      {lead.priority} priority
+                    </Badge>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge className={statusStyles[lead.status]}>{lead.status}</Badge>
-                  <Badge variant="outline" className={cn(
-                    "capitalize",
-                    lead.priority === 'hot' && 'border-hot-lead text-hot-lead',
-                    lead.priority === 'warm' && 'border-warm-lead text-warm-lead',
-                    lead.priority === 'cold' && 'border-cold-lead text-cold-lead'
-                  )}>
-                    {lead.priority} priority
-                  </Badge>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Tab Navigation */}
-          <div className="space-y-4">
+            {/* Tab Navigation */}
             <div className="flex gap-1 p-1 bg-muted rounded-lg">
               <button
                 onClick={() => setActiveMainTab('contact')}
@@ -302,373 +303,300 @@ export function NotificationPanelContent({ lead, onContact }: NotificationPanelC
                 History
               </button>
             </div>
+          </div>
+        </div>
 
-            {/* Contact Tab Content */}
-            {activeMainTab === 'contact' && (
-              <div className="space-y-4">
-                {/* AI Response Section */}
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base">AI Suggested Response</CardTitle>
-                    <p className="text-xs text-muted-foreground">
-                      Method: {contactMethod === 'phone' ? 'Phone Call' : contactMethod === 'email' ? 'Email' : 'Text Message'}
-                    </p>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="p-3 bg-muted/50 rounded-lg text-sm whitespace-pre-line">
-                      {currentAIResponse}
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-muted-foreground">Your Response</label>
-                      <textarea
-                        value={responseText}
-                        onChange={(e) => setResponseText(e.target.value)}
-                        placeholder={`Edit the AI suggestion or write your own ${contactMethod || 'text'} message...`}
-                        className="w-full p-3 border border-input rounded-lg text-sm resize-none"
-                        rows={4}
-                      />
-                    </div>
-
-                    {/* Quick AI Edit Actions */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {[
-                        "Quick check-in about test drive",
-                        "Follow up on financing options", 
-                        "Schedule appointment this week",
-                        "Send vehicle pricing details"
-                      ].map((quickEdit, index) => (
-                        <Button
-                          key={index}
-                          variant="outline"
-                          size="sm"
-                          className="text-xs h-8"
-                          onClick={() => setResponseText(quickEdit)}
-                        >
-                          {quickEdit}
-                        </Button>
-                      ))}
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Button 
-                        className="flex-1 gap-2 bg-gradient-primary hover:opacity-90"
-                        onClick={async () => {
-                          const messageToSend = responseText.trim() || currentAIResponse;
-                          if (messageToSend) {
-                            try {
-                              await sendMessage(
-                                lead.id,
-                                messageToSend,
-                                contactMethod === 'phone' ? 'call' : contactMethod === 'email' ? 'email' : 'text',
-                                lead.journeyStage
-                              );
-                              
-                              toast({
-                                title: "Message Sent",
-                                description: `Your ${contactMethod} message has been sent to ${lead.name}.`,
-                              });
-                              
-                              setResponseText('');
-                            } catch (error) {
-                              toast({
-                                title: "Error",
-                                description: "Failed to send message. Please try again.",
-                                variant: "destructive",
-                              });
-                            }
-                          }
-                        }}
-                        disabled={isLoading}
-                      >
-                        <Send className="h-4 w-4" />
-                        {isLoading ? 'Sending...' : 'Send Message'}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Quick Contact Actions */}
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Quick Actions</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="gap-2"
-                        onClick={() => handleContactMethodClick('phone')}
-                      >
-                        <Phone className="h-4 w-4" />
-                        Call
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="gap-2"
-                        onClick={() => handleContactMethodClick('text')}
-                      >
-                        <MessageCircle className="h-4 w-4" />
-                        Text
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="gap-2"
-                        onClick={() => handleContactMethodClick('email')}
-                      >
-                        <Mail className="h-4 w-4" />
-                        Email
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="gap-2"
-                        onClick={() => handleContactMethodClick('appointment')}
-                      >
-                        <Calendar className="h-4 w-4" />
-                        Schedule
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Message History */}
-                <MessageHistory leadId={lead.id} />
-              </div>
-            )}
-
-            {/* Customer Info Tab */}
-            {activeMainTab === 'customer-info' && (
-              <div className="space-y-4">
-                {/* Lead Summary */}
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Lead Summary</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                        <label className="text-xs font-medium text-muted-foreground">Vehicle Interest</label>
-                        <div className="flex items-center gap-2">
-                          <Car className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">{lead.vehicle}</span>
-                        </div>
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-xs font-medium text-muted-foreground">Deal Value</label>
-                        <div className="flex items-center gap-2">
-                          <DollarSign className="h-4 w-4 text-success" />
-                          <span className="text-sm font-medium text-success">
-                            ${lead.value.toLocaleString()}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    {/* Quick Actions */}
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-medium">Quick Actions</h4>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Button variant="outline" size="sm" className="gap-2">
-                          <Phone className="h-4 w-4" />
-                          Call Customer
-                        </Button>
-                        <Button variant="outline" size="sm" className="gap-2">
-                          <MessageCircle className="h-4 w-4" />
-                          Send Text
-                        </Button>
-                        <Button variant="outline" size="sm" className="gap-2">
-                          <Mail className="h-4 w-4" />
-                          Send Email
-                        </Button>
-                        <Button variant="outline" size="sm" className="gap-2">
-                          <Calendar className="h-4 w-4" />
-                          Schedule
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Sub-tabs for detailed info */}
-                <div className="space-y-4">
-                  <div className="flex gap-1 p-1 bg-muted rounded-lg">
-                    <button
-                      onClick={() => setActiveSubTab('overview')}
-                      className={cn(
-                        "flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors",
-                        activeSubTab === 'overview' 
-                          ? "bg-background text-foreground shadow-sm" 
-                          : "text-muted-foreground hover:text-foreground"
-                      )}
-                    >
-                      Overview
-                    </button>
-                    <button
-                      onClick={() => setActiveSubTab('notes')}
-                      className={cn(
-                        "flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors",
-                        activeSubTab === 'notes' 
-                          ? "bg-background text-foreground shadow-sm" 
-                          : "text-muted-foreground hover:text-foreground"
-                      )}
-                    >
-                      Notes
-                    </button>
+        {/* Tab Content */}
+        <div className="px-4 pt-4 space-y-4">
+          {/* Contact Tab Content */}
+          {activeMainTab === 'contact' && (
+            <div className="space-y-4">
+              {/* AI Response Section */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">AI Suggested Response</CardTitle>
+                  <p className="text-xs text-muted-foreground">
+                    Method: {contactMethod === 'phone' ? 'Phone Call' : contactMethod === 'email' ? 'Email' : 'Text Message'}
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="p-3 bg-muted/50 rounded-lg text-sm whitespace-pre-line">
+                    {currentAIResponse}
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium text-muted-foreground">Your Response</label>
+                    <textarea
+                      value={responseText}
+                      onChange={(e) => setResponseText(e.target.value)}
+                      placeholder={`Edit the AI suggestion or write your own ${contactMethod || 'text'} message...`}
+                      className="w-full p-3 border border-input rounded-lg text-sm resize-none"
+                      rows={4}
+                    />
                   </div>
 
-                  {activeSubTab === 'overview' && (
-                    <Card>
-                      <CardContent className="p-4 space-y-4">
-                        {/* Customer Details */}
-                        <div className="space-y-3">
-                          <h4 className="text-sm font-medium">Customer Information</h4>
-                          <div className="space-y-2">
-                            <div className="flex justify-between">
-                              <span className="text-xs text-muted-foreground">Email</span>
-                              <span className="text-xs">{lead.email || 'Not provided'}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-xs text-muted-foreground">Phone</span>
-                              <span className="text-xs">{lead.phone || 'Not provided'}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-xs text-muted-foreground">Preferred Contact</span>
-                              <span className="text-xs capitalize">{lead.preferredContact || 'Phone'}</span>
-                            </div>
-                          </div>
-                        </div>
+                  {/* Quick AI Edit Actions */}
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {[
+                      "Quick check-in about test drive",
+                      "Follow up on financing options", 
+                      "Schedule appointment this week",
+                      "Send vehicle pricing details"
+                    ].map((quickEdit, index) => (
+                      <Button
+                        key={index}
+                        variant="outline"
+                        size="sm"
+                        className="text-xs h-8"
+                        onClick={() => setResponseText(quickEdit)}
+                      >
+                        {quickEdit}
+                      </Button>
+                    ))}
+                  </div>
 
-                        <Separator />
+                  <div className="flex gap-2">
+                    <Button 
+                      className="flex-1 gap-2 bg-gradient-primary hover:opacity-90"
+                      onClick={async () => {
+                        const messageToSend = responseText.trim() || currentAIResponse;
+                        if (messageToSend) {
+                          try {
+                            await sendMessage(
+                              lead.id,
+                              messageToSend,
+                              contactMethod === 'phone' ? 'call' : contactMethod === 'email' ? 'email' : 'text',
+                              lead.journeyStage
+                            );
+                            
+                            toast({
+                              title: "Message Sent",
+                              description: `Your ${contactMethod} message has been sent to ${lead.name}.`,
+                            });
+                            
+                            setResponseText('');
+                          } catch (error) {
+                            toast({
+                              title: "Error",
+                              description: "Failed to send message. Please try again.",
+                              variant: "destructive",
+                            });
+                          }
+                        }
+                      }}
+                      disabled={isLoading}
+                    >
+                      <Send className="h-4 w-4" />
+                      {isLoading ? 'Sending...' : 'Send Message'}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
 
-                        {/* Deal Information */}
-                        <div className="space-y-3">
-                          <h4 className="text-sm font-medium">Deal Information</h4>
-                          <div className="space-y-2">
-                            <div className="flex justify-between">
-                              <span className="text-xs text-muted-foreground">Deal Probability</span>
-                              <span className="text-xs font-medium">{lead.dealProbability}%</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-xs text-muted-foreground">Last Activity</span>
-                              <span className="text-xs">{lead.lastActivity}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-xs text-muted-foreground">Journey Stage</span>
-                              <Badge variant="outline" className="text-xs">{lead.journeyStage}</Badge>
-                            </div>
-                          </div>
-                        </div>
+              {/* Quick Contact Actions */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Quick Actions</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button 
+                      variant="outline" 
+                      className="gap-2"
+                      onClick={() => handleContactMethodClick('phone')}
+                    >
+                      <Phone className="h-4 w-4" />
+                      Call
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="gap-2"
+                      onClick={() => handleContactMethodClick('text')}
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      Text
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="gap-2"
+                      onClick={() => handleContactMethodClick('email')}
+                    >
+                      <Mail className="h-4 w-4" />
+                      Email
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="gap-2"
+                      onClick={() => handleContactMethodClick('appointment')}
+                    >
+                      <Calendar className="h-4 w-4" />
+                      Appointment
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
-                        {/* Journey Progress */}
-                        {lead.journeyStage && (
-                          <>
-                            <Separator />
-                            <div className="space-y-2">
-                              <h4 className="text-sm font-medium">Journey Progress</h4>
-                              <JourneyAdvanceButton
-                                currentStage={lead.journeyStage}
-                                leadId={lead.id}
-                                leadName={lead.name}
-                                leadStatus={lead.status}
-                                hasCustomerReplied={true}
-                                onStageAdvanced={() => {}}
-                              />
-                            </div>
-                          </>
-                        )}
-
-                        {/* Work Plan Progress */}
-                        {lead.workPlan && (
-                          <>
-                            <Separator />
-                            <div className="space-y-2">
-                              <h4 className="text-sm font-medium">Work Plan</h4>
-                              <WorkPlanProgress 
-                                tasks={lead.workPlan}
-                                journeyStage={lead.journeyStage}
-                              />
-                            </div>
-                          </>
-                        )}
-                      </CardContent>
-                    </Card>
+          {/* Details Tab */}
+          {activeMainTab === 'customer-info' && (
+            <div className="space-y-4">
+              <div className="flex gap-1 p-1 bg-muted rounded-lg">
+                <button
+                  onClick={() => setActiveSubTab('overview')}
+                  className={cn(
+                    "flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors",
+                    activeSubTab === 'overview' 
+                      ? "bg-background text-foreground shadow-sm" 
+                      : "text-muted-foreground hover:text-foreground"
                   )}
+                >
+                  Overview
+                </button>
+                <button
+                  onClick={() => setActiveSubTab('notes')}
+                  className={cn(
+                    "flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors",
+                    activeSubTab === 'notes' 
+                      ? "bg-background text-foreground shadow-sm" 
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Notes
+                </button>
+              </div>
 
-                  {activeSubTab === 'notes' && (
-                    <Card>
-                      <CardContent className="p-4">
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <h4 className="text-sm font-medium">Customer Notes</h4>
-                            <Button variant="outline" size="sm" className="gap-2">
-                              <Edit3 className="h-3 w-3" />
-                              Edit
-                            </Button>
+              {activeSubTab === 'overview' && (
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="space-y-4">
+                      {/* Customer Info */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <h4 className="text-sm font-medium mb-2">Contact Information</h4>
+                          <div className="space-y-1 text-sm text-muted-foreground">
+                            <p>{lead.email}</p>
+                            <p>{lead.phone}</p>
                           </div>
-                          <textarea
-                            placeholder="Add notes about this customer..."
-                            className="w-full p-3 border border-input rounded-lg text-sm resize-none"
-                            rows={6}
-                            defaultValue={`Initial interest in ${lead.vehicle}. Customer mentioned they need a reliable family vehicle. Budget appears flexible based on features. Good candidate for extended warranty discussion.`}
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-medium mb-2">Vehicle Interest</h4>
+                          <div className="space-y-1 text-sm text-muted-foreground">
+                            <p>{lead.vehicle}</p>
+                            <p>${lead.value?.toLocaleString()}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <Separator />
+
+                      {/* Journey Stage */}
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium">Journey Stage</h4>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">
+                            {lead.journeyStage}
+                          </Badge>
+                          <JourneyAdvanceButton 
+                            currentStage={lead.journeyStage}
+                            leadId={lead.id}
+                            leadName={lead.name}
+                            leadStatus={lead.status}
+                            hasCustomerReplied={false}
+                            onStageAdvanced={() => {
+                              toast({
+                                title: "Journey Stage Advanced",
+                                description: `Lead moved to next stage.`,
+                              });
+                            }}
                           />
                         </div>
-                      </CardContent>
-                    </Card>
-                  )}
+                      </div>
+
+                      {/* Work Plan Progress */}
+                      {lead.workPlan && (
+                        <>
+                          <Separator />
+                          <div className="space-y-2">
+                            <h4 className="text-sm font-medium">Work Plan</h4>
+                            <WorkPlanProgress 
+                              tasks={lead.workPlan}
+                              journeyStage={lead.journeyStage}
+                            />
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {activeSubTab === 'notes' && (
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-sm font-medium">Customer Notes</h4>
+                        <Button variant="outline" size="sm" className="gap-2">
+                          <Edit3 className="h-3 w-3" />
+                          Edit
+                        </Button>
+                      </div>
+                      <textarea
+                        placeholder="Add notes about this customer..."
+                        className="w-full p-3 border border-input rounded-lg text-sm resize-none"
+                        rows={6}
+                        defaultValue={`Initial interest in ${lead.vehicle}. Customer mentioned they need a reliable family vehicle. Budget appears flexible based on features. Good candidate for extended warranty discussion.`}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+
+          {/* History Tab */}
+          {activeMainTab === 'customer-history' && (
+            <div className="space-y-4">
+              {/* History Section Scope Tabs */}
+              <div className="space-y-2">
+                {/* Deal vs Customer Scope Tabs - Full Width */}
+                <div className="flex gap-0.5 p-0.5 bg-muted rounded-md">
+                  <button
+                    onClick={() => setHistoryScope('deal')}
+                    className={cn(
+                      "flex-1 px-2 py-1 text-xs font-medium rounded-sm transition-colors",
+                      historyScope === 'deal' 
+                        ? "bg-background text-foreground shadow-sm" 
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    This Deal Only
+                  </button>
+                  <button
+                    onClick={() => setHistoryScope('customer')}
+                    className={cn(
+                      "flex-1 px-2 py-1 text-xs font-medium rounded-sm transition-colors",
+                      historyScope === 'customer' 
+                        ? "bg-background text-foreground shadow-sm" 
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    Full Customer
+                  </button>
                 </div>
               </div>
-            )}
 
-            {/* History Tab */}
-            {activeMainTab === 'customer-history' && (
-              <div className="space-y-4">
-                {/* History Section Scope Tabs */}
-                <div className="space-y-2">
-
-                  {/* Deal vs Customer Scope Tabs - Smaller */}
-                  <div className="flex gap-0.5 p-0.5 bg-muted rounded-md w-fit">
-                    <button
-                      onClick={() => setHistoryScope('deal')}
-                      className={cn(
-                        "px-2 py-1 text-xs font-medium rounded-sm transition-colors",
-                        historyScope === 'deal' 
-                          ? "bg-background text-foreground shadow-sm" 
-                          : "text-muted-foreground hover:text-foreground"
-                      )}
-                    >
-                      This Deal Only
-                    </button>
-                    <button
-                      onClick={() => setHistoryScope('customer')}
-                      className={cn(
-                        "px-2 py-1 text-xs font-medium rounded-sm transition-colors",
-                        historyScope === 'customer' 
-                          ? "bg-background text-foreground shadow-sm" 
-                          : "text-muted-foreground hover:text-foreground"
-                      )}
-                    >
-                      Full Customer
-                    </button>
-                  </div>
-                </div>
-
-                {/* Customer History Timeline */}
-                <CustomerHistoryTimeline 
-                  leadId={lead.id}
-                  leadName={lead.name}
-                  filter={historyFilter}
-                  onFilterChange={setHistoryFilter}
-                  scope={historyScope}
-                />
-              </div>
-            )}
-          </div>
+              {/* Customer History Timeline */}
+              <CustomerHistoryTimeline 
+                leadId={lead.id}
+                leadName={lead.name}
+                filter={historyFilter}
+                onFilterChange={setHistoryFilter}
+                scope={historyScope}
+              />
+            </div>
+          )}
         </div>
       </ScrollArea>
 
