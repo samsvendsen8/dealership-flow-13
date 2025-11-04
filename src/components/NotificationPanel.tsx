@@ -287,7 +287,132 @@ export function NotificationPanel({ isOpen, onClose, selectedLead, onContact, co
                   <X className="h-4 w-4" />
                 </Button>
               </div>
+            </div>
 
+            {/* Dashboard Sections */}
+            <div className="space-y-4">
+              {/* Quick Response Section */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                      <MessageCircle className="h-4 w-4 text-primary" />
+                      Quick Response
+                    </CardTitle>
+                    <Badge variant="secondary" className="text-xs">2 New</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="p-3 bg-muted/30 rounded-lg space-y-1">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium">{selectedLead.name}</p>
+                      <Badge variant="destructive" className="text-xs">New</Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{selectedLead.vehicle}</p>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        5m
+                      </span>
+                      <Button size="sm" className="h-7 text-xs">Respond</Button>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
+                    <span>Avg Response Time: 4.2 min</span>
+                    <span className="text-green-600">SLA Target: ✓ &lt; 5 min</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Appointments Section */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-primary" />
+                      Appointments
+                    </CardTitle>
+                    <Button variant="ghost" size="sm" className="h-7 text-xs">Schedule New</Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="p-3 bg-muted/30 rounded-lg space-y-1">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium">{selectedLead.name}</p>
+                      <Badge variant="outline" className="text-xs">confirmed</Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      Today 2:00 PM • Test Drive
+                    </p>
+                    <p className="text-xs text-muted-foreground">{selectedLead.vehicle}</p>
+                  </div>
+                  <div className="text-xs text-muted-foreground pt-1">
+                    Show Rate (30d): <span className="font-medium">72%</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Quick Log Section */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-semibold">Quick Log</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button className="p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+                      <Phone className="h-4 w-4 mx-auto mb-1 text-primary" />
+                      <p className="text-xs font-medium">Log Call</p>
+                    </button>
+                    <button className="p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+                      <MessageCircle className="h-4 w-4 mx-auto mb-1 text-primary" />
+                      <p className="text-xs font-medium">Log Text</p>
+                    </button>
+                    <button className="p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+                      <User className="h-4 w-4 mx-auto mb-1 text-primary" />
+                      <p className="text-xs font-medium">Walk-in</p>
+                    </button>
+                    <button className="p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+                      <Car className="h-4 w-4 mx-auto mb-1 text-primary" />
+                      <p className="text-xs font-medium">Test Drive</p>
+                    </button>
+                    <button className="p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+                      <DollarSign className="h-4 w-4 mx-auto mb-1 text-primary" />
+                      <p className="text-xs font-medium">Quote Sent</p>
+                    </button>
+                    <button className="p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+                      <CheckCircle className="h-4 w-4 mx-auto mb-1 text-primary" />
+                      <p className="text-xs font-medium">Note</p>
+                    </button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Vehicle Inventory Section */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm font-semibold">Vehicle Inventory</CardTitle>
+                    <span className="text-xs text-muted-foreground">24 Available</span>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="p-3 bg-muted/30 rounded-lg">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-sm font-medium">{selectedLead.vehicle}</p>
+                      <Badge variant="outline" className="text-xs">available</Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Sport • #H24001 • Board A3</p>
+                    <div className="flex justify-end mt-2">
+                      <Button variant="outline" size="sm" className="h-7 text-xs">Details</Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Tab Navigation Container */}
+            <div className="bg-white border rounded-lg p-4">
               {/* Tab Navigation */}
               <div className="flex gap-1 p-1 bg-white border rounded-lg">
                 <button
